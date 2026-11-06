@@ -48,7 +48,7 @@ public class MediaScannerPlugin extends Plugin {
         JSArray video = new JSArray();
         ContentResolver r = getContext().getContentResolver();
         String[] ap = {MediaStore.Audio.Media._ID, MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DURATION};
+            MediaStore.Audio.Media.ALBUM, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DURATION, MediaStore.Audio.Media.DATE_ADDED};
         try (Cursor c = r.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, ap,
                 MediaStore.Audio.Media.DURATION + ">=30000", null, MediaStore.Audio.Media.DATE_ADDED + " DESC")) {
             while (c != null && c.moveToNext()) {
@@ -59,11 +59,13 @@ public class MediaScannerPlugin extends Plugin {
                 o.put("album", c.getString(3));
                 o.put("path", c.getString(4));
                 o.put("dur", c.getLong(5));
+                o.put("added", c.getLong(6));
                 audio.put(o);
             }
         } catch (Exception e) { }
         String[] vp = {MediaStore.Video.Media._ID, MediaStore.Video.Media.TITLE,
-            MediaStore.Video.Media.DATA, MediaStore.Video.Media.DURATION};
+            MediaStore.Video.Media.DATA, MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.HEIGHT, MediaStore.Video.Media.DATE_ADDED};
         try (Cursor c = r.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, vp, null, null,
                 MediaStore.Video.Media.DATE_ADDED + " DESC")) {
             while (c != null && c.moveToNext()) {
@@ -72,6 +74,8 @@ public class MediaScannerPlugin extends Plugin {
                 o.put("title", c.getString(1));
                 o.put("path", c.getString(2));
                 o.put("dur", c.getLong(3));
+                o.put("h", c.getLong(4));
+                o.put("added", c.getLong(5));
                 video.put(o);
             }
         } catch (Exception e) { }
@@ -86,9 +90,10 @@ public class MediaScannerPlugin extends Plugin {
         if (Build.VERSION.SDK_INT < 29) { call.reject("na"); return; }
         long id = call.getData().optLong("id");
         boolean vid = call.getData().optBoolean("video", false);
+        int sz = call.getData().optInt("size", 160);
         Uri base = vid ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         try {
-            Bitmap b = getContext().getContentResolver().loadThumbnail(ContentUris.withAppendedId(base, id), new Size(160, 160), null);
+            Bitmap b = getContext().getContentResolver().loadThumbnail(ContentUris.withAppendedId(base, id), new Size(sz, sz), null);
             ByteArrayOutputStream s = new ByteArrayOutputStream();
             b.compress(Bitmap.CompressFormat.JPEG, 80, s);
             JSObject o = new JSObject();
