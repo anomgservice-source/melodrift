@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Melodrift</title>
+<style>
+:root{--bg:#0b0b0d;--card:#1c1c20;--tx:#fff;--sub:#9a9aa3;--ac:#2f9bff;--mini:#16303f;--pk:#ffd9b0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:14px;padding:calc(env(safe-area-inset-top) + 14px) 16px 8px}
+header h1{flex:1;margin:0;font-size:26px;font-weight:800}
+header button{background:none;border:0;color:var(--tx);font-size:24px;padding:4px}
+#q{display:none;margin:0 16px 8px;padding:12px 16px;border-radius:14px;border:0;background:var(--card);color:var(--tx);font-size:16px}
+nav{display:flex;gap:10px;padding:8px 16px;overflow-x:auto;scrollbar-width:none}
+nav button{border:0;border-radius:20px;padding:12px 20px;background:var(--card);color:var(--sub);font-size:17px;white-space:nowrap}
+nav button.on{background:var(--ac);color:#fff;font-weight:600}
+#list{flex:1;overflow-y:auto;padding:8px 16px 130px}
+.it{display:flex;align-items:center;gap:16px;padding:8px 0}
+.cv{width:64px;height:64px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:26px;font-weight:700;color:#fff}
+.tt{flex:1;min-width:0}.tt b{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt small{color:var(--sub);font-size:14px}
+.it.cur b{color:var(--ac)}
+.fav{background:none;border:0;font-size:22px;color:var(--sub)}.fav.on{color:#ff5a7a}
+.empty{text-align:center;color:var(--sub);margin-top:80px;line-height:1.6}
+#mini{position:fixed;left:0;right:0;bottom:0;background:var(--mini);border-radius:28px 28px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 14px)}
+#mini .row{display:flex;align-items:center;gap:12px}
+#mini .cv{width:52px;height:52px;font-size:22px}
+#mini b{color:var(--pk);font-size:18px}
+#mini button{background:none;border:0;color:var(--pk);font-size:26px;padding:6px}
+#mini #pp{border:2px solid var(--pk);border-radius:50%;width:52px;height:52px}
+#bar{width:100%;margin:10px 0 0;accent-color:var(--pk)}
+</style></head><body>
+<header><h1>Melodrift</h1><button id="bs">⌕</button><button id="bi">＋</button></header>
+<input id="q" placeholder="Rechercher">
+<input id="f" type="file" accept="audio/*" multiple hidden>
+<nav id="nav"></nav>
+<div id="list"></div>
+<div id="mini"><div class="row"><div class="cv" id="mc" style="background:#333">♪</div>
+<div class="tt"><b id="mt">Aucune chanson</b><small id="ma" style="color:var(--sub)">Appuie sur ＋ pour importer</small></div>
+<button id="pv">⏮</button><button id="pp">▶</button><button id="nx">⏭</button></div>
+<input id="bar" type="range" min="0" max="100" value="0"></div>
+<audio id="au"></audio>
+<script>
+const $=id=>document.getElementById(id),au=$('au');
+const TABS=['Chansons','Playlists','Dossiers','Artistes','Albums'];
+let songs=[],tab=0,cur=-1,sub=null,favs=new Set(JSON.parse(localStorage.mdFav||'[]')),batch=0;
+const col=s=>'hsl('+[...s].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)%360+',45%,38%)';
+const cover=s=>`<div class="cv" style="background:${col(s)}">${(s[0]||'♪').toUpperCase()}</div>`;
+function parse(f,i){let n=f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ');let a='Artiste inconnu',t=n;
+ const m=n.split(' - ');if(m.length>1){a=m[0].trim();t=m.slice(1).join(' - ').trim()}
+ return{id:f.name+f.size,title:t,artist:a,album:a,folder:'Import '+batch,url:URL.createObjectURL(f)}}
+$('bi').onclick=()=>$('f').click();
+$('f').onchange=e=>{batch++;[...e.target.files].forEach(f=>{const s=parse(f);if(!songs.some(x=>x.id===s.id))songs.push(s)});render()};
+$('bs').onclick=()=>{const q=$('q');q.style.display=q.style.display=='block'?'none':'block';q.value='';render()};
+$('q').oninput=render;
+function row(s,i,click){return`<div class="it ${i===cur?'cur':''}" data-i="${i}">${cover(s.title)}<div class="tt"><b>${s.title}</b><small>${s.artist}</small></div><button class="fav ${favs.has(s.id)?'on':''}" data-f="${i}">♥</button></div>`}
+function groups(key){const g={};songs.forEach((s,i)=>(g[s[key]]=g[s[key]]||[]).push(i));return g}
+function render(){
+ $('nav').innerHTML=TABS.map((t,i)=>`<button class="${i==tab?'on':''}" data-t="${i}">${t}</button>`).join('');
+ const q=$('q').value.toLowerCase();let h='';
+ const idx=songs.map((s,i)=>i).filter(i=>!q||(songs[i].title+songs[i].artist).toLowerCase().includes(q));
+ if(!songs.length)h='<div class="empty">Ta bibliothèque est vide.<br>Appuie sur ＋ pour importer des musiques.</div>';
+ else if(tab==0)h=idx.map(i=>row(songs[i],i)).join('');
+ else if(tab==1)h=songs.map((s,i)=>favs.has(s.id)?row(s,i):'').join('')||'<div class="empty">Aucun favori.<br>Appuie sur ♥ pour en ajouter.</div>';
+ else{const key=['','','folder','artist','album'][tab];
+  if(sub!==null&&groups(key)[sub])h=`<div class="it" data-back="1"><b>← ${sub}</b></div>`+groups(key)[sub].map(i=>row(songs[i],i)).join('');
+  else{sub=null;h=Object.entries(groups(key)).map(([k,v])=>`<div class="it" data-g="${k}">${cover(k)}<div class="tt"><b>${k}</b><small>${v.length} titre${v.length>1?'s':''}</small></div></div>`).join('')}}
+ $('list').innerHTML=h}
+$('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined){tab=+t;sub=null;render()}};
+$('list').onclick=e=>{const f=e.target.dataset.f;if(f!==undefined){const id=songs[f].id;favs.has(id)?favs.delete(id):favs.add(id);localStorage.mdFav=JSON.stringify([...favs]);return render()}
+ const it=e.target.closest('.it');if(!it)return;
+ if(it.dataset.back){sub=null;return render()}
+ if(it.dataset.g!==undefined){sub=it.dataset.g;return render()}
+ if(it.dataset.i!==undefined)play(+it.dataset.i)};
+function play(i){if(!songs[i])return;cur=i;const s=songs[i];au.src=s.url;au.play();
+ $('mt').textContent=s.title;$('ma').textContent=s.artist;$('mc').outerHTML=cover(s.title).replace('class="cv"','class="cv" id="mc"');
+ if('mediaSession'in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist});
+  navigator.mediaSession.setActionHandler('nexttrack',nx);navigator.mediaSession.setActionHandler('previoustrack',pv)}
+ render()}
+const nx=()=>songs.length&&play((cur+1)%songs.length),pv=()=>songs.length&&play((cur-1+songs.length)%songs.length);
+$('nx').onclick=nx;$('pv').onclick=pv;
+$('pp').onclick=()=>{if(cur<0)return songs.length&&play(0);au.paused?au.play():au.pause()};
+au.onplay=()=>$('pp').textContent='⏸';au.onpause=()=>$('pp').textContent='▶';au.onended=nx;
+au.ontimeupdate=()=>{if(au.duration)$('bar').value=au.currentTime/au.duration*100};
+$('bar').oninput=e=>{if(au.duration)au.currentTime=e.target.value/100*au.duration};
+render();
+</script></body></html>
