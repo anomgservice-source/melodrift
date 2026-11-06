@@ -40,8 +40,18 @@ small{color:var(--sub);font-size:14px;display:block;white-space:nowrap;overflow:
 input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--mt)}
 .ov{position:fixed;inset:0;background:var(--bg);z-index:10;display:none;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 40px}
 #fp{background:var(--mini);color:var(--mt);z-index:11;text-align:left}
-#fp .cv{width:100%;height:auto;aspect-ratio:1;border-radius:28px;font-size:90px;margin:18px 0 22px}
-#fp h2{margin:0 0 4px;font-size:28px}.ctl{display:flex;justify-content:space-around;align-items:center;margin-top:18px}.ctl button{font-size:38px!important}.ctl .pp{width:84px;height:84px;font-size:36px!important}
+#fp{flex-direction:column;padding-bottom:calc(env(safe-area-inset-bottom) + 20px)}
+#fp .cv{width:100%;height:auto;aspect-ratio:1.2;max-height:44vh;border-radius:26px;font-size:90px;margin:8px 0 22px;flex:none}
+.trow{display:flex;align-items:center;gap:2px}
+#fp h2{margin:0 0 6px;font-size:30px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#fa{font-size:19px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fh,#fm{font-size:30px!important;flex:none}
+#fb{-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;margin:6px 0;background:linear-gradient(to right,var(--mt) var(--p,0%),#00000026 var(--p,0%))}
+#fb::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--mt)}
+.ctl{display:flex;justify-content:space-around;align-items:center;margin:14px 0}
+.ctl button{width:76px;height:76px;padding:8px}#fpp{width:100px!important;height:100px!important}
+.bot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:8px}
+.bot span{flex:1;text-align:center;font-size:16px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tm{display:flex;justify-content:space-between;font-size:14px;opacity:.7}
 .set{background:var(--card);border-radius:24px;padding:4px 18px;margin-bottom:16px}
 .sr{display:flex;justify-content:space-between;padding:18px 0;font-size:18px}.sr small{display:inline}
@@ -59,10 +69,12 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--mt)}
 <div class="tt" id="mo"><b id="mt">Aucune chanson</b><small id="ma">Choisis un titre</small></div>
 <button class="md">↻</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div>
 <input id="bar" type="range"></div>
-<div class="ov" id="fp"><button class="ic" id="fx">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
-<h2 id="ft"></h2><small id="fa" style="color:var(--mt);opacity:.7"></small>
+<div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
+<div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
+<div style="flex:1"></div>
 <input id="fb" type="range"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div>
-<div class="ctl"><button class="md">↻</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button><button id="fm">⋮</button></div></div>
+<div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
+<div class="bot"><button class="md">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
 <div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span>Paramètres</span></div><div class="set" id="sl"></div></div>
 <div id="sh"></div>
@@ -133,7 +145,8 @@ async function scan(){
  render()}
 function sheet(title,items){const sh=$('sh');sh.innerHTML=`<div class="shb"><h3>${esc(title)}</h3>${items.map((x,i)=>`<div class="si" data-s="${i}">${esc(x[0])}</div>`).join('')}</div>`;sh.style.display='block';
  sh.onclick=e=>{const i=e.target.dataset.s;sh.style.display='none';if(i!==undefined)items[i][1]()}}
-const sv=()=>{S('fav',[...favs]);S('hid',[...hid]);S('pls',pls)};
+const sv=()=>{S('fav',[...favs]);S('hid',[...hid]);S('pls',pls);updHeart()}
+function updHeart(){const f=cur&&favs.has(cur.id);$('fh').textContent=f?'♥':'♡';$('fh').style.color=f?'#ff5a7a':''};
 function newPl(then){const n=prompt('Nom de la playlist');if(!n)return;const p={id:'u'+Date.now(),name:n.trim(),ids:[]};pls.push(p);sv();then?then(p):render()}
 function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();render()};sheet('Ajouter à une playlist',[...pls.map(p=>[p.name,()=>put(p)]),['＋ Nouvelle playlist',()=>newPl(put)]])}
 function songMenu(s){sheet(s.title,[[favs.has(s.id)?'Retirer des favoris':'Ajouter aux favoris',()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],['Ajouter à une playlist',()=>addTo(s)],['Masquer ce fichier',()=>{hid.add(s.id);sv();render()}]])}
@@ -146,7 +159,7 @@ $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a=='hid')sheet('Fichiers masqués (toucher pour afficher)',songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['Fermer',()=>0]]));
  if(a=='scan'){scan();$('st').style.display='none'}
  if(a=='about')sheet('Melodrift 3.0',[['Lecteur de musique et vidéos, sans pub.',()=>0]])};
-const ovs=['fp','sr','st'];const openOv=id=>{$(id).style.display='block'};const closeOv=id=>{$(id).style.display='none'};
+const ovs=['fp','sr','st'];const openOv=id=>{$(id).style.display=id=='fp'?'flex':'block'};const closeOv=id=>{$(id).style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
 $('bt').onclick=()=>sheet('Tri',SORTS.map(x=>[(sort==x[0]?'✓ ':'')+x[1],()=>{sort=x[0];render()}]));
 $('bs').onclick=()=>{openOv('sr');$('q').value='';sres();$('q').focus()};$('sx').onclick=()=>closeOv('sr');
@@ -174,7 +187,7 @@ $('vx').onclick=()=>{$('vv').pause();$('vv').removeAttribute('src');$('vw').styl
 function play(s,list){if(!s)return;if(list)queue=list;cur=s;au.src=src(s.path);au.play();
  plays[s.id]=(plays[s.id]||0)+1;recent=[s.id,...recent.filter(i=>i!=s.id)].slice(0,100);S('plays',plays);S('rec',recent);
  $('mt').textContent=s.title;$('ma').textContent=s.artist;$('ft').textContent=s.title;$('fa').textContent=s.artist;
- setCv($('mc'),s);setCv($('fc'),s);
+ setCv($('mc'),s);setCv($('fc'),s);$('fal').textContent=s.album;updHeart();
  if('mediaSession'in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist});
   navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1))}
  render()}
@@ -183,17 +196,25 @@ const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
 all('md').forEach(b=>b.onclick=()=>{mode=(mode+1)%3;all('md').forEach(x=>x.textContent=['↻','🔂','🔀'][mode])});
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
-au.onplay=()=>all('pp').forEach(b=>b.textContent='⏸');au.onpause=()=>all('pp').forEach(b=>b.textContent='▶');
+au.onplay=()=>{all('pp').forEach(b=>b.textContent='⏸');$('fpp').innerHTML=ico(PAUSE)};au.onpause=()=>{all('pp').forEach(b=>b.textContent='▶');$('fpp').innerHTML=ico(PLAY)};
 au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1);
 const bars=[$('bar'),$('fb')];bars.forEach(b=>{b.min=0;b.max=100;b.step='any';b.value=0;b.oninput=e=>{if(au.duration)au.currentTime=e.target.value/100*au.duration}});
-au.ontimeupdate=()=>{if(au.duration){const v=au.currentTime/au.duration*100;bars.forEach(b=>b.value=v);$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
+au.ontimeupdate=()=>{if(au.duration){const v=au.currentTime/au.duration*100;bars.forEach(b=>b.value=v);$('fb').style.setProperty('--p',v+'%');$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
 $('mo').onclick=$('mc').onclick=()=>cur&&openOv('fp');$('fx').onclick=()=>closeOv('fp');
 $('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?'Retirer des favoris':'Ajouter aux favoris',()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],['Ajouter à une playlist',()=>addTo(cur)],['Minuterie de sommeil',()=>sheet('Minuterie',[['Désactiver',0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
 setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}},1000);
 try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
  if($('sh').style.display=='block')return $('sh').style.display='none';
- const o=['sr','st','fp'].find(i=>$(i).style.display=='block');if(o)return closeOv(o);
+ const o=['sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);
  if(view){view=null;return render()}Capacitor.Plugins.App.exitApp()})}catch(e){}
+const ico=d=>`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="${d}"/></svg>`;
+const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 18V6L3 12zM21 18V6l-8.5 6z',NEXT='M12.5 6v12L21 12zM3 6v12l8.5-6z';
+document.querySelector('#fp .pv').innerHTML=ico(PREV);document.querySelector('#fp .nx').innerHTML=ico(NEXT);$('fpp').innerHTML=ico(PLAY);
+$('fpp').onclick=()=>document.querySelector('#mini .pp').click();
+$('fh').onclick=()=>{if(!cur)return;favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv();render()};
+$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet('File d\'attente ('+queue.length+')',queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)]))};
+let fy=0,fxx=0;$('fp').addEventListener('touchstart',e=>{fy=e.touches[0].clientY;fxx=e.touches[0].clientX},{passive:true});
+$('fp').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(t.clientY-fy>140&&Math.abs(t.clientX-fxx)<80&&!e.target.closest('input'))closeOv('fp')},{passive:true});
 render();scan();
 </script></body></html>
