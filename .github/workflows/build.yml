@@ -19,6 +19,18 @@ jobs:
           java-version: 17
       - run: npm install
       - run: npx cap add android
+      - name: Plugin natif, permissions, icones
+        run: |
+          cp android-src/*.java android/app/src/main/java/com/melodrift/app/
+          M=android/app/src/main/AndroidManifest.xml
+          sed -i 's#<application#<uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>\n    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>\n    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>\n    <uses-permission android:name="android.permission.WAKE_LOCK"/>\n    <application#' $M
+          R=android/app/src/main/res
+          rm -rf $R/mipmap-anydpi-v26
+          for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            cp icons/$d.png $R/mipmap-$d/ic_launcher.png
+            cp icons/$d.png $R/mipmap-$d/ic_launcher_round.png
+            cp icons/$d.png $R/mipmap-$d/ic_launcher_foreground.png
+          done
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk Melodrift.apk

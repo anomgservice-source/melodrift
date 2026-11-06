@@ -13,74 +13,102 @@ header button{background:none;border:0;color:var(--tx);font-size:24px;padding:4p
 nav{display:flex;gap:10px;padding:8px 16px;overflow-x:auto;scrollbar-width:none}
 nav button{border:0;border-radius:20px;padding:12px 20px;background:var(--card);color:var(--sub);font-size:17px;white-space:nowrap}
 nav button.on{background:var(--ac);color:#fff;font-weight:600}
-#list{flex:1;overflow-y:auto;padding:8px 16px 130px}
+#list{flex:1;overflow-y:auto;padding:8px 16px 150px}
 .it{display:flex;align-items:center;gap:16px;padding:8px 0}
-.cv{width:64px;height:64px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:26px;font-weight:700;color:#fff}
+.cv{width:64px;height:64px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:26px;font-weight:700;color:#fff;background-size:cover}
 .tt{flex:1;min-width:0}.tt b{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tt small{color:var(--sub);font-size:14px}
 .it.cur b{color:var(--ac)}
 .fav{background:none;border:0;font-size:22px;color:var(--sub)}.fav.on{color:#ff5a7a}
-.empty{text-align:center;color:var(--sub);margin-top:80px;line-height:1.6}
+.empty{text-align:center;color:var(--sub);margin-top:80px;line-height:1.8;padding:0 20px}
+.empty button{margin-top:14px;border:0;border-radius:20px;padding:12px 24px;background:var(--ac);color:#fff;font-size:16px}
 #mini{position:fixed;left:0;right:0;bottom:0;background:var(--mini);border-radius:28px 28px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 14px)}
-#mini .row{display:flex;align-items:center;gap:12px}
-#mini .cv{width:52px;height:52px;font-size:22px}
+#mini .row{display:flex;align-items:center;gap:6px}
+#mini .cv{width:52px;height:52px;font-size:22px;margin-right:6px}
 #mini b{color:var(--pk);font-size:18px}
-#mini button{background:none;border:0;color:var(--pk);font-size:26px;padding:6px}
+#mini button{background:none;border:0;color:var(--pk);font-size:24px;padding:6px}
 #mini #pp{border:2px solid var(--pk);border-radius:50%;width:52px;height:52px}
 #bar{width:100%;margin:10px 0 0;accent-color:var(--pk)}
+#vw{position:fixed;inset:0;background:#000;display:none;z-index:9}
+#vw video{width:100%;height:100%}
+#vx{position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:14px;font-size:30px;color:#fff;background:#0008;border:0;border-radius:50%;width:44px;height:44px}
 </style></head><body>
-<header><h1>Melodrift</h1><button id="bs">⌕</button><button id="bi">＋</button></header>
+<header><h1>Melodrift</h1><button id="bs">⌕</button><button id="bi">↻</button></header>
 <input id="q" placeholder="Rechercher">
-<input id="f" type="file" accept="audio/*" multiple hidden>
 <nav id="nav"></nav>
 <div id="list"></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#333">♪</div>
-<div class="tt"><b id="mt">Aucune chanson</b><small id="ma" style="color:var(--sub)">Appuie sur ＋ pour importer</small></div>
-<button id="pv">⏮</button><button id="pp">▶</button><button id="nx">⏭</button></div>
-<input id="bar" type="range" min="0" max="100" value="0"></div>
+<div class="tt"><b id="mt">Aucune chanson</b><small id="ma" style="color:var(--sub)">Choisis un titre</small></div>
+<button id="md">↻</button><button id="pv">⏮</button><button id="pp">▶</button><button id="nx">⏭</button></div>
+<input id="bar" type="range" step="any"></div>
+<div id="vw"><video id="vv" controls playsinline></video><button id="vx">✕</button></div>
 <audio id="au"></audio>
 <script>
-const $=id=>document.getElementById(id),au=$('au');
-const TABS=['Chansons','Playlists','Dossiers','Artistes','Albums'];
-let songs=[],tab=0,cur=-1,sub=null,favs=new Set(JSON.parse(localStorage.mdFav||'[]')),batch=0;
+const $=id=>document.getElementById(id),au=$('au'),MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
+const TABS=['Vidéos','Chansons','Playlists','Dossiers','Artistes','Albums'];
+let songs=[],vids=[],tab=1,cur=-1,sub=null,mode=0,denied=false,favs=new Set(JSON.parse(localStorage.mdFav||'[]'));
+$('bar').min=0;$('bar').max=100;$('bar').value=0;
+const MODES=['↻','🔂','🔀'];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const col=s=>'hsl('+[...s].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)%360+',45%,38%)';
-const cover=s=>`<div class="cv" style="background:${col(s)}">${(s[0]||'♪').toUpperCase()}</div>`;
-function parse(f,i){let n=f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ');let a='Artiste inconnu',t=n;
- const m=n.split(' - ');if(m.length>1){a=m[0].trim();t=m.slice(1).join(' - ').trim()}
- return{id:f.name+f.size,title:t,artist:a,album:a,folder:'Import '+batch,url:URL.createObjectURL(f)}}
-$('bi').onclick=()=>$('f').click();
-$('f').onchange=e=>{batch++;[...e.target.files].forEach(f=>{const s=parse(f);if(!songs.some(x=>x.id===s.id))songs.push(s)});render()};
+const fmt=ms=>{const s=Math.round(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const src=p=>Capacitor.convertFileSrc('file://'+p.split('/').map(encodeURIComponent).join('/'));
+const artCache=new Map(),obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){obs.unobserve(e.target);loadArt(e.target)}}),{rootMargin:'200px'});
+async function loadArt(el){const k=el.dataset.art;if(!k||!MS)return;
+ if(!artCache.has(k))artCache.set(k,MS.getArt({id:+k.slice(2),video:k[0]=='v'}).then(r=>r.data).catch(()=>null));
+ const d=await artCache.get(k);if(d){el.style.background=`center/cover url(${d})`;el.textContent=''}}
+const cover=(name,key)=>`<div class="cv" data-art="${key||''}" style="background:${col(name)}">${esc((name[0]||'♪').toUpperCase())}</div>`;
+async function scan(){
+ if(!MS){songs=[];render();return}
+ try{const r=await MS.scan();denied=false;
+  songs=r.audio.map(s=>({...s,title:s.title||'Sans titre',artist:/unknown/i.test(s.artist||'')?'Artiste inconnu':s.artist,album:/unknown|0$/i.test(s.album||'')&&!s.album?'Album inconnu':(s.album||'Album inconnu'),folder:s.path.slice(0,s.path.lastIndexOf('/'))}));
+  vids=r.video;
+ }catch(e){denied=true}
+ render()}
+$('bi').onclick=scan;
 $('bs').onclick=()=>{const q=$('q');q.style.display=q.style.display=='block'?'none':'block';q.value='';render()};
 $('q').oninput=render;
-function row(s,i,click){return`<div class="it ${i===cur?'cur':''}" data-i="${i}">${cover(s.title)}<div class="tt"><b>${s.title}</b><small>${s.artist}</small></div><button class="fav ${favs.has(s.id)?'on':''}" data-f="${i}">♥</button></div>`}
-function groups(key){const g={};songs.forEach((s,i)=>(g[s[key]]=g[s[key]]||[]).push(i));return g}
+const sa=s=>`<small>${esc(s.artist)} · ${fmt(s.dur)}</small>`;
+function row(s,i){return`<div class="it ${i===cur?'cur':''}" data-i="${i}">${cover(s.title,'a:'+s.id)}<div class="tt"><b>${esc(s.title)}</b>${sa(s)}</div><button class="fav ${favs.has(s.id)?'on':''}" data-f="${i}">♥</button></div>`}
+const groups=key=>{const g={};songs.forEach((s,i)=>(g[s[key]]=g[s[key]]||[]).push(i));return g};
+const gname=(k,key)=>key=='folder'?k.slice(k.lastIndexOf('/')+1):k;
 function render(){
  $('nav').innerHTML=TABS.map((t,i)=>`<button class="${i==tab?'on':''}" data-t="${i}">${t}</button>`).join('');
  const q=$('q').value.toLowerCase();let h='';
  const idx=songs.map((s,i)=>i).filter(i=>!q||(songs[i].title+songs[i].artist).toLowerCase().includes(q));
- if(!songs.length)h='<div class="empty">Ta bibliothèque est vide.<br>Appuie sur ＋ pour importer des musiques.</div>';
- else if(tab==0)h=idx.map(i=>row(songs[i],i)).join('');
- else if(tab==1)h=songs.map((s,i)=>favs.has(s.id)?row(s,i):'').join('')||'<div class="empty">Aucun favori.<br>Appuie sur ♥ pour en ajouter.</div>';
- else{const key=['','','folder','artist','album'][tab];
-  if(sub!==null&&groups(key)[sub])h=`<div class="it" data-back="1"><b>← ${sub}</b></div>`+groups(key)[sub].map(i=>row(songs[i],i)).join('');
-  else{sub=null;h=Object.entries(groups(key)).map(([k,v])=>`<div class="it" data-g="${k}">${cover(k)}<div class="tt"><b>${k}</b><small>${v.length} titre${v.length>1?'s':''}</small></div></div>`).join('')}}
- $('list').innerHTML=h}
+ if(denied)h='<div class="empty">Melodrift a besoin d\'accéder à tes musiques.<br><button onclick="scan()">Autoriser</button></div>';
+ else if(!MS)h='<div class="empty">Ouvre Melodrift depuis l\'app installée pour scanner tes musiques.</div>';
+ else if(tab==0)h=vids.filter(v=>!q||v.title.toLowerCase().includes(q)).map(v=>`<div class="it" data-v="${v.id}">${cover(v.title,'v:'+v.id)}<div class="tt"><b>${esc(v.title)}</b><small>${fmt(v.dur)}</small></div></div>`).join('')||'<div class="empty">Aucune vidéo trouvée.</div>';
+ else if(!songs.length)h='<div class="empty">Aucune musique trouvée sur ce téléphone.<br><button onclick="scan()">Scanner à nouveau</button></div>';
+ else if(tab==1)h=idx.map(i=>row(songs[i],i)).join('');
+ else if(tab==2)h=songs.map((s,i)=>favs.has(s.id)?row(s,i):'').join('')||'<div class="empty">Aucun favori.<br>Appuie sur ♥ pour en ajouter.</div>';
+ else{const key=['','','','folder','artist','album'][tab],g=groups(key);
+  if(sub!==null&&g[sub])h=`<div class="it" data-back="1"><b>← ${esc(gname(sub,key))}</b></div>`+g[sub].map(i=>row(songs[i],i)).join('');
+  else{sub=null;h=Object.entries(g).map(([k,v])=>`<div class="it" data-g="${esc(k)}">${cover(gname(k,key),'a:'+songs[v[0]].id)}<div class="tt"><b>${esc(gname(k,key))}</b><small>${v.length} titre${v.length>1?'s':''}</small></div></div>`).join('')}}
+ $('list').innerHTML=h;
+ document.querySelectorAll('[data-art]').forEach(e=>obs.observe(e))}
 $('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined){tab=+t;sub=null;render()}};
-$('list').onclick=e=>{const f=e.target.dataset.f;if(f!==undefined){const id=songs[f].id;favs.has(id)?favs.delete(id):favs.add(id);localStorage.mdFav=JSON.stringify([...favs]);return render()}
+$('list').onclick=e=>{const f=e.target.dataset.f;
+ if(f!==undefined){const id=songs[f].id;favs.has(id)?favs.delete(id):favs.add(id);localStorage.mdFav=JSON.stringify([...favs]);return render()}
  const it=e.target.closest('.it');if(!it)return;
  if(it.dataset.back){sub=null;return render()}
  if(it.dataset.g!==undefined){sub=it.dataset.g;return render()}
+ if(it.dataset.v){const v=vids.find(x=>x.id==it.dataset.v);au.pause();$('vv').src=src(v.path);$('vw').style.display='block';return $('vv').play()}
  if(it.dataset.i!==undefined)play(+it.dataset.i)};
-function play(i){if(!songs[i])return;cur=i;const s=songs[i];au.src=s.url;au.play();
- $('mt').textContent=s.title;$('ma').textContent=s.artist;$('mc').outerHTML=cover(s.title).replace('class="cv"','class="cv" id="mc"');
+$('vx').onclick=()=>{$('vv').pause();$('vv').removeAttribute('src');$('vw').style.display='none'};
+function play(i){const s=songs[i];if(!s)return;cur=i;au.src=src(s.path);au.play();
+ $('mt').textContent=s.title;$('ma').textContent=s.artist;
+ $('mc').outerHTML=cover(s.title,'a:'+s.id).replace('class="cv"','class="cv" id="mc"');loadArt($('mc'));
  if('mediaSession'in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist});
   navigator.mediaSession.setActionHandler('nexttrack',nx);navigator.mediaSession.setActionHandler('previoustrack',pv)}
  render()}
-const nx=()=>songs.length&&play((cur+1)%songs.length),pv=()=>songs.length&&play((cur-1+songs.length)%songs.length);
+const nx=()=>songs.length&&play(mode==2?Math.floor(Math.random()*songs.length):(cur+1)%songs.length),pv=()=>songs.length&&play((cur-1+songs.length)%songs.length);
 $('nx').onclick=nx;$('pv').onclick=pv;
+$('md').onclick=()=>{mode=(mode+1)%3;$('md').textContent=MODES[mode]};
 $('pp').onclick=()=>{if(cur<0)return songs.length&&play(0);au.paused?au.play():au.pause()};
-au.onplay=()=>$('pp').textContent='⏸';au.onpause=()=>$('pp').textContent='▶';au.onended=nx;
+au.onplay=()=>$('pp').textContent='⏸';au.onpause=()=>$('pp').textContent='▶';
+au.onended=()=>mode==1?(au.currentTime=0,au.play()):nx();
 au.ontimeupdate=()=>{if(au.duration)$('bar').value=au.currentTime/au.duration*100};
 $('bar').oninput=e=>{if(au.duration)au.currentTime=e.target.value/100*au.duration};
-render();
+render();scan();
 </script></body></html>
