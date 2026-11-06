@@ -8,14 +8,14 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;overflow:hidden}
 button{font:inherit;color:inherit}
-#main{height:100%;overflow-y:auto}
+#main{height:100%;overflow-y:auto;overflow-x:hidden}
 header{display:flex;align-items:center;gap:6px;padding:calc(env(safe-area-inset-top) + 14px) 16px 6px}
 header h1{flex:1;margin:0;font-size:28px;font-weight:800}
 header button,.ic{background:none;border:0;font-size:24px;padding:6px 8px}
 nav{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:10px;padding:8px 16px;overflow-x:auto;scrollbar-width:none}
 nav button{border:0;border-radius:20px;padding:11px 20px;background:var(--card);color:var(--sub);font-size:17px;white-space:nowrap}
 nav button.on{background:var(--ac);color:#fff;font-weight:600}
-#list{padding:8px 16px 160px}
+#list{padding:8px 16px 160px;min-height:80vh;overflow-x:hidden}
 .it{display:flex;align-items:center;gap:14px;padding:8px 0}
 .cv{width:64px;height:64px;border-radius:14px;flex:none;display:grid;place-items:center;font-size:26px;font-weight:700;color:#fff;background-size:cover}
 .tt{flex:1;min-width:0}.tt b{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -27,16 +27,16 @@ small{color:var(--sub);font-size:14px;display:block;white-space:nowrap;overflow:
 .card .ct{flex:1;min-width:0}.card b{font-size:21px;display:block;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card>span{color:var(--sub);align-self:flex-start;margin-top:6px}
 .card.add{flex-direction:column;justify-content:center;height:130px;color:var(--sub)}.plus{font-size:44px;color:var(--sub)!important}
-.vg{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px}
-.vg .cv{width:100%;height:auto;aspect-ratio:16/10;border-radius:18px;margin-bottom:6px}.vg b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 14px}.vg>div{min-width:0;overflow:hidden}
+.vg .cv{width:100%;height:auto;aspect-ratio:16/10;border-radius:18px;margin-bottom:6px}.vg b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .empty{text-align:center;color:var(--sub);margin-top:80px;line-height:1.8;padding:0 20px}
 .btn{margin-top:14px;border:0;border-radius:20px;padding:12px 24px;background:var(--ac);color:#fff;font-size:16px}
 .top{display:flex;align-items:center;gap:8px;padding:6px 0 10px;font-size:22px;font-weight:700}.top span{flex:1}
 #mini{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--mini);color:var(--mt);border-radius:28px 28px 0 0;padding:14px 16px calc(env(safe-area-inset-bottom) + 12px)}
 #mini .row{display:flex;align-items:center;gap:4px}#mini .cv{width:52px;height:52px;font-size:22px;margin-right:8px}
 #mini .tt b{font-size:18px}#mini small{color:var(--mt);opacity:.7}
-#mini button,#fp button{background:none;border:0;color:var(--mt);font-size:24px;padding:6px}
-.pp{border:2px solid var(--mt)!important;border-radius:50%;width:52px;height:52px}
+#mini button,#fp button{background:none;border:0;color:var(--mt);font-size:22px;padding:4px}
+.pp{border:2px solid var(--mt)!important;border-radius:50%;width:48px;height:48px;flex:none}
 input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--mt)}
 .ov{position:fixed;inset:0;background:var(--bg);z-index:10;display:none;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 12px) 16px 40px}
 #fp{background:var(--mini);color:var(--mt);z-index:11;text-align:left}
@@ -57,7 +57,7 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--mt)}
 <nav id="nav"></nav><div id="list"></div></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Aucune chanson</b><small id="ma">Choisis un titre</small></div>
-<button class="md">↻</button><button class="pp">▶</button><button class="nx">⏭</button></div>
+<button class="md">↻</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div>
 <input id="bar" type="range"></div>
 <div class="ov" id="fp"><button class="ic" id="fx">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
 <h2 id="ft"></h2><small id="fa" style="color:var(--mt);opacity:.7"></small>
@@ -103,8 +103,17 @@ const row=(s,i)=>`<div class="it ${cur&&cur.id==s.id?'cur':''}" data-i="${i}">${
 const rows=l=>{shown=l;return l.map(row).join('')||'<div class="empty">Rien ici pour le moment.</div>'};
 function viewData(){if(view.t=='g'){const g=groups(KEYS[tab]).find(x=>x.k==view.k);return g?{name:g.name,list:srt(g.list)}:null}
  const p=allPl().find(x=>x.id==view.id);return p?{name:p.name,list:p.list,user:p.user}:null}
+function setNav(){const n=$('nav');if(!n.children.length)n.innerHTML=TABS.map((t,i)=>`<button data-t="${i}">${t}</button>`).join('');
+ [...n.children].forEach((b,i)=>b.classList.toggle('on',i==tab));
+ const b=n.children[tab];n.scrollTo({left:b.offsetLeft-(n.clientWidth-b.offsetWidth)/2,behavior:'smooth'})}
+function go(t){if(t<0||t>=TABS.length||t==tab)return;const d=t>tab?1:-1;tab=t;view=null;render();
+ $('list').animate([{transform:`translateX(${d*60}px)`,opacity:0},{transform:'none',opacity:1}],{duration:240,easing:'ease-out'})}
+let tx=0,ty=0,tn=null;
+$('main').addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tn=e.target.closest('nav,input[type=range],video')},{passive:true});
+$('main').addEventListener('touchend',e=>{if(tn)return;const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;
+ if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){if(view&&dx>0){view=null;render()}else go(tab+(dx<0?1:-1))}},{passive:true});
 function render(){
- $('nav').innerHTML=TABS.map((t,i)=>`<button class="${i==tab?'on':''}" data-t="${i}">${t}</button>`).join('');
+ setNav();
  let h='';
  if(denied)h='<div class="empty">Melodrift a besoin d\'accéder à tes musiques.<br><button class="btn" onclick="scan()">Autoriser</button></div>';
  else if(!MS)h='<div class="empty">Ouvre Melodrift depuis l\'app installée pour scanner tes musiques.</div>';
@@ -150,7 +159,7 @@ $('sc').onclick=e=>{const h=e.target.dataset.h;if(h!==undefined){$('q').value=h;
  if(e.target.dataset.clr){hist=[];S('hist',hist);return sres()}
  const m=e.target.dataset.m;if(m!==undefined)return songMenu(shown[m]);
  const it=e.target.closest('[data-i]');if(it){hist=[sq,...hist.filter(x=>x!=sq)].slice(0,10);S('hist',hist);play(shown[+it.dataset.i],shown)}};
-$('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined){tab=+t;view=null;render()}};
+$('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined)go(+t)};
 $('list').onclick=e=>{const d=e.target.dataset,m=d.m;
  if(m!==undefined)return songMenu(shown[m]);
  if(d.back){view=null;return render()}
