@@ -1,12 +1,17 @@
 package com.melodrift.app;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Size;
@@ -20,12 +25,34 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.Collections;
 
 @CapacitorPlugin(name = "MediaScanner", permissions = {
     @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO}),
-    @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE})
+    @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE}),
+    @Permission(alias = "notif", strings = {Manifest.permission.POST_NOTIFICATIONS})
 })
 public class MediaScannerPlugin extends Plugin {
+    private PluginCall delCall;
+
+    @Override
+    public void load() {
+        PlaybackService.cb = new PlaybackService.Cb() {
+            public void on(String a) {
+                JSObject o = new JSObject();
+                o.put("a", a);
+                notifyListeners("media", o);
+            }
+        };
+    }
+
     private String alias() { return Build.VERSION.SDK_INT >= 33 ? "media" : "legacy"; }
 
     @PluginMethod
@@ -63,9 +90,8 @@ public class MediaScannerPlugin extends Plugin {
                 audio.put(o);
             }
         } catch (Exception e) { }
-        String[] vp = {MediaStore.Video.Media._ID, MediaStore.Video.Media.TITLE,
-            MediaStore.Video.Media.DATA, MediaStore.Video.Media.DURATION,
-            MediaStore.Video.Media.HEIGHT, MediaStore.Video.Media.DATE_ADDED};
+        String[] vp = {MediaStore.Video.Media._ID, MediaStore.Video.Media.TITLE, MediaStore.Video.Media.DATA,
+            MediaStore.Video.Media.DURATION, MediaStore.Video.Media.HEIGHT, MediaStore.Video.Media.DATE_ADDED};
         try (Cursor c = r.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, vp, null, null,
                 MediaStore.Video.Media.DATE_ADDED + " DESC")) {
             while (c != null && c.moveToNext()) {
@@ -100,5 +126,98 @@ public class MediaScannerPlugin extends Plugin {
             o.put("data", "data:image/jpeg;base64," + Base64.encodeToString(s.toByteArray(), Base64.NO_WRAP));
             call.resolve(o);
         } catch (Exception e) { call.reject("none"); }
+    }
+
+    @PluginMethod
+    public void notifPerm(PluginCall call) {
+        if (Build.VERSION.SDK_INT >= 33 && getPermissionState("notif") != PermissionState.GRANTED) {
+            requestPermissionForAlias("notif", call, "notifCb");
+        } else call.resolve();
+    }
+
+    @PermissionCallback
+    private void notifCb(PluginCall call) { call.resolve(); }
+
+    @PluginMethod
+    public void showNotif(PluginCall call) {
+        Intent i = new Intent(getContext(), PlaybackService.class).setAction("SHOW");
+        i.putExtra("title", call.getString("title", ""));
+        i.putExtra("artist", call.getString("artist", ""));
+        i.putExtra("playing", call.getBoolean("playing", false));
+        i.putExtra("art", call.getString("art", ""));
+        try {
+            if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
+            else getContext().startService(i);
+            call.resolve();
+        } catch (Exception e) { call.reject("notif"); }
+    }
+
+    @PluginMethod
+    public void reindex(PluginCall call) {
+        HashSet<String> known = new HashSet<String>();
+        try {
+            JSArray k = call.getArray("known");
+            if (k != null) for (int i = 0; i < k.length(); i++) known.add(k.getString(i));
+        } catch (Exception e) { }
+        ArrayList<String> found = new ArrayList<String>();
+        File root = Environment.getExternalStorageDirectory();
+        String[] dirs = {"Download", "Music", "Movies", "Documents", "DCIM", "Recordings"};
+        for (String d : dirs) walk(new File(root, d), known, found, 0);
+        JSObject o = new JSObject();
+        o.put("n", found.size());
+        if (found.isEmpty()) { call.resolve(o); return; }
+        final CountDownLatch l = new CountDownLatch(found.size());
+        MediaScannerConnection.scanFile(getContext(), found.toArray(new String[0]), null,
+            new MediaScannerConnection.OnScanCompletedListener() {
+                public void onScanCompleted(String p, Uri u) { l.countDown(); }
+            });
+        try { l.await(6, TimeUnit.SECONDS); } catch (Exception e) { }
+        call.resolve(o);
+    }
+
+    private void walk(File f, HashSet<String> known, ArrayList<String> found, int depth) {
+        if (depth > 6 || !f.exists()) return;
+        File[] a = f.listFiles();
+        if (a == null) return;
+        for (File x : a) {
+            if (x.isDirectory()) {
+                if (!x.getName().startsWith(".")) walk(x, known, found, depth + 1);
+            } else {
+                String n = x.getName().toLowerCase();
+                if (n.matches(".*\\.(mp3|m4a|aac|wav|flac|ogg|opus|wma|mp4|mkv|3gp|webm|avi|mov)$")
+                        && !known.contains(x.getAbsolutePath()) && found.size() < 3000) found.add(x.getAbsolutePath());
+            }
+        }
+    }
+
+    @PluginMethod
+    public void deleteMedia(PluginCall call) {
+        long id = call.getData().optLong("id");
+        boolean vid = call.getData().optBoolean("video", false);
+        Uri u = ContentUris.withAppendedId(vid ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+        try {
+            if (Build.VERSION.SDK_INT >= 30) {
+                PendingIntent pi = MediaStore.createDeleteRequest(getContext().getContentResolver(), Collections.singletonList(u));
+                delCall = call;
+                getBridge().saveCall(call);
+                getActivity().startIntentSenderForResult(pi.getIntentSender(), 4711, null, 0, 0, 0);
+            } else {
+                int n = getContext().getContentResolver().delete(u, null, null);
+                JSObject o = new JSObject();
+                o.put("ok", n > 0);
+                call.resolve(o);
+            }
+        } catch (Exception e) { call.reject("del"); }
+    }
+
+    @Override
+    protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
+        super.handleOnActivityResult(requestCode, resultCode, data);
+        if (requestCode == 4711 && delCall != null) {
+            JSObject o = new JSObject();
+            o.put("ok", resultCode == Activity.RESULT_OK);
+            delCall.resolve(o);
+            delCall = null;
+        }
     }
 }
