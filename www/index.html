@@ -77,9 +77,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #mini .row .pp::after{content:"";position:absolute;inset:3.5px;border-radius:50%;background:var(--mini);transition:background-color .6s}
 #mini .row .pp svg{position:relative;z-index:1}
 .sw{width:54px;height:30px;border-radius:15px;background:rgba(128,128,128,.5);position:relative;flex:none}.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}.sw.on{background:var(--ac)}.sw.on i{left:27px}
+#ptr{position:fixed;left:50%;top:0;width:46px;height:46px;border-radius:50%;background:var(--card);box-shadow:0 2px 10px #0004;z-index:4;display:grid;place-items:center;opacity:0;pointer-events:none;transform:translate(-50%,-60px)}
+#ptr.spin svg{animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 </style></head><body>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
 <nav id="nav"></nav></div>
+<div id="ptr"><svg viewBox="0 0 44 44" width="36" height="36"><circle cx="22" cy="22" r="14" fill="none" stroke="rgba(128,128,128,.3)" stroke-width="4"/><circle id="pa" cx="22" cy="22" r="14" fill="none" stroke="var(--ac)" stroke-width="4" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88" transform="rotate(-90 22 22)"/></svg></div>
 <div id="main"><div id="list"></div></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
@@ -181,7 +184,7 @@ function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();r
 function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],[t(35),()=>{hid.add(s.id);sv();render()}]])}
 function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
 function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
- $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'8.0')}
+ $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'9.0')}
 $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a=='theme')sheet(t(14),[[t(15),()=>0],[t(16),()=>0],[t(17),()=>0]].map((x,i)=>[x[0],()=>{theme=['auto','light','dark'][i];S('theme',theme);applyTheme();renderSet()}]));
  if(a=='sleep')sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
@@ -189,7 +192,7 @@ $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a=='scan'){scan();$('st').style.display='none'}
  if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();
  if(a=='fb')openFb();
- if(a=='about')sheet('Melodrift 8.0',[['© anomgservice',()=>0]])};
+ if(a=='about')sheet('Melodrift 9.0',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
 const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else e.style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
@@ -263,7 +266,7 @@ function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').i
 $('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
 $('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 8.0 (Android)')};
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 9.0 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
@@ -278,6 +281,17 @@ function openPlay(){$('pst').textContent=t(24);$('psl').innerHTML=`<div class="s
 $('psl').onclick=e=>{if(e.target.closest('[data-f]')){fadeOn=!fadeOn;S('fade',fadeOn);if(!fadeOn)au.volume=1;openPlay()}};$('psx').onclick=()=>closeOv('ps');
 function openTime(){$('tpt').textContent=t(13);const B=(l,v)=>`<div class="sr" style="display:block"><small>${l}</small><div style="font-size:30px;font-weight:700;margin-top:6px">${fmtD(v)}</div></div>`;$('tpc').innerHTML=B(t(56),ptime+vtime)+B(t(57),ptime)+B(t(58),vtime);openOv('tp')}
 $('tpx').onclick=()=>closeOv('tp');
+const ptr=$('ptr');let py=0,pull=0,pgo=false,busy=false;
+function ptrSet(p,prog){ptr.style.opacity=Math.min(1,p/25);ptr.style.transform=`translate(-50%,${$('top').offsetHeight-46+p}px)`;$('pa').style.strokeDashoffset=88*(1-Math.min(1,prog))}
+$('main').addEventListener('touchstart',e=>{pgo=false;if(busy||$('main').scrollTop>2||e.target.closest('input,video'))return;py=e.touches[0].clientY;pgo=true;pull=0},{passive:true});
+$('main').addEventListener('touchmove',e=>{if(!pgo)return;const dy=e.touches[0].clientY-py;
+ if(dy<=0||$('main').scrollTop>2){if(pull){pull=0;ptrSet(0,0)}return}
+ pull=Math.min(dy*.5,110);ptr.style.transition='none';ptrSet(pull,pull/70)},{passive:true});
+$('main').addEventListener('touchend',async()=>{if(!pgo)return;pgo=false;ptr.style.transition='transform .25s,opacity .25s';
+ if(pull>=70&&!busy){busy=true;ptr.classList.add('spin');ptrSet(60,.75);
+  await Promise.all([scan(),new Promise(r=>setTimeout(r,800))]);
+  ptr.classList.remove('spin');ptrSet(0,0);busy=false;navigator.vibrate&&navigator.vibrate(40)}
+ else ptrSet(0,0);pull=0});
 applyTint();
 applyLang();scan();
 </script></body></html>
