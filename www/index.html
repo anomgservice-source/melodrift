@@ -76,12 +76,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #mini .row .pp{position:relative;border:0!important;background:conic-gradient(var(--mt) var(--p,0%),rgba(128,128,128,.3) 0)}
 #mini .row .pp::after{content:"";position:absolute;inset:3.5px;border-radius:50%;background:var(--mini);transition:background-color .6s}
 #mini .row .pp svg{position:relative;z-index:1}
+.sw{width:54px;height:30px;border-radius:15px;background:rgba(128,128,128,.5);position:relative;flex:none}.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .2s}.sw.on{background:var(--ac)}.sw.on i{left:27px}
 </style></head><body>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
 <nav id="nav"></nav></div>
 <div id="main"><div id="list"></div></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
-<div class="tt" id="mo"><b id="mt">Aucune chanson</b><small id="ma">Choisis un titre</small></div>
+<div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
 <button class="md">↻</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
 <div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
 <div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
@@ -90,23 +91,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
 <div class="bot"><button class="md">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
-<div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span>Paramètres</span></div><div class="set" id="sl"></div></div>
-<div class="ov" id="fk"><div class="top"><button class="ic" id="kx">←</button><span>Dites-nous le problème</span></div>
-<div id="kc"></div><h3>Avis *</h3><textarea id="kt" maxlength="500" placeholder="Explique ce qui s'est passé ou donne ton avis."></textarea>
+<div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span id="stt">Paramètres</span></div><div class="set" id="sl"></div></div>
+<div class="ov" id="fk"><div class="top"><button class="ic" id="kx">←</button><span id="fkt"></span></div>
+<div id="kc"></div><h3 id="fko"></h3><textarea id="kt" maxlength="500" placeholder="Explique ce qui s'est passé ou donne ton avis."></textarea>
 <small id="kn" style="text-align:right;margin:4px 8px">0/500</small>
 <button class="btn" id="ke" style="width:100%">Envoyer par e-mail</button>
 <button class="btn" id="kf" style="width:100%;background:#1877f2">Écrire sur Facebook</button></div>
+<div class="ov" id="lg"><div class="top"><button class="ic" id="lx">←</button><span id="lgt"></span></div><div class="set" id="ll"></div></div>
+<div class="ov" id="ps"><div class="top"><button class="ic" id="psx">←</button><span id="pst"></span></div><div class="set" id="psl"></div></div>
+<div class="ov" id="tp"><div class="top"><button class="ic" id="tpx">←</button><span id="tpt"></span></div><div class="set" id="tpc"></div></div>
 <div id="sh"></div>
 <div id="vw"><video id="vv" controls playsinline></video><button id="vx">✕</button></div>
 <audio id="au"></audio>
 <script>
 const $=id=>document.getElementById(id),au=$('au'),MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
 const L=(k,d)=>{try{const v=JSON.parse(localStorage[k]);return v==null?d:v}catch(e){return d}},S=(k,v)=>{localStorage[k]=JSON.stringify(v)};
-let tint={h:205,s:45};const MAIL='anomgservice@gmail.com',FB_URL='';
-let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],mode=0,denied=false,sleepT=null,sleepL='Désactiver',sq='';
-let favs=new Set(L('fav',[])),hid=new Set(L('hid',[])),plays=L('plays',{}),recent=L('rec',[]),pls=L('pls',[]),hist=L('hist',[]),theme=L('theme','auto'),ptime=L('ptime',0);
-const TABS=['Vidéos','Chansons','Playlists','Dossiers','Artistes','Albums'],KEYS={3:'folder',4:'artist',5:'album'};
-const SORTS=[['new','Le dernier'],['top','Le plus joué'],['az','De A à Z'],['count','La plupart comptent']];
+let tint={h:205,s:45};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
+let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
+let favs=new Set(L('fav',[])),hid=new Set(L('hid',[])),plays=L('plays',{}),recent=L('rec',[]),pls=L('pls',[]),hist=L('hist',[]),theme=L('theme','auto'),ptime=L('ptime',0),vtime=L('vtime',0),fadeOn=L('fade',false),lang=L('lang','auto');
+const TABS=[0,1,2,3,4,5],KEYS={3:'folder',4:'artist',5:'album'};
+const P=s=>s.split('|');
+const LANGS={fr:['Français',P(`Vidéos|Chansons|Playlists|Dossiers|Artistes|Albums|Rechercher ma musique|Tri|Le dernier|Le plus joué|De A à Z|La plupart comptent|Paramètres|Temps de lecture|Thème|Auto (téléphone)|Clair|Sombre|Minuterie de sommeil|Désactiver|Fichiers masqués|fichiers|Scanner à nouveau|Langue|Paramètres de lecture|Commentaires et problèmes|À propos|Nouvelle playlist|Nom de la playlist|Chansons aimées|Lue dernièrement|Ajouter à une playlist|Supprimer cette playlist ?|Ajouter aux favoris|Retirer des favoris|Masquer ce fichier|Aucune musique trouvée.|Autoriser|Melodrift a besoin d'accéder à tes musiques.|Rien ici pour le moment.|File d'attente|Historique|titres|Dites-nous le problème|Avis|Explique ce qui s'est passé ou donne ton avis.|Envoyer par e-mail|Écrire sur Facebook|Écris ton avis d'abord.|Fichier non trouvé|Le fichier ne peut pas être lu|La musique s'arrête|Application lente|Parole|Pubs|Autres|Durée totale de lecture|Temps de lecture de musique|Durée de lecture vidéo|Fondu enchaîné|Fondu à la fin et au début des pistes|Aucun favori.`)],en:['English',P(`Videos|Songs|Playlists|Folders|Artists|Albums|Search my music|Sort|Latest|Most played|A to Z|Most tracks|Settings|Listening time|Theme|Auto (phone)|Light|Dark|Sleep timer|Off|Hidden files|files|Scan again|Language|Playback settings|Feedback and problems|About|New playlist|Playlist name|Liked songs|Recently played|Add to a playlist|Delete this playlist?|Add to favorites|Remove from favorites|Hide this file|No music found.|Allow|Melodrift needs access to your music.|Nothing here yet.|Queue|History|tracks|Tell us the problem|Feedback|Explain what happened or share your opinion.|Send by email|Write on Facebook|Write your feedback first.|File not found|The file cannot be played|The music stops|App is slow|Lyrics|Ads|Other|Total listening time|Music listening time|Video watching time|Crossfade|Fade out and in between tracks|No favorites.`)],mg:['Malagasy',P(`Horonan-tsary|Hira|Lisitra hira|Lahatahiry|Mpanakanto|Albom|Hikaroka ny mozikako|Alaharo|Vaovao indrindra|Re be indrindra|A hatramin'ny Z|Hira maro indrindra|Fanamboarana|Fotoana nihainoana|Lohahevitra|Ho azy (findainao)|Mazava|Maizina|Fandefasana tory|Atsaharo|Rakitra miafina|rakitra|Hikaroka indray|Fiteny|Fanamboarana ny fampiasana|Hevitra sy olana|Mombamomba|Lisitra vaovao|Anaran'ny lisitra|Hira tiana|Vao re|Ampio ao amin'ny lisitra|Fafana ity lisitra ity ve?|Ampio amin'ny tiana|Esory amin'ny tiana|Afeno ity rakitra ity|Tsy nahita hira.|Avela|Mila alalana hidirana amin'ny hirakao i Melodrift.|Tsy mbola misy eto.|Laharana fihainoana|Tantara|hira|Lazao anay ny olana|Hevitra|Lazao ny zava-nitranga na ny hevitrao.|Alefaso amin'ny mailaka|Soraty ao amin'ny Facebook|Soraty aloha ny hevitrao.|Tsy hita ny rakitra|Tsy azo henoina ny rakitra|Mijanona ny hira|Miadana ny application|Tonony|Doka|Hafa|Fotoana feno nihainoana|Fotoana nihainoana hira|Fotoana nijerena horonan-tsary|Fampifangaroana|Fampiakarana sy fampidinana feo eo anelanelan'ny hira|Tsy misy tiana.`)],es:['Español',P(`Vídeos|Canciones|Listas|Carpetas|Artistas|Álbumes|Buscar en mi música|Ordenar|Más reciente|Más escuchado|De la A a la Z|Más canciones|Ajustes|Tiempo de reproducción|Tema|Auto (teléfono)|Claro|Oscuro|Temporizador de sueño|Desactivado|Archivos ocultos|archivos|Volver a escanear|Idioma|Ajustes de reproducción|Comentarios y problemas|Acerca de|Nueva lista|Nombre de la lista|Canciones favoritas|Reproducidas recientemente|Añadir a una lista|¿Eliminar esta lista?|Añadir a favoritos|Quitar de favoritos|Ocultar este archivo|No se encontró música.|Permitir|Melodrift necesita acceso a tu música.|Aún no hay nada aquí.|Cola|Historial|canciones|Cuéntanos el problema|Opinión|Explica qué pasó o danos tu opinión.|Enviar por correo|Escribir en Facebook|Escribe primero tu opinión.|Archivo no encontrado|No se puede reproducir el archivo|La música se detiene|La aplicación va lenta|Letra|Anuncios|Otros|Tiempo total de reproducción|Tiempo de reproducción de música|Tiempo de reproducción de vídeo|Fundido encadenado|Fundido al final y al inicio de las pistas|Sin favoritos.`)],pt:['Português',P(`Vídeos|Músicas|Playlists|Pastas|Artistas|Álbuns|Pesquisar minha música|Ordenar|Mais recente|Mais tocadas|De A a Z|Mais faixas|Configurações|Tempo de reprodução|Tema|Auto (telefone)|Claro|Escuro|Temporizador de sono|Desativado|Arquivos ocultos|arquivos|Verificar novamente|Idioma|Configurações de reprodução|Comentários e problemas|Sobre|Nova playlist|Nome da playlist|Músicas curtidas|Tocadas recentemente|Adicionar a uma playlist|Excluir esta playlist?|Adicionar aos favoritos|Remover dos favoritos|Ocultar este arquivo|Nenhuma música encontrada.|Permitir|O Melodrift precisa de acesso às suas músicas.|Nada aqui ainda.|Fila|Histórico|faixas|Conte-nos o problema|Opinião|Explique o que aconteceu ou dê sua opinião.|Enviar por e-mail|Escrever no Facebook|Escreva sua opinião primeiro.|Arquivo não encontrado|O arquivo não pode ser reproduzido|A música para|Aplicativo lento|Letra|Anúncios|Outros|Tempo total de reprodução|Tempo de reprodução de música|Tempo de reprodução de vídeo|Fade cruzado|Esmaecer no fim e no início das faixas|Sem favoritos.`)],ar:['العربية',P(`فيديو|أغاني|قوائم التشغيل|مجلدات|فنانون|ألبومات|ابحث في موسيقاي|ترتيب|الأحدث|الأكثر تشغيلاً|من أ إلى ي|الأكثر أغاني|الإعدادات|وقت التشغيل|السمة|تلقائي (الهاتف)|فاتح|داكن|مؤقت النوم|إيقاف|ملفات مخفية|ملفات|فحص مرة أخرى|اللغة|إعدادات التشغيل|الملاحظات والمشاكل|حول|قائمة تشغيل جديدة|اسم القائمة|الأغاني المفضلة|شُغّلت مؤخراً|أضف إلى قائمة تشغيل|حذف هذه القائمة؟|أضف إلى المفضلة|أزل من المفضلة|إخفاء هذا الملف|لم يتم العثور على موسيقى.|السماح|يحتاج Melodrift إلى الوصول إلى موسيقاك.|لا شيء هنا بعد.|قائمة الانتظار|السجل|أغاني|أخبرنا بالمشكلة|ملاحظاتك|اشرح ما حدث أو شاركنا رأيك.|إرسال بالبريد الإلكتروني|اكتب على فيسبوك|اكتب ملاحظاتك أولاً.|الملف غير موجود|لا يمكن تشغيل الملف|الموسيقى تتوقف|التطبيق بطيء|الكلمات|إعلانات|أخرى|إجمالي وقت التشغيل|وقت تشغيل الموسيقى|وقت تشغيل الفيديو|مزج التلاشي|تلاشي في نهاية المقاطع وبدايتها|لا توجد مفضلة.`)],hi:['हिन्दी',P(`वीडियो|गाने|प्लेलिस्ट|फ़ोल्डर|कलाकार|एल्बम|मेरा संगीत खोजें|क्रमबद्ध करें|नवीनतम|सबसे ज़्यादा सुने|A से Z|सबसे ज़्यादा गाने|सेटिंग्स|सुनने का समय|थीम|ऑटो (फ़ोन)|हल्का|गहरा|स्लीप टाइमर|बंद|छिपी हुई फ़ाइलें|फ़ाइलें|दोबारा स्कैन करें|भाषा|प्लेबैक सेटिंग्स|प्रतिक्रिया और समस्याएँ|के बारे में|नई प्लेलिस्ट|प्लेलिस्ट का नाम|पसंदीदा गाने|हाल ही में चलाए गए|प्लेलिस्ट में जोड़ें|यह प्लेलिस्ट हटाएँ?|पसंदीदा में जोड़ें|पसंदीदा से हटाएँ|यह फ़ाइल छिपाएँ|कोई संगीत नहीं मिला।|अनुमति दें|Melodrift को आपके संगीत तक पहुँच चाहिए।|यहाँ अभी कुछ नहीं है।|कतार|इतिहास|गाने|हमें समस्या बताएँ|राय|बताएँ क्या हुआ या अपनी राय दें।|ईमेल से भेजें|Facebook पर लिखें|पहले अपनी राय लिखें।|फ़ाइल नहीं मिली|फ़ाइल चलाई नहीं जा सकती|संगीत रुक जाता है|ऐप धीमा है|बोल|विज्ञापन|अन्य|कुल सुनने का समय|संगीत सुनने का समय|वीडियो देखने का समय|क्रॉसफ़ेड|गानों के अंत और शुरुआत में फ़ेड|कोई पसंदीदा नहीं।`)],id:['Bahasa Indonesia',P(`Video|Lagu|Playlist|Folder|Artis|Album|Cari musik saya|Urutkan|Terbaru|Paling sering diputar|A sampai Z|Lagu terbanyak|Pengaturan|Waktu pemutaran|Tema|Otomatis (ponsel)|Terang|Gelap|Timer tidur|Nonaktif|File tersembunyi|file|Pindai ulang|Bahasa|Pengaturan pemutaran|Masukan dan masalah|Tentang|Playlist baru|Nama playlist|Lagu favorit|Baru diputar|Tambahkan ke playlist|Hapus playlist ini?|Tambahkan ke favorit|Hapus dari favorit|Sembunyikan file ini|Musik tidak ditemukan.|Izinkan|Melodrift memerlukan akses ke musik Anda.|Belum ada apa-apa di sini.|Antrean|Riwayat|lagu|Ceritakan masalahnya|Masukan|Jelaskan apa yang terjadi atau berikan pendapat Anda.|Kirim lewat email|Tulis di Facebook|Tulis masukan Anda dulu.|File tidak ditemukan|File tidak dapat diputar|Musik berhenti|Aplikasi lambat|Lirik|Iklan|Lainnya|Total waktu pemutaran|Waktu pemutaran musik|Waktu pemutaran video|Crossfade|Memudar di akhir dan awal lagu|Belum ada favorit.`)],ru:['Русский',P(`Видео|Песни|Плейлисты|Папки|Исполнители|Альбомы|Поиск в моей музыке|Сортировка|Последние|Самые популярные|От А до Я|Больше всего треков|Настройки|Время прослушивания|Тема|Авто (телефон)|Светлая|Тёмная|Таймер сна|Выкл.|Скрытые файлы|файлов|Сканировать заново|Язык|Настройки воспроизведения|Отзывы и проблемы|О приложении|Новый плейлист|Название плейлиста|Любимые песни|Недавно воспроизведённые|Добавить в плейлист|Удалить этот плейлист?|Добавить в избранное|Убрать из избранного|Скрыть этот файл|Музыка не найдена.|Разрешить|Melodrift нужен доступ к вашей музыке.|Здесь пока ничего нет.|Очередь|История|треков|Расскажите о проблеме|Отзыв|Опишите, что произошло, или поделитесь мнением.|Отправить по e-mail|Написать в Facebook|Сначала напишите отзыв.|Файл не найден|Файл не удаётся воспроизвести|Музыка останавливается|Приложение тормозит|Текст песни|Реклама|Другое|Общее время прослушивания|Время прослушивания музыки|Время просмотра видео|Плавный переход|Затухание в конце и начале треков|Нет избранного.`)],zh:['中文',P(`视频|歌曲|播放列表|文件夹|艺术家|专辑|搜索我的音乐|排序|最新|播放最多|A 到 Z|歌曲最多|设置|播放时长|主题|自动（手机）|浅色|深色|睡眠定时|关闭|隐藏的文件|个文件|重新扫描|语言|播放设置|反馈与问题|关于|新建播放列表|播放列表名称|喜欢的歌曲|最近播放|添加到播放列表|删除此播放列表？|添加到收藏|从收藏中移除|隐藏此文件|未找到音乐。|允许|Melodrift 需要访问你的音乐。|这里还没有内容。|播放队列|历史记录|首|告诉我们问题|意见|请说明发生了什么，或分享你的意见。|通过邮件发送|在 Facebook 上留言|请先写下你的意见。|找不到文件|无法播放该文件|音乐停止|应用很慢|歌词|广告|其他|总播放时长|音乐播放时长|视频播放时长|淡入淡出|曲目结尾和开头淡入淡出|没有收藏。`)]};
+const cl=()=>{if(lang!='auto'&&LANGS[lang])return lang;const n=(navigator.language||'en').slice(0,2).toLowerCase();return LANGS[n]?n:'en'};
+const t=i=>LANGS[cl()][1][i]||LANGS.fr[1][i]||'';
+const fmtD=s=>s>=3600?Math.floor(s/3600)+'h '+Math.floor(s%3600/60)+'m':Math.floor(s/60)+'m '+s%60+'s';
+const SORTS=[['new',8],['top',9],['az',10],['count',11]];
 const dm=matchMedia('(prefers-color-scheme:dark)');
 function applyTheme(){document.documentElement.dataset.theme=theme=='auto'?(dm.matches?'dark':'light'):theme;applyTint()}
 dm.onchange=applyTheme;applyTheme();
@@ -126,16 +135,16 @@ function groups(key){const g={};vis().forEach(s=>(g[s[key]]=g[s[key]]||[]).push(
  const e=Object.entries(g).map(([k,list])=>({k,list,name:key=='folder'?k.slice(k.lastIndexOf('/')+1):k}));
  const sc=x=>sort=='count'?x.list.length:sort=='top'?x.list.reduce((a,s)=>a+(plays[s.id]||0),0):Math.max(...x.list.map(s=>s.added));
  return sort=='az'?e.sort((a,b)=>a.name.localeCompare(b.name)):e.sort((a,b)=>sc(b)-sc(a))}
-const allPl=()=>[{id:'fav',name:'❤ Chansons aimées',list:vis().filter(s=>favs.has(s.id))},
- {id:'rec',name:'🕘 Lue dernièrement',list:recent.map(i=>byId[i]).filter(s=>s&&!hid.has(s.id))},
- {id:'top',name:'🔥 Le plus joué',list:vis().filter(s=>plays[s.id]).sort((a,b)=>plays[b.id]-plays[a.id]).slice(0,100)},
+const allPl=()=>[{id:'fav',name:'❤ '+t(29),list:vis().filter(s=>favs.has(s.id))},
+ {id:'rec',name:'🕘 '+t(30),list:recent.map(i=>byId[i]).filter(s=>s&&!hid.has(s.id))},
+ {id:'top',name:'🔥 '+t(9),list:vis().filter(s=>plays[s.id]).sort((a,b)=>plays[b.id]-plays[a.id]).slice(0,100)},
  ...pls.map(p=>({id:p.id,name:p.name,user:1,list:p.ids.map(i=>byId[i]).filter(s=>s&&!hid.has(s.id))}))];
 const card=(attr,name,list)=>`<div class="card" ${attr}>${cv(name,list[0]?'a:'+list[0].id:'')}<div class="ct"><b>${esc(name)}</b>${list.slice(0,2).map(s=>`<small>♫ ${esc(s.title)}</small>`).join('')}</div><span>${list.length}</span></div>`;
 const row=(s,i)=>`<div class="it ${cur&&cur.id==s.id?'cur':''}" data-i="${i}">${cv(s.title,'a:'+s.id)}<div class="tt"><b>${esc(s.title)}</b><small>${esc(s.artist)} · ${fmt(s.dur)}</small></div><button class="mo" data-m="${i}">⋮</button></div>`;
-const rows=l=>{shown=l;return l.map(row).join('')||'<div class="empty">Rien ici pour le moment.</div>'};
+const rows=l=>{shown=l;return l.map(row).join('')||'<div class="empty">'+t(view&&view.id=='fav'?61:39)+'</div>'};
 function viewData(){if(view.t=='g'){const g=groups(KEYS[tab]).find(x=>x.k==view.k);return g?{name:g.name,list:srt(g.list)}:null}
  const p=allPl().find(x=>x.id==view.id);return p?{name:p.name,list:p.list,user:p.user}:null}
-function setNav(){const n=$('nav');if(!n.children.length)n.innerHTML=TABS.map((t,i)=>`<button data-t="${i}">${t}</button>`).join('');
+function setNav(){const n=$('nav');if(!n.children.length)n.innerHTML=TABS.map(i=>`<button data-t="${i}">${t(i)}</button>`).join('');
  [...n.children].forEach((b,i)=>b.classList.toggle('on',i==tab));
  const b=n.children[tab];n.scrollTo({left:b.offsetLeft-(n.clientWidth-b.offsetWidth)/2,behavior:'smooth'})}
 function go(t){if(t<0||t>=TABS.length||t==tab)return;const d=t>tab?1:-1;tab=t;view=null;$('top').classList.remove('h');render();
@@ -147,14 +156,14 @@ $('main').addEventListener('touchend',e=>{if(tn)return;const t=e.changedTouches[
 function render(){
  setNav();
  let h='';
- if(denied)h='<div class="empty">Melodrift a besoin d\'accéder à tes musiques.<br><button class="btn" onclick="scan()">Autoriser</button></div>';
+ if(denied)h='<div class="empty">'+t(38)+'<br><button class="btn" onclick="scan()">'+t(37)+'</button></div>';
  else if(!MS)h='<div class="empty">Ouvre Melodrift depuis l\'app installée pour scanner tes musiques.</div>';
  else if(view){const d=viewData();if(!d){view=null;return render()}
   h=`<div class="top"><button class="ic" data-back="1">←</button><span>${esc(d.name)}</span>${d.user?'<button class="ic" data-del="1">🗑</button>':''}</div>`+rows(d.list)}
- else if(tab==0)h=`<small style="margin-bottom:12px">${vids.length} vidéos</small><div class="vg">`+vids.map(v=>`<div data-v="${v.id}">${cv(v.title,'v:'+v.id)}<b>${esc(v.title)}</b><small>${v.h?v.h+'P | ':''}${fmt(v.dur)}</small></div>`).join('')+'</div>';
- else if(!songs.length)h='<div class="empty">Aucune musique trouvée.<br><button class="btn" onclick="scan()">Scanner à nouveau</button></div>';
+ else if(tab==0)h=`<small style="margin-bottom:12px">${vids.length} ${t(0).toLowerCase()}</small><div class="vg">`+vids.map(v=>`<div data-v="${v.id}">${cv(v.title,'v:'+v.id)}<b>${esc(v.title)}</b><small>${v.h?v.h+'P | ':''}${fmt(v.dur)}</small></div>`).join('')+'</div>';
+ else if(!songs.length)h='<div class="empty">'+t(36)+'<br><button class="btn" onclick="scan()">'+t(22)+'</button></div>';
  else if(tab==1)h=rows(srt(vis()));
- else if(tab==2)h='<div class="card add" data-new="1"><span class="plus">＋</span><b>Nouvelle playlist</b></div>'+allPl().map(p=>card(`data-p="${esc(p.id)}"`,p.name,p.list)).join('');
+ else if(tab==2)h='<div class="card add" data-new="1"><span class="plus">＋</span><b>'+t(27)+'</b></div>'+allPl().map(p=>card(`data-p="${esc(p.id)}"`,p.name,p.list)).join('');
  else h=groups(KEYS[tab]).map(g=>card(`data-g="${esc(g.k)}"`,g.name,g.list)).join('');
  $('list').innerHTML=h;document.querySelectorAll('#list [data-art]').forEach(e=>obs.observe(e))}
 async function scan(){
@@ -167,26 +176,27 @@ function sheet(title,items){const sh=$('sh');sh.innerHTML=`<div class="shb"><h3>
  sh.onclick=e=>{const i=e.target.dataset.s;sh.style.display='none';if(i!==undefined)items[i][1]()}}
 const sv=()=>{S('fav',[...favs]);S('hid',[...hid]);S('pls',pls);updHeart()}
 function updHeart(){const f=cur&&favs.has(cur.id);$('fh').textContent=f?'♥':'♡';$('fh').style.color=f?'#ff5a7a':''};
-function newPl(then){const n=prompt('Nom de la playlist');if(!n)return;const p={id:'u'+Date.now(),name:n.trim(),ids:[]};pls.push(p);sv();then?then(p):render()}
-function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();render()};sheet('Ajouter à une playlist',[...pls.map(p=>[p.name,()=>put(p)]),['＋ Nouvelle playlist',()=>newPl(put)]])}
-function songMenu(s){sheet(s.title,[[favs.has(s.id)?'Retirer des favoris':'Ajouter aux favoris',()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],['Ajouter à une playlist',()=>addTo(s)],['Masquer ce fichier',()=>{hid.add(s.id);sv();render()}]])}
-function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':'Désactiver';if(m)sleepT=setTimeout(()=>{au.pause();sleepL='Désactiver'},m*60000);renderSet()}
-function renderSet(){const t=ptime,R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
- $('sl').innerHTML=R('time','Temps de lecture',Math.floor(t/3600)+'h '+Math.floor(t%3600/60)+'m')+R('theme','Thème',{auto:'Auto (téléphone)',light:'Clair',dark:'Sombre'}[theme])+R('sleep','Minuterie de sommeil',sleepL)+R('hid','Fichiers masqués',hid.size+' fichiers')+R('scan','Scanner à nouveau','')+R('fb','Commentaires et problèmes','')+R('about','À propos','5.1')}
+function newPl(then){const n=prompt(t(28));if(!n)return;const p={id:'u'+Date.now(),name:n.trim(),ids:[]};pls.push(p);sv();then?then(p):render()}
+function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();render()};sheet(t(31),[...pls.map(p=>[p.name,()=>put(p)]),['＋ '+t(27),()=>newPl(put)]])}
+function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],[t(35),()=>{hid.add(s.id);sv();render()}]])}
+function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
+function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
+ $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'8.0')}
 $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
- if(a=='theme')sheet('Thème',[['Auto (téléphone)',()=>0],['Clair',()=>0],['Sombre',()=>0]].map((x,i)=>[x[0],()=>{theme=['auto','light','dark'][i];S('theme',theme);applyTheme();renderSet()}]));
- if(a=='sleep')sheet('Minuterie de sommeil',[['Désactiver',0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
- if(a=='hid')sheet('Fichiers masqués (toucher pour afficher)',songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['Fermer',()=>0]]));
+ if(a=='theme')sheet(t(14),[[t(15),()=>0],[t(16),()=>0],[t(17),()=>0]].map((x,i)=>[x[0],()=>{theme=['auto','light','dark'][i];S('theme',theme);applyTheme();renderSet()}]));
+ if(a=='sleep')sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
+ if(a=='hid')sheet(t(20),songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['✕',()=>0]]));
  if(a=='scan'){scan();$('st').style.display='none'}
+ if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();
  if(a=='fb')openFb();
- if(a=='about')sheet('Melodrift 5.1',[['Lecteur de musique et vidéos, sans pub.',()=>0]])};
+ if(a=='about')sheet('Melodrift 8.0',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
 const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else e.style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
-$('bt').onclick=()=>sheet('Tri',SORTS.map(x=>[(sort==x[0]?'✓ ':'')+x[1],()=>{sort=x[0];render()}]));
+$('bt').onclick=()=>sheet(t(7),SORTS.map(x=>[(sort==x[0]?'✓ ':'')+t(x[1]),()=>{sort=x[0];render()}]));
 $('bs').onclick=()=>{openOv('sr');$('q').value='';sres();$('q').focus()};$('sx').onclick=()=>closeOv('sr');
 function sres(){sq=$('q').value.toLowerCase().trim();
- if(!sq){$('sc').innerHTML=(hist.length?'<div class="top"><span style="font-size:20px">Historique</span><button class="ic" data-clr="1">🗑</button></div>'+hist.map(h=>`<span class="ch" data-h="${esc(h)}">${esc(h)}</span>`).join(''):'');return}
+ if(!sq){$('sc').innerHTML=(hist.length?'<div class="top"><span style="font-size:20px">'+t(41)+'</span><button class="ic" data-clr="1">🗑</button></div>'+hist.map(h=>`<span class="ch" data-h="${esc(h)}">${esc(h)}</span>`).join(''):'');return}
  $('sc').innerHTML=rows(vis().filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(sq)));
  document.querySelectorAll('#sc [data-art]').forEach(e=>obs.observe(e))}
 $('q').oninput=sres;
@@ -198,7 +208,7 @@ $('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined)go(+t)};
 $('list').onclick=e=>{const d=e.target.dataset,m=d.m;
  if(m!==undefined)return songMenu(shown[m]);
  if(d.back){view=null;return render()}
- if(d.del){if(confirm('Supprimer cette playlist ?')){pls=pls.filter(p=>p.id!=view.id);sv();view=null;render()}return}
+ if(d.del){if(confirm(t(32))){pls=pls.filter(p=>p.id!=view.id);sv();view=null;render()}return}
  const it=e.target.closest('[data-i],[data-g],[data-p],[data-v],[data-new]');if(!it)return;const x=it.dataset;
  if(x.new)return newPl();
  if(x.p!==undefined){view={t:'p',id:x.p};return render()}
@@ -220,21 +230,21 @@ all('md').forEach(b=>b.onclick=()=>{mode=(mode+1)%3;all('md').forEach(x=>x.textC
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
 au.onplay=()=>{all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE)};au.onpause=()=>{all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY)};
 au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1);
-au.ontimeupdate=()=>{if(au.duration){const v=au.currentTime/au.duration*100;document.querySelectorAll('.pp').forEach(b=>b.style.setProperty('--p',v+'%'));$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
+au.ontimeupdate=()=>{if(au.duration){au.volume=fadeOn?Math.max(.03,Math.min(1,(au.duration-au.currentTime)/3,au.currentTime/3+.1)):1;const v=au.currentTime/au.duration*100;document.querySelectorAll('.pp').forEach(b=>b.style.setProperty('--p',v+'%'));$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
 $('mo').onclick=$('mc').onclick=()=>cur&&openOv('fp');$('fx').onclick=()=>closeOv('fp');
-$('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?'Retirer des favoris':'Ajouter aux favoris',()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],['Ajouter à une playlist',()=>addTo(cur)],['Minuterie de sommeil',()=>sheet('Minuterie',[['Désactiver',0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
-setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}},1000);
+$('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?t(34):t(33),()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],[t(31),()=>addTo(cur)],[t(18),()=>sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
+setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}if(!$('vv').paused&&$('vw').style.display=='block'){vtime++;if(vtime%10==0)S('vtime',vtime)}},1000);
 try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
  if($('sh').style.display=='block')return $('sh').style.display='none';
- const o=['fk','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);
+ const o=['fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);
  if(view){view=null;return render()}Capacitor.Plugins.App.exitApp()})}catch(e){}
 const ico=d=>`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 18V6L3 12zM21 18V6l-8.5 6z',NEXT='M12.5 6v12L21 12zM3 6v12l8.5-6z';
 document.querySelector('#fp .pv').innerHTML=ico(PREV);document.querySelector('#fp .nx').innerHTML=ico(NEXT);$('fpp').innerHTML=ico(PLAY);all('pp').forEach(b=>b.innerHTML=ico(PLAY));all('pv').forEach(b=>b.innerHTML=ico(PREV));all('nx').forEach(b=>b.innerHTML=ico(NEXT));
 $('fpp').onclick=()=>document.querySelector('#mini .pp').click();
 $('fh').onclick=()=>{if(!cur)return;favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv();render()};
-$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet('File d\'attente ('+queue.length+')',queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)]))};
+$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet(t(40)+' ('+queue.length+')',queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)]))};
 let fy=0,fxx=0;$('fp').addEventListener('touchstart',e=>{fy=e.touches[0].clientY;fxx=e.touches[0].clientX},{passive:true});
 $('fp').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(t.clientY-fy>140&&Math.abs(t.clientX-fxx)<80&&!e.target.closest('input'))closeOv('fp')},{passive:true});
 function rgb2hs(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/2;let h=0;if(d){h=mx==r?((g-b)/d)%6:mx==g?(b-r)/d+2:(r-g)/d+4;h=Math.round(h*60);if(h<0)h+=360}return{h,s:d?Math.round(d/(1-Math.abs(2*l-1))*100):0}}
@@ -248,17 +258,26 @@ async function tintOf(s){let d=null;
   tint=rgb2hs(r/w,g/w,b/w)}catch(e){}}
  else tint={h:+col(s.title).match(/\d+/)[0],s:40};
  if(cur&&cur.id==s.id)applyTint()}
-let kcat='';const KC=['Fichier non trouvé','Le fichier ne peut pas être lu','La musique s\'arrête','Application lente','Parole','Pubs','Autres'];
-function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').innerHTML=KC.map((c,i)=>`<span class="ch" data-k="${i}">${esc(c)}</span>`).join('');$('kf').style.display=FB_URL?'block':'none';openOv('fk')}
-$('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
+let kcat='';const KC=()=>[49,50,51,52,53,54,55].map(t);
+function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').innerHTML=KC().map((c,i)=>`<span class="ch" data-k="${i}">${esc(c)}</span>`).join('');$('kf').style.display=FB_URL?'block':'none';openOv('fk')}
+$('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
-$('ke').onclick=()=>{if(!$('kt').value.trim())return alert('Écris ton avis d\'abord.');
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 5.1 (Android)')};
+$('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 8.0 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
 function lay(){$('top').style.setProperty('--hh',$('hd').offsetHeight+'px');$('main').style.paddingTop=$('top').offsetHeight+'px'}
 let ls=0;$('main').addEventListener('scroll',()=>{const st=$('main').scrollTop,dy=st-ls;if(st<20||dy<-6)$('top').classList.remove('h');else if(dy>8)$('top').classList.add('h');ls=st},{passive:true});
-addEventListener('resize',lay);lay();setTimeout(lay,400);applyTint();
-render();scan();
+addEventListener('resize',lay);lay();setTimeout(lay,400);function applyLang(){document.documentElement.lang=cl();document.documentElement.dir=cl()=='ar'?'rtl':'ltr';
+ $('q').placeholder=t(6);$('stt').textContent=t(12);$('fkt').textContent=t(43);$('fko').textContent=t(44)+' *';$('kt').placeholder=t(45);$('ke').textContent=t(46);$('kf').textContent=t(47);
+ $('nav').innerHTML='';render();renderSet()}
+function openLang(){$('lgt').textContent=t(23);$('ll').innerHTML=[['auto','Auto'],...Object.entries(LANGS).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<div class="sr" data-l="${k}"><span>${esc(n)}</span><span>${lang==k?'✓':''}</span></div>`).join('');openOv('lg')}
+$('ll').onclick=e=>{const k=e.target.closest('[data-l]')?.dataset.l;if(!k)return;lang=k;S('lang',k);applyLang();openLang()};$('lx').onclick=()=>closeOv('lg');
+function openPlay(){$('pst').textContent=t(24);$('psl').innerHTML=`<div class="sr" data-f="1"><div><div>${t(59)}</div><small>${t(60)}</small></div><div class="sw ${fadeOn?'on':''}"><i></i></div></div>`;openOv('ps')}
+$('psl').onclick=e=>{if(e.target.closest('[data-f]')){fadeOn=!fadeOn;S('fade',fadeOn);if(!fadeOn)au.volume=1;openPlay()}};$('psx').onclick=()=>closeOv('ps');
+function openTime(){$('tpt').textContent=t(13);const B=(l,v)=>`<div class="sr" style="display:block"><small>${l}</small><div style="font-size:30px;font-weight:700;margin-top:6px">${fmtD(v)}</div></div>`;$('tpc').innerHTML=B(t(56),ptime+vtime)+B(t(57),ptime)+B(t(58),vtime);openOv('tp')}
+$('tpx').onclick=()=>closeOv('tp');
+applyTint();
+applyLang();scan();
 </script></body></html>
