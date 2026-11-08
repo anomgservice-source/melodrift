@@ -80,6 +80,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #ptr{position:fixed;left:50%;top:0;width:46px;height:46px;border-radius:50%;background:var(--card);box-shadow:0 2px 10px #0004;z-index:4;display:grid;place-items:center;opacity:0;pointer-events:none;transform:translate(-50%,-60px)}
 #ptr.spin svg{animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 .sk{display:flex;justify-content:space-between;margin-top:6px}.sk button{font-size:20px!important;opacity:.85}
+
+.eqQuick{background:var(--card)!important;border:0;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-size:21px!important;color:var(--ac)!important;flex:none}
+#fp .eqQuick{width:44px;height:44px}
+#repeatBtn{background:var(--card);border:0;border-radius:18px;padding:9px 12px;color:var(--mt);font-size:18px}
+#fc.vinyl{border-radius:50%!important;animation:vinylTurn 14s linear infinite;box-shadow:0 0 0 8px rgba(255,255,255,.12),0 0 0 12px rgba(0,0,0,.12)}
+#fc.vinyl:after{content:"";display:block;width:17%;height:17%;border-radius:50%;position:absolute;left:41.5%;top:41.5%;background:var(--mini);border:4px solid rgba(0,0,0,.28);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
+#fc{position:relative;overflow:hidden}
+@keyframes vinylTurn{to{transform:rotate(360deg)}}
+#eqRows{display:flex;align-items:flex-end;justify-content:space-around;gap:4px;padding:18px 8px 12px;min-height:250px}
+#eqRows>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;min-width:0;flex:1}
+#eqRows>div b{font-size:11px;white-space:nowrap}
+#eqRows>div small{font-size:11px}
+#eqRows input[type=range]{writing-mode:vertical-lr;direction:rtl;width:24px;height:165px;margin:0;accent-color:var(--ac);touch-action:pan-x}
+@media(max-width:380px){#eqRows{gap:1px;padding-left:2px;padding-right:2px}#eqRows>div b{font-size:9px}}
 </style></head><body>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
 <nav id="nav"></nav></div>
@@ -87,14 +101,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div id="main"><div id="list"></div></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
-<button class="md">↻</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
+<button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
 <div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
 <div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
 <div style="flex:1"></div>
 <input id="fb" type="range"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div>
 <div class="sk"><button id="sm">⟲ 10</button><button id="sq">10 ⟳</button></div>
 <div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
-<div class="bot"><button class="md">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
+<div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
 <div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span id="stt">Paramètres</span></div><div class="set" id="sl"></div></div>
 <div class="ov" id="fk"><div class="top"><button class="ic" id="kx">←</button><span id="fkt"></span></div>
@@ -234,7 +248,7 @@ $('list').onclick=e=>{const d=e.target.dataset,m=d.m;
  if(x.v){const v=vids.find(y=>y.id==x.v);au.pause();$('vv').src=src(v.path);$('vw').style.display='block';return $('vv').play()}
  if(x.i!==undefined)play(shown[+x.i],shown)};
 $('vx').onclick=()=>{$('vv').pause();$('vv').removeAttribute('src');$('vw').style.display='none'};
-function play(s,list){if(!s)return;if(list){queue=list;S('queue',queue.map(x=>x.id))}cur=s;au.src=src(s.path);au.play();
+function play(s,list){if(!s)return;if(list){queue=list;S('queue',queue.map(x=>x.id))}cur=s;$('fc').classList.remove('vinyl');au.src=src(s.path);au.play();
  plays[s.id]=(plays[s.id]||0)+1;recent=[s.id,...recent.filter(i=>i!=s.id)].slice(0,100);S('plays',plays);S('rec',recent);
  $('mt').textContent=s.title;$('ma').textContent=s.artist;$('ft').textContent=s.title;$('fa').textContent=s.artist;
  all('pp').forEach(b=>b.style.setProperty('--p','0%'));setCv($('mc'),s);setCv($('fc'),s);tintOf(s);nSoon();$('fal').textContent=s.album;updHeart();
@@ -245,9 +259,12 @@ function nSoon(){clearTimeout(nT);nT=setTimeout(nSync,300)}
 function step(d){if(!queue.length)return;let i=queue.findIndex(x=>x.id==cur.id);i=mode==2?Math.floor(Math.random()*queue.length):(i+d+queue.length)%queue.length;play(queue[i])}
 const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
-all('md').forEach(b=>b.onclick=()=>{mode=(mode+1)%3;all('md').forEach(x=>x.textContent=['↻','🔂','🔀'][mode])});
+function syncRepeat(){const b=$('repeatBtn');if(b){b.textContent=mode===1?'🔂 1':mode===2?'🔀':'↻';b.title=mode===1?'Répéter ce titre':mode===2?'Lecture aléatoire':'Répétition désactivée'}}
+$('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};
+all('eqQuick').forEach(b=>b.onclick=()=>{openOv('studio');openStudioTool('eq')});
+syncRepeat();
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
-au.onplay=()=>{all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE);nSoon()};au.onpause=()=>{all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY);nSoon()};
+au.onplay=()=>{$('fc').classList.add('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE);nSoon()};au.onpause=()=>{$('fc').classList.remove('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY);nSoon()};
 au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1);
 au.ontimeupdate=()=>{if(au.duration){au.volume=fadeOn?Math.max(.03,Math.min(1,(au.duration-au.currentTime)/3,au.currentTime/3+.1)):1;const v=au.currentTime/au.duration*100;document.querySelectorAll('.pp').forEach(b=>b.style.setProperty('--p',v+'%'));if(!fdrag){$('fb').value=v;$('fb').style.setProperty('--p',v+'%')}if(cur&&Date.now()-lsv>4000){lsv=Date.now();S('last',{id:cur.id,t:au.currentTime})}$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
 $('mo').onclick=$('mc').onclick=()=>cur&&openOv('fp');$('fx').onclick=()=>closeOv('fp');
