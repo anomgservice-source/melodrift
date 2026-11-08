@@ -88,12 +88,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #fc.vinyl:after{content:"";display:block;width:17%;height:17%;border-radius:50%;position:absolute;left:41.5%;top:41.5%;background:var(--mini);border:4px solid rgba(0,0,0,.28);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
 #fc{position:relative;overflow:hidden}
 @keyframes vinylTurn{to{transform:rotate(360deg)}}
+#playerVisual{display:none;width:100%;height:112px;margin:4px 0 8px;border-radius:18px;background:rgba(0,0,0,.10)}
+#playerVisual.active{display:block}
+#studio{z-index:12}
 #eqRows{display:flex;align-items:flex-end;justify-content:space-around;gap:4px;padding:18px 8px 12px;min-height:250px}
 #eqRows>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;min-width:0;flex:1}
 #eqRows>div b{font-size:11px;white-space:nowrap}
 #eqRows>div small{font-size:11px}
 #eqRows input[type=range]{writing-mode:vertical-lr;direction:rtl;width:24px;height:165px;margin:0;accent-color:var(--ac);touch-action:pan-x}
 @media(max-width:380px){#eqRows{gap:1px;padding-left:2px;padding-right:2px}#eqRows>div b{font-size:9px}}
+#eqRows>div>div{display:flex!important;flex-direction:column;align-items:center;gap:2px;width:100%}#eqRows>div b{font-size:10px}#eqRows>div small{font-size:9px;white-space:nowrap}
 </style></head><body>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
 <nav id="nav"></nav></div>
@@ -101,12 +105,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div id="main"><div id="list"></div></div>
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
-<button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
+<button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
 <div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
 <div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
 <div style="flex:1"></div>
+<canvas id="playerVisual" width="900" height="180" aria-label="Visualisation musicale"></canvas>
 <input id="fb" type="range"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div>
-<div class="sk"><button id="sm">⟲ 10</button><button id="sq">10 ⟳</button></div>
 <div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
 <div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
@@ -210,7 +214,8 @@ const sv=()=>{S('fav',[...favs]);S('hid',[...hid]);S('pls',pls);updHeart()}
 function updHeart(){const f=cur&&favs.has(cur.id);$('fh').textContent=f?'♥':'♡';$('fh').style.color=f?'#ff5a7a':''};
 function newPl(then){const n=prompt(t(28));if(!n)return;const p={id:'u'+Date.now(),name:n.trim(),ids:[]};pls.push(p);sv();then?then(p):render()}
 function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();render()};sheet(t(31),[...pls.map(p=>[p.name,()=>put(p)]),['＋ '+t(27),()=>newPl(put)]])}
-function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
+function chooseVisual(){const modes=[['Barres de fréquences','bars'],['Ondes audio','waves'],['Cercle animé','circle'],['Spectre circulaire','radial']];sheet('Visualisation musicale',modes.map(([label,key])=>[`${L('visualMode','bars')===key?'✓ ':''}${label}`,()=>{S('visualMode',key);refreshPlayerVisual()}]).concat([['Désactiver la visualisation',()=>{S('visualMode','off');refreshPlayerVisual()}]]))}
+function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],['Visualisation musicale',chooseVisual],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
 function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
 function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
  $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('studio','Studio & outils avancés','Égaliseur • Paroles • Visualiseur')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'10.0')}
@@ -261,14 +266,14 @@ const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
 function syncRepeat(){const b=$('repeatBtn');if(b){b.textContent=mode===1?'🔂 1':mode===2?'🔀':'↻';b.title=mode===1?'Répéter ce titre':mode===2?'Lecture aléatoire':'Répétition désactivée'}}
 $('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};
-all('eqQuick').forEach(b=>b.onclick=()=>{openOv('studio');openStudioTool('eq')});
+const fullEq=$('#fp .eqQuick');if(fullEq)fullEq.onclick=()=>{openOv('studio');openStudioTool('eq')};
 syncRepeat();
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
-au.onplay=()=>{$('fc').classList.add('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE);nSoon()};au.onpause=()=>{$('fc').classList.remove('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY);nSoon()};
+au.onplay=()=>{if(L('visualMode','bars')!=='off'){visualOn=true;ensureAudioGraph();refreshPlayerVisual()}$('fc').classList.add('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE);nSoon()};au.onpause=()=>{$('fc').classList.remove('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY);nSoon()};
 au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1);
 au.ontimeupdate=()=>{if(au.duration){au.volume=fadeOn?Math.max(.03,Math.min(1,(au.duration-au.currentTime)/3,au.currentTime/3+.1)):1;const v=au.currentTime/au.duration*100;document.querySelectorAll('.pp').forEach(b=>b.style.setProperty('--p',v+'%'));if(!fdrag){$('fb').value=v;$('fb').style.setProperty('--p',v+'%')}if(cur&&Date.now()-lsv>4000){lsv=Date.now();S('last',{id:cur.id,t:au.currentTime})}$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
-$('mo').onclick=$('mc').onclick=()=>cur&&openOv('fp');$('fx').onclick=()=>closeOv('fp');
-$('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?t(34):t(33),()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],[t(31),()=>addTo(cur)],[t(18),()=>sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
+$('mo').onclick=$('mc').onclick=()=>{if(cur){openOv('fp');refreshPlayerVisual()}};$('fx').onclick=()=>closeOv('fp');
+$('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?t(34):t(33),()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],[t(31),()=>addTo(cur)],['Visualisation musicale',chooseVisual],[t(18),()=>sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
 setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}if(!$('vv').paused&&$('vw').style.display=='block'){vtime++;if(vtime%10==0)S('vtime',vtime)}},1000);
 try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
@@ -341,19 +346,19 @@ try{MS&&MS.addListener('media',e=>{if(e.a=='PLAY')document.querySelector('#mini 
 const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
 fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fbE.style.setProperty('--p',e.target.value+'%')}};
-$('sm').onclick=()=>{au.currentTime=Math.max(0,au.currentTime-10)};$('sq').onclick=()=>{au.currentTime=Math.min(au.duration||1e9,au.currentTime+10)};
+
 // Melodrift 11.0 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
-function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';openOv('studio'); }
+function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display='';openOv('studio'); }
 $('studioBack').onclick=()=>closeOv('studio');
 $('studioHome').onclick=e=>{const tool=e.target.closest('[data-tool]')?.dataset.tool;if(!tool)return;openStudioTool(tool)};
 function openStudioTool(tool){
- $('studioHome').style.display='none';const p=$('studioPanel');
+ $('studioHome').style.display='none';$('studio').firstElementChild.style.display='none';const p=$('studioPanel');
  const back='<div class="top"><button class="ic" id="toolBack">←</button><span>Melodrift Studio</span></div>';
  if(tool==='eq'){
   const presets=['Personnalisé','Flat','Bass Boost','Pop','Rock','Jazz','Classique'];
-  p.innerHTML=back+'<h2>Égaliseur 10 bandes</h2><p style="color:var(--sub)">Traitement audio expérimental Web Audio. Active-le pendant la lecture.</p><div class="set" id="eqRows">'+EQ_BANDS.map((hz,i)=>`<div style="padding:9px 4px"><div style="display:flex;justify-content:space-between"><b>${hz>=1000?(hz/1000)+' kHz':hz+' Hz'}</b><small id="eqv${i}">0 dB</small></div><input aria-label="${hz} Hz" type="range" min="-12" max="12" step="1" value="${(L('eq11',Array(10).fill(0))||[])[i]||0}" data-eq="${i}" style="width:100%;accent-color:var(--ac)"></div>`).join('')+'</div><div class="set"><div class="sr"><span>Préréglage</span><select id="eqPreset" style="background:var(--card);color:var(--tx);border:0;padding:8px;border-radius:12px">'+presets.map(x=>`<option>${x}</option>`).join('')+'</select></div><div class="sr" id="eqToggle"><span>Activer le traitement audio</span><button class="btn" style="margin:0">Activer</button></div></div><small id="eqStatus" style="color:var(--sub)">Égaliseur désactivé par défaut.</small>';
+  p.innerHTML=back+'<h2>Égaliseur 10 bandes</h2><p style="color:var(--sub)">Traitement audio expérimental Web Audio. Active-le pendant la lecture. Fréquences en Hz.</p><div class="set" id="eqRows">'+EQ_BANDS.map((hz,i)=>`<div style="padding:9px 4px"><div style="display:flex;justify-content:space-between"><b>${hz>=1000?(hz/1000)+'k':hz}</b><small id="eqv${i}">0 dB</small></div><input aria-label="${hz} Hz" type="range" min="-12" max="12" step="1" value="${(L('eq11',Array(10).fill(0))||[])[i]||0}" data-eq="${i}" style="width:100%;accent-color:var(--ac)"></div>`).join('')+'</div><div class="set"><div class="sr"><span>Préréglage</span><select id="eqPreset" style="background:var(--card);color:var(--tx);border:0;padding:8px;border-radius:12px">'+presets.map(x=>`<option>${x}</option>`).join('')+'</select></div><div class="sr" id="eqToggle"><span>Activer le traitement audio</span><button class="btn" style="margin:0">Activer</button></div></div><small id="eqStatus" style="color:var(--sub)">Égaliseur désactivé par défaut.</small>';
   p.querySelectorAll('[data-eq]').forEach(el=>{const i=+el.dataset.eq;$('eqv'+i).textContent=el.value+' dB';el.oninput=()=>{ $('eqv'+i).textContent=el.value+' dB';saveEq();applyEq() }});
   $('eqPreset').onchange=()=>{const key=$('eqPreset').value;const presets={Flat:[0,0,0,0,0,0,0,0,0,0],'Bass Boost':[7,6,4,1,0,0,0,1,2,2],Pop:[-1,2,4,5,3,0,-1,-1,0,1],Rock:[5,3,-1,-3,1,3,5,6,6,5],Jazz:[4,2,1,2,-2,-2,0,2,3,4],Classique:[4,3,2,1,-1,-1,0,2,3,4]};const vals=presets[key];if(vals){p.querySelectorAll('[data-eq]').forEach((el,i)=>{el.value=vals[i];$('eqv'+i).textContent=vals[i]+' dB'});saveEq();applyEq()}};
   $('eqToggle').onclick=()=>toggleEq();if(L('eqEnabled',false))$('eqToggle').querySelector('button').textContent='Désactiver';
@@ -378,7 +383,7 @@ function openStudioTool(tool){
  } else if(tool==='tags'){
   p.innerHTML=back+'<h2>Informations du morceau</h2><p style="color:var(--sub)">L’édition directe des tags du fichier dépend des permissions Android. Pour l’instant, consulte les métadonnées détectées.</p><div class="set" style="padding:16px">'+(cur?`<b>${esc(cur.title)}</b><p>Artiste : ${esc(cur.artist)}</p><p>Album : ${esc(cur.album)}</p><p>Durée : ${fmt(cur.dur)}</p><p>Fichier : ${esc(cur.path)}</p>`:'Aucun morceau sélectionné.')+'</div>';
  }
- $('toolBack').onclick=()=>{$('studioPanel').innerHTML='';$('studioHome').style.display='block'};
+ $('toolBack').onclick=()=>{$('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display=''};
 }
 function saveEq(){S('eq11',[...$('studioPanel').querySelectorAll('[data-eq]')].map(x=>+x.value))}
 function ensureAudioGraph(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;if(!eqContext){eqContext=new AC();eqSource=eqContext.createMediaElementSource(au);let prev=eqSource;eqFilters=EQ_BANDS.map((hz,i)=>{const f=eqContext.createBiquadFilter();f.type='peaking';f.frequency.value=hz;f.Q.value=1;f.gain.value=(L('eq11',Array(10).fill(0))||[])[i]||0;prev.connect(f);prev=f;return f});eqAnalyser=eqContext.createAnalyser();eqAnalyser.fftSize=128;prev.connect(eqAnalyser);eqAnalyser.connect(eqContext.destination)}if(eqContext.state==='suspended')eqContext.resume();return true}catch(e){return false}}
@@ -389,7 +394,8 @@ function renderLyrics(){const now=$('lyricsNow');if(!now)return;now.textContent=
 function syncLyrics(){if(!lyrics.length||!$('lyricsNow'))return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}
 function moveQueue(i,d){const q=queue.length?queue.slice():(cur?[cur]:srt(vis()));const j=i+d;if(j<0||j>=q.length)return;[q[i],q[j]]=[q[j],q[i]];queue=q;S('queue',q.map(x=>x.id));openStudioTool('queue')}
 function exportM3U(pl){if(!pl||!pl.list.length){alert('Cette playlist est vide.');return}const body='#EXTM3U\n'+pl.list.map(x=>`#EXTINF:${Math.round((x.dur||0)/1000)},${x.artist} - ${x.title}\n${x.path}`).join('\n');const blob=new Blob([body],{type:'audio/x-mpegurl'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(pl.name||'Melodrift').replace(/[^a-z0-9-_ ]/gi,'_')+'.m3u';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
-function drawVisual(){if(!visualOn)return;const c=$('visualCanvas');if(!c)return;const x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);const n=48,data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);for(let i=0;i<n;i++){const v=eqAnalyser?data[Math.floor(i*data.length/n)]:0;const h=eqAnalyser?Math.max(4,v/255*c.height*.88):8;x.fillStyle=`hsl(${22+i*0.55},85%,${48+v/9}%)`;x.fillRect(i*(c.width/n)+3,c.height-h,c.width/n-6,h)}visualFrame=requestAnimationFrame(drawVisual)}
+function drawVisual(){if(!visualOn)return;const c=$('playerVisual');if(!c||$('fp').style.display!=='flex'||au.paused){visualFrame=requestAnimationFrame(drawVisual);return}const x=c.getContext('2d'),w=c.width,h=c.height,mode=L('visualMode','bars');x.clearRect(0,0,w,h);const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const val=i=>eqAnalyser?(data[i%data.length]/255):(.15+.08*Math.sin(Date.now()/260+i));x.lineWidth=5;x.lineCap='round';if(mode==='waves'){x.beginPath();for(let i=0;i<180;i++){const xx=i/179*w,yy=h/2+Math.sin(i*.12+Date.now()/260)*(10+val(i)*55);i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.strokeStyle='#f08a43';x.stroke()}else if(mode==='circle'||mode==='radial'){const cx=w/2,cy=h/2,r=mode==='circle'?Math.min(w,h)*.22:Math.min(w,h)*.27;for(let i=0;i<64;i++){const a=i/64*Math.PI*2,amp=val(i)*(mode==='circle'?28:45),r1=r,r2=r+amp; x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.strokeStyle=`hsl(${24+i*1.1},85%,58%)`;x.stroke()}x.beginPath();x.arc(cx,cy,r-5,0,Math.PI*2);x.strokeStyle='rgba(240,138,67,.55)';x.lineWidth=3;x.stroke()}else{const n=48;for(let i=0;i<n;i++){const v=val(i*2),bh=8+v*h*.72;x.fillStyle=`hsl(${22+i*.55},85%,${48+v*18}%)`;x.fillRect(i*(w/n)+3,h-bh,w/n-6,bh)}}visualFrame=requestAnimationFrame(drawVisual)}
+function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);if(on){visualOn=true;ensureAudioGraph();cancelAnimationFrame(visualFrame);drawVisual()}else{visualOn=false;cancelAnimationFrame(visualFrame);c.getContext('2d').clearRect(0,0,c.width,c.height)}}
 $('carBack').onclick=()=>closeOv('carMode');$('carPrev').onclick=()=>step(-1);$('carNext').onclick=()=>step(1);$('carPlay').onclick=()=>{if(!cur){const l=srt(vis());if(l.length)play(l[0],l)}else au.paused?au.play():au.pause()};
 $('carMode').addEventListener('click',e=>{if(e.target.id==='carPlay')return});
 const oldOnPlay=au.onplay,oldOnPause=au.onpause;au.addEventListener('timeupdate',syncLyrics);au.addEventListener('play',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='Ⅱ'});au.addEventListener('pause',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='▶'});
