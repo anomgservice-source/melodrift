@@ -34,6 +34,7 @@ public class PlaybackService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String a = intent != null ? intent.getAction() : null;
         if (a == null) { stopSelf(); return START_NOT_STICKY; }
+        if (a.equals("HIDE")) { stopForeground(true); stopSelf(); return START_NOT_STICKY; }
         if (a.equals("PREV") || a.equals("PLAY") || a.equals("NEXT")) {
             if (cb != null) cb.on(a);
             return START_NOT_STICKY;

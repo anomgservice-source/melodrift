@@ -9,7 +9,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -41,6 +44,7 @@ import java.util.Collections;
 })
 public class MediaScannerPlugin extends Plugin {
     private PluginCall delCall;
+    private PluginCall trashCall;
 
     @Override
     public void load() {
@@ -213,11 +217,106 @@ public class MediaScannerPlugin extends Plugin {
     @Override
     protected void handleOnActivityResult(int requestCode, int resultCode, Intent data) {
         super.handleOnActivityResult(requestCode, resultCode, data);
+        if (requestCode == 4712 && trashCall != null) {
+            JSObject tr = new JSObject();
+            tr.put("ok", resultCode == Activity.RESULT_OK);
+            trashCall.resolve(tr);
+            trashCall = null;
+            return;
+        }
         if (requestCode == 4711 && delCall != null) {
             JSObject o = new JSObject();
             o.put("ok", resultCode == Activity.RESULT_OK);
             delCall.resolve(o);
             delCall = null;
         }
+    }
+
+    @PluginMethod
+    public void shareFile(PluginCall call) {
+        long id = call.getData().optLong("id");
+        boolean vid = call.getData().optBoolean("video", false);
+        Uri u = ContentUris.withAppendedId(vid ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+        try {
+            Intent i = new Intent(Intent.ACTION_SEND);
+            i.setType(vid ? "video/*" : "audio/*");
+            i.putExtra(Intent.EXTRA_STREAM, u);
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            getActivity().startActivity(Intent.createChooser(i, call.getString("title", "Melodrift")));
+            call.resolve();
+        } catch (Exception e) { call.reject("share"); }
+    }
+
+    @PluginMethod
+    public void setRingtone(PluginCall call) {
+        long id = call.getData().optLong("id");
+        Uri u = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+        try {
+            android.content.Context c = getContext();
+            JSObject o = new JSObject();
+            if (Build.VERSION.SDK_INT >= 23 && !Settings.System.canWrite(c)) {
+                Intent i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + c.getPackageName()));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                c.startActivity(i);
+                o.put("perm", true);
+                call.resolve(o);
+                return;
+            }
+            RingtoneManager.setActualDefaultRingtoneUri(c, RingtoneManager.TYPE_RINGTONE, u);
+            o.put("ok", true);
+            call.resolve(o);
+        } catch (Exception e) { call.reject("ringtone"); }
+    }
+
+    @PluginMethod
+    public void trashMedia(PluginCall call) {
+        long id = call.getData().optLong("id");
+        boolean vid = call.getData().optBoolean("video", false);
+        boolean undo = call.getData().optBoolean("undo", false);
+        Uri u = ContentUris.withAppendedId(vid ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+        try {
+            if (Build.VERSION.SDK_INT >= 30) {
+                PendingIntent pi = MediaStore.createTrashRequest(getContext().getContentResolver(), Collections.singletonList(u), !undo);
+                trashCall = call;
+                getBridge().saveCall(call);
+                getActivity().startIntentSenderForResult(pi.getIntentSender(), 4712, null, 0, 0, 0);
+            } else {
+                JSObject o = new JSObject();
+                o.put("unsupported", true);
+                call.resolve(o);
+            }
+        } catch (Exception e) { call.reject("trash"); }
+    }
+
+    @PluginMethod
+    public void listTrashed(PluginCall call) {
+        boolean vid = call.getData().optBoolean("video", false);
+        JSArray arr = new JSArray();
+        if (Build.VERSION.SDK_INT >= 30) {
+            Uri base = vid ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+            Bundle b = new Bundle();
+            b.putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY);
+            String[] proj = {MediaStore.MediaColumns._ID, MediaStore.MediaColumns.TITLE, MediaStore.MediaColumns.DATE_EXPIRES};
+            try (Cursor c = getContext().getContentResolver().query(base, proj, b, null)) {
+                while (c != null && c.moveToNext()) {
+                    JSObject o = new JSObject();
+                    o.put("id", c.getLong(0));
+                    o.put("title", c.getString(1));
+                    o.put("exp", c.getLong(2));
+                    arr.put(o);
+                }
+            } catch (Exception e) { }
+        }
+        JSObject res = new JSObject();
+        res.put("items", arr);
+        call.resolve(res);
+    }
+
+    @PluginMethod
+    public void hideNotif(PluginCall call) {
+        try {
+            getContext().startService(new Intent(getContext(), PlaybackService.class).setAction("HIDE"));
+            call.resolve();
+        } catch (Exception e) { call.reject("hide"); }
     }
 }
