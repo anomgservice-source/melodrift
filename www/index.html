@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Melodrift 11.5</title>
+<title>Melodrift 11.6</title>
 <style>
 :root{--bg:#fffaf5;--card:#f4e8dc;--tx:#21160f;--sub:#806e60;--ac:#d97735;--mini:#f0c9a8;--mt:#4b2818}
 [data-theme=dark]{--bg:#120d0a;--card:#261a14;--tx:#fff4eb;--sub:#b7a091;--ac:#f08a43;--mini:#3a2418;--mt:#ffd9b0}
@@ -124,7 +124,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .accs{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}.accs i{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:24px}
 .it .cv{width:var(--cvs,64px);height:var(--cvs,64px)}
 #playerVisual{background:none;flex:none}#fp #fc{max-height:44vh;min-height:90px}
+#splash{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .5s}#splash img{width:100%;height:100%;object-fit:contain}
 </style></head><body>
+<div id="splash"><img src="splash.jpg" alt="Melodrift"></div>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
 <nav id="nav"></nav></div>
 <div id="ptr"><svg viewBox="0 0 44 44" width="36" height="36"><circle cx="22" cy="22" r="14" fill="none" stroke="rgba(128,128,128,.3)" stroke-width="4"/><circle id="pa" cx="22" cy="22" r="14" fill="none" stroke="var(--ac)" stroke-width="4" stroke-linecap="round" stroke-dasharray="88" stroke-dashoffset="88" transform="rotate(-90 22 22)"/></svg></div>
@@ -156,9 +158,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div id="sh"></div>
 <div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span>Melodrift Studio</span></div>
  <div class="set" id="studioHome">
-  <div class="sr" data-tool="eq"><span>🎚️ Égaliseur 10 bandes</span><small>Réglages audio ›</small></div>
   <div class="sr" data-tool="lyrics"><span>🎤 Paroles synchronisées</span><small>Importer un fichier LRC ›</small></div>
-  <div class="sr" data-tool="visual"><span>〰️ Visualiseur audio</span><small>Spectre animé ›</small></div>
   <div class="sr" data-tool="queue"><span>☷ File d'attente intelligente</span><small>Réorganiser les titres ›</small></div>
   <div class="sr" data-tool="car"><span>🚗 Mode voiture</span><small>Commandes simplifiées ›</small></div>
   <div class="sr" data-tool="mix"><span>✨ Mix intelligent</span><small>Suggestions depuis ta bibliothèque ›</small></div><div class="sr" data-tool="export"><span>↗ Exporter une playlist</span><small>Créer un fichier M3U ›</small></div><div class="sr" data-tool="tags"><span>✎ Informations du morceau</span><small>Consulter les métadonnées ›</small></div>
@@ -256,7 +256,7 @@ $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  
  if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
  if(a=='fb')openFb();
- if(a=='about')sheet('Melodrift 11.5',[['© anomgservice',()=>0]])};
+ if(a=='about')sheet('Melodrift 11.6',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
 const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else e.style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
@@ -334,7 +334,7 @@ function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').i
 $('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
 $('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.5 (Android)')};
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.6 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
@@ -377,7 +377,7 @@ const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
 fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fbE.style.setProperty('--p',e.target.value+'%')}};
 
-// Melodrift 11.5 — advanced tools. All settings remain local on this device.
+// Melodrift 11.6 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
 function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display='';openOv('studio'); }
@@ -432,7 +432,7 @@ $('carMode').addEventListener('click',e=>{if(e.target.id==='carPlay')return});
 const oldOnPlay=au.onplay,oldOnPause=au.onpause;au.addEventListener('timeupdate',syncLyrics);au.addEventListener('play',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='Ⅱ'});au.addEventListener('pause',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='▶'});
 // restore persisted queue after the library scan has populated byId
 const originalScan=scan;scan=async function(){await originalScan();const ids=L('queue',[]);if(ids.length)queue=ids.map(id=>byId[id]).filter(Boolean)};
-// ===== Melodrift 11.5 : égaliseur, visualiseur, thème, corbeille, notifications =====
+// ===== Melodrift 11.6 : égaliseur, visualiseur, thème, corbeille, notifications =====
 const X={
  trash:['Récemment supprimé','Recently deleted'],notif:['Paramètres de notifications','Notification settings'],
  share:['Partager','Share'],speed:['Vitesse','Speed'],ring:['Définir comme sonnerie','Set as ringtone'],del:['Supprimer','Delete'],
@@ -554,8 +554,8 @@ $('ntl').onclick=e=>{const r=e.target.closest('[data-n]');if(!r)return;const k=r
 $('ntx').onclick=()=>closeOv('nt');
 
 /* ---------- Page Thème : mode, couleur d'accent, taille de liste ---------- */
-const ACC=['#2f9bff','#12c26e','#d94fc4','#ff7a45','#f04e63','#8b5cf6','#14b8a6','#eab308'],CVS={S:'48px',M:'64px',L:'84px'};
-let accent=L('accent','#2f9bff'),lsize=L('lsize','M');
+const ACC=['#ff8a1f','#2f9bff','#12c26e','#d94fc4','#ff7a45','#f04e63','#8b5cf6','#14b8a6','#eab308'],CVS={S:'48px',M:'64px',L:'84px'};
+let accent=L('accent','#ff8a1f'),lsize=L('lsize','M');
 function applyLook(){const r=document.documentElement.style;r.setProperty('--ac',accent);r.setProperty('--cvs',CVS[lsize]||'64px')}
 function openTheme(){$('tht').textContent=tz('theme');
  $('thS').innerHTML=['S','M','L'].map(k=>`<button data-ls="${k}" class="${k===lsize?'on':''}">${k}</button>`).join('');
@@ -571,11 +571,12 @@ $('thx').onclick=()=>closeOv('th');
 
 /* ---------- Paramètres en cartes ---------- */
 function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`,C=x=>`<div class="set">${x}</div>`;
- $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Égaliseur • Paroles • Outils'))
+ $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Paroles • Outils'))
   +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
   +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('lang',t(23),LANGS[cl()][0]))
-  +C(R('fb',t(25))+R('about',t(26),'11.5'))}
+  +C(R('fb',t(25))+R('about',t(26),'11.6'))}
 applyLook();
+setTimeout(()=>{const sp=$('splash');if(!sp)return;sp.style.opacity=0;setTimeout(()=>sp.remove(),600)},1500);
 
 applyTint();
 applyLang();scan();

@@ -40,6 +40,7 @@ import java.util.Collections;
 @CapacitorPlugin(name = "MediaScanner", permissions = {
     @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO}),
     @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE}),
+    @Permission(alias = "legacy10", strings = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}),
     @Permission(alias = "notif", strings = {Manifest.permission.POST_NOTIFICATIONS})
 })
 public class MediaScannerPlugin extends Plugin {
@@ -57,7 +58,7 @@ public class MediaScannerPlugin extends Plugin {
         };
     }
 
-    private String alias() { return Build.VERSION.SDK_INT >= 33 ? "media" : "legacy"; }
+    private String alias() { return Build.VERSION.SDK_INT >= 33 ? "media" : (Build.VERSION.SDK_INT >= 30 ? "legacy" : "legacy10"); }
 
     @PluginMethod
     public void scan(PluginCall call) {
