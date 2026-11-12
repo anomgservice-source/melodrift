@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Melodrift 11.6</title>
+<title>Melodrift 11.7</title>
 <style>
 :root{--bg:#fffaf5;--card:#f4e8dc;--tx:#21160f;--sub:#806e60;--ac:#d97735;--mini:#f0c9a8;--mt:#4b2818}
 [data-theme=dark]{--bg:#120d0a;--card:#261a14;--tx:#fff4eb;--sub:#b7a091;--ac:#f08a43;--mini:#3a2418;--mt:#ffd9b0}
@@ -125,6 +125,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .it .cv{width:var(--cvs,64px);height:var(--cvs,64px)}
 #playerVisual{background:none;flex:none}#fp #fc{max-height:44vh;min-height:90px}
 #splash{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .5s}#splash img{width:100%;height:100%;object-fit:contain}
+.ta{width:100%;border:0;border-radius:16px;background:rgba(128,128,128,.14);color:var(--tx);padding:12px;font:inherit;font-size:16px;resize:none;height:90px;margin:6px 0 14px;display:block}
+#wr .set small{display:block;margin-top:4px}
+.wp{white-space:pre-wrap;font:inherit;font-size:17px;line-height:1.55;margin:0 0 14px;word-break:break-word}
+#wr .ch{background:rgba(128,128,128,.16)}#wr .ch.on{background:var(--ac)}
+.wact{display:flex;gap:8px;flex-wrap:wrap}.wact .btn{margin-top:0;padding:10px 16px;font-size:15px}
 </style></head><body>
 <div id="splash"><img src="splash.jpg" alt="Melodrift"></div>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
@@ -155,9 +160,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div class="ov" id="th"><div class="top"><button class="ic" id="thx">←</button><span id="tht"></span><div class="lsz" id="thS"></div></div><div id="thB"></div></div>
 <div class="ov" id="tr"><div class="top"><button class="ic" id="trx">←</button><span id="trt"></span></div><div class="seg" id="trS"><button data-v="0">Audio</button><button data-v="1">Vidéo</button></div><div id="trl"></div></div>
 <div class="ov" id="nt"><div class="top"><button class="ic" id="ntx">←</button><span id="ntt"></span></div><div class="set" id="ntl"></div></div>
+<div class="ov" id="wr"><div class="top"><button class="ic" id="wrx">←</button><span id="wrt"></span><button class="ic" id="wrs" style="font-size:22px">⚙</button></div><div id="wrb"></div></div>
 <div id="sh"></div>
 <div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span>Melodrift Studio</span></div>
  <div class="set" id="studioHome">
+  <div class="sr" data-tool="write"><span>✍️ Écrire des paroles (IA)</span><small>Texte original ›</small></div>
   <div class="sr" data-tool="lyrics"><span>🎤 Paroles synchronisées</span><small>Importer un fichier LRC ›</small></div>
   <div class="sr" data-tool="queue"><span>☷ File d'attente intelligente</span><small>Réorganiser les titres ›</small></div>
   <div class="sr" data-tool="car"><span>🚗 Mode voiture</span><small>Commandes simplifiées ›</small></div>
@@ -256,7 +263,7 @@ $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  
  if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
  if(a=='fb')openFb();
- if(a=='about')sheet('Melodrift 11.6',[['© anomgservice',()=>0]])};
+ if(a=='about')sheet('Melodrift 11.7',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
 const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else e.style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
@@ -308,7 +315,7 @@ setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}if(!$('v
 try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
  if($('sh').style.display=='block')return $('sh').style.display='none';
- const o=['eqs','vzs','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);if($('carMode').style.display=='block')return closeOv('carMode');if($('studio').style.display=='block')return closeOv('studio');
+ const o=['wr','eqs','vzs','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);if($('carMode').style.display=='block')return closeOv('carMode');if($('studio').style.display=='block')return closeOv('studio');
  if(view){view=null;return render()}Capacitor.Plugins.App.exitApp()})}catch(e){}
 const ico=d=>`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 18V6L3 12zM21 18V6l-8.5 6z',NEXT='M12.5 6v12L21 12zM3 6v12l8.5-6z';
@@ -334,7 +341,7 @@ function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').i
 $('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
 $('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.6 (Android)')};
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.7 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
@@ -377,13 +384,14 @@ const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
 fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fbE.style.setProperty('--p',e.target.value+'%')}};
 
-// Melodrift 11.6 — advanced tools. All settings remain local on this device.
+// Melodrift 11.7 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
 function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display='';openOv('studio'); }
 $('studioBack').onclick=()=>closeOv('studio');
 $('studioHome').onclick=e=>{const tool=e.target.closest('[data-tool]')?.dataset.tool;if(!tool)return;openStudioTool(tool)};
 function openStudioTool(tool){
+ if(tool==='write'){closeOv('studio');openWrite();return}
  if(tool==='eq'){closeOv('studio');openEqSheet();return}
  $('studioHome').style.display='none';$('studio').firstElementChild.style.display='none';const p=$('studioPanel');
  const back='<div class="top"><button class="ic" id="toolBack">←</button><span>Melodrift Studio</span></div>';
@@ -432,7 +440,7 @@ $('carMode').addEventListener('click',e=>{if(e.target.id==='carPlay')return});
 const oldOnPlay=au.onplay,oldOnPause=au.onpause;au.addEventListener('timeupdate',syncLyrics);au.addEventListener('play',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='Ⅱ'});au.addEventListener('pause',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='▶'});
 // restore persisted queue after the library scan has populated byId
 const originalScan=scan;scan=async function(){await originalScan();const ids=L('queue',[]);if(ids.length)queue=ids.map(id=>byId[id]).filter(Boolean)};
-// ===== Melodrift 11.6 : égaliseur, visualiseur, thème, corbeille, notifications =====
+// ===== Melodrift 11.7 : égaliseur, visualiseur, thème, corbeille, notifications =====
 const X={
  trash:['Récemment supprimé','Recently deleted'],notif:['Paramètres de notifications','Notification settings'],
  share:['Partager','Share'],speed:['Vitesse','Speed'],ring:['Définir comme sonnerie','Set as ringtone'],del:['Supprimer','Delete'],
@@ -574,9 +582,56 @@ function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${
  $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Paroles • Outils'))
   +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
   +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('lang',t(23),LANGS[cl()][0]))
-  +C(R('fb',t(25))+R('about',t(26),'11.6'))}
+  +C(R('fb',t(25))+R('about',t(26),'11.7'))}
 applyLook();
 setTimeout(()=>{const sp=$('splash');if(!sp)return;sp.style.opacity=0;setTimeout(()=>sp.remove(),600)},1500);
+
+/* ---------- Paroles IA (serveur Render) ---------- */
+const tw=(a,b)=>cl()==='fr'?a:b;
+const WL=[['fr','Français'],['en','English'],['mg','Malagasy']];
+const WS=['Salegy','Hira gasy','Afrobeat','Pop','Rap','Ballade','Gospel','Reggae'];
+const WM=[['Joyeuse','Joyful'],['Nostalgique','Nostalgic'],['Romantique','Romantic'],['Énergique','Energetic'],['Triste','Sad'],['Inspirante','Inspiring']];
+const WLEN=[['short','Court','Short'],['normal','Normal','Normal'],['long','Long','Long']];
+let wf=L('wf',{theme:'',lang:'fr',style:'Pop',mood:0,len:'normal'}),wres=L('wres',''),wbusy=false,wsetup=false;
+const wSaved=()=>L('wsaved',[]);
+function openWrite(){$('wrt').textContent=tw('Écrire des paroles (IA)','Write lyrics (AI)');openOv('wr');wDraw()}
+const wChip=(g,v,l,on)=>`<span class="ch ${on?'on':''}" data-g="${g}" data-v="${v}">${esc(l)}</span>`;
+function wSetupHtml(){return `<div class="set" style="padding:16px"><b>${tw('Connexion au serveur de paroles','Lyrics server connection')}</b><small style="white-space:normal;margin:6px 0 10px">${tw('Colle l’adresse de ton serveur Render et ton code d’accès (voir le guide du serveur).','Paste your Render server address and your access code.')}</small>
+ <input id="wurl" class="ta" style="height:auto" placeholder="https://melodrift-lyrics.onrender.com" value="${esc(L('lyUrl',''))}">
+ <input id="wkey" class="ta" style="height:auto;margin-top:-4px" placeholder="${tw('Code d’accès','Access code')}" value="${esc(L('lyKey',''))}">
+ <button class="btn" id="wsv" style="width:100%;margin-top:0">${tw('Enregistrer','Save')}</button></div>`}
+function wOutHtml(){return `<div class="set" style="padding:16px"><pre class="wp">${esc(wres)}</pre><div class="wact"><button class="btn" data-w="copy">${tw('Copier','Copy')}</button><button class="btn" data-w="share">${tw('Partager','Share')}</button><button class="btn" data-w="save">${tw('Enregistrer','Save')}</button><button class="btn" data-w="again">${tw('Régénérer','Regenerate')}</button></div></div>`}
+function wSavedHtml(){const a=wSaved();if(!a.length)return '';return `<h3 style="margin:18px 4px 8px">${tw('Mes paroles','My lyrics')}</h3><div class="set">`+a.map((x,i)=>`<div class="sr" data-sv="${i}" style="align-items:center;gap:8px"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.title)}<small>${esc(x.meta)}</small></span><button class="ic" data-sd="${i}">🗑</button></div>`).join('')+'</div>'}
+function wDraw(){if(!L('lyUrl','')||wsetup){$('wrb').innerHTML=wSetupHtml();return}
+ $('wrb').innerHTML=`<div class="set" style="padding:16px"><small>${tw('Thème ou idée','Theme or idea')}</small>
+ <textarea id="wth" class="ta" maxlength="300" placeholder="${tw('Ex. : le retour au village après des années','E.g. coming back to the village after years')}">${esc(wf.theme)}</textarea>
+ <small>${tw('Langue','Language')}</small><div>${WL.map(l=>wChip('lang',l[0],l[1],wf.lang===l[0])).join('')}</div>
+ <small>Style</small><div>${WS.map(x=>wChip('style',x,x,wf.style===x)).join('')}</div>
+ <small>${tw('Ambiance','Mood')}</small><div>${WM.map((m,i)=>wChip('mood',i,m[cl()==='fr'?0:1],wf.mood===i)).join('')}</div>
+ <small>${tw('Longueur','Length')}</small><div>${WLEN.map(l=>wChip('len',l[0],cl()==='fr'?l[1]:l[2],wf.len===l[0])).join('')}</div>
+ <button class="btn" id="wgo" style="width:100%">${tw('Générer','Generate')}</button></div>
+ <div id="wout" style="margin-top:14px">${wres?wOutHtml():''}</div>${wSavedHtml()}`}
+async function wGenerate(){if(wbusy)return;const th=$('wth')?$('wth').value.trim():wf.theme;wf.theme=th;S('wf',wf);
+ if(th.length<3){alert(tw('Écris d’abord un thème.','Write a theme first.'));return}
+ wbusy=true;const go=$('wgo');if(go){go.disabled=true;go.textContent=tw('Écriture en cours… (jusqu’à 1 minute si le serveur dort)','Writing… (up to 1 min if the server is asleep)')}
+ try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),70000);
+  const r=await fetch(L('lyUrl','').replace(/\/+$/,'')+'/lyrics',{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json','X-App-Key':L('lyKey','')},body:JSON.stringify({theme:th,lang:wf.lang,style:wf.style,mood:WM[wf.mood][0],len:wf.len})});
+  clearTimeout(to);const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(r.status===401?tw('Code d’accès incorrect.','Wrong access code.'):r.status===429?tw('Trop de demandes, réessaie plus tard.','Too many requests, try later.'):(d.error||('Erreur '+r.status)));
+  wres=d.text||'';S('wres',wres)}
+ catch(e){alert(e.name==='AbortError'?tw('Le serveur met trop de temps à répondre.','The server took too long.'):(e.message==='Failed to fetch'?tw('Impossible de joindre le serveur (Internet ou adresse).','Cannot reach the server.'):e.message))}
+ wbusy=false;wDraw()}
+async function wCopy(){try{await navigator.clipboard.writeText(wres)}catch(e){const a=document.createElement('textarea');a.value=wres;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}alert(tw('Paroles copiées.','Lyrics copied.'))}
+function wShare(){if(navigator.share)navigator.share({text:wres}).catch(()=>0);else wCopy()}
+function wSave(){const a=wSaved(),m=wres.match(/^\s*(?:Titre|Title)\s*:\s*(.+)$/im);a.unshift({title:m?m[1].trim():(wf.theme.slice(0,40)||'Sans titre'),meta:WL.find(l=>l[0]===wf.lang)[1]+' · '+wf.style,text:wres,t:Date.now()});S('wsaved',a.slice(0,50));wDraw()}
+$('wr').onclick=e=>{const t=e.target,c=t.closest('.ch');
+ if(c&&c.dataset.g){const g=c.dataset.g,v=c.dataset.v;wf[g]=g==='mood'?+v:v;S('wf',wf);[...c.parentNode.children].forEach(x=>x.classList.toggle('on',x===c));return}
+ if(t.id==='wgo')return wGenerate();
+ if(t.id==='wsv'){S('lyUrl',$('wurl').value.trim());S('lyKey',$('wkey').value.trim());wsetup=false;return wDraw()}
+ const b=t.closest('[data-w]');if(b){const k=b.dataset.w;if(k==='copy')wCopy();else if(k==='share')wShare();else if(k==='save')wSave();else if(k==='again')wGenerate();return}
+ const sd=t.closest('[data-sd]');if(sd){const a=wSaved();a.splice(+sd.dataset.sd,1);S('wsaved',a);return wDraw()}
+ const sv=t.closest('[data-sv]');if(sv){wres=wSaved()[+sv.dataset.sv].text;S('wres',wres);wDraw();const o=$('wout');if(o)o.scrollIntoView({behavior:'smooth'})}};
+$('wrx').onclick=()=>closeOv('wr');$('wrs').onclick=()=>{wsetup=!wsetup;wDraw()};
 
 applyTint();
 applyLang();scan();
