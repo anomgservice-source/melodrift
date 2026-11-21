@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.Collections;
 
 @CapacitorPlugin(name = "MediaScanner", permissions = {
-    @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO}),
+    @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_IMAGES}),
     @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE}),
     @Permission(alias = "legacy10", strings = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}),
     @Permission(alias = "notif", strings = {Manifest.permission.POST_NOTIFICATIONS})
@@ -150,6 +150,7 @@ public class MediaScannerPlugin extends Plugin {
         i.putExtra("artist", call.getString("artist", ""));
         i.putExtra("playing", call.getBoolean("playing", false));
         i.putExtra("art", call.getString("art", ""));
+        i.putExtra("color", call.getInt("color", 0));
         try {
             if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
             else getContext().startService(i);

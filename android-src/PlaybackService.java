@@ -70,6 +70,8 @@ public class PlaybackService extends Service {
             .addAction(playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play, playing ? "Pause" : "Play", act("PLAY"))
             .addAction(android.R.drawable.ic_media_next, "Next", act("NEXT"))
             .setStyle(new Notification.MediaStyle().setShowActionsInCompactView(0, 1, 2));
+        int col = in.getIntExtra("color", 0);
+        if (col != 0 && Build.VERSION.SDK_INT >= 26) { b.setColor(col); b.setColorized(true); }
         Intent li = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (li != null) b.setContentIntent(PendingIntent.getActivity(this, 0, li, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
         Notification n = b.build();

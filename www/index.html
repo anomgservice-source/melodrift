@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Melodrift 11.7</title>
+<title>Melodrift 11.8</title>
 <style>
 :root{--bg:#fffaf5;--card:#f4e8dc;--tx:#21160f;--sub:#806e60;--ac:#d97735;--mini:#f0c9a8;--mt:#4b2818}
 [data-theme=dark]{--bg:#120d0a;--card:#261a14;--tx:#fff4eb;--sub:#b7a091;--ac:#f08a43;--mini:#3a2418;--mt:#ffd9b0}
@@ -130,6 +130,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .wp{white-space:pre-wrap;font:inherit;font-size:17px;line-height:1.55;margin:0 0 14px;word-break:break-word}
 #wr .ch{background:rgba(128,128,128,.16)}#wr .ch.on{background:var(--ac)}
 .wact{display:flex;gap:8px;flex-wrap:wrap}.wact .btn{margin-top:0;padding:10px 16px;font-size:15px}
+
+#repeatBtn{display:none!important}#fal{cursor:pointer}#studio{z-index:35}
+body:has(#sr[style*="block"]) #mini{z-index:11}#sc{padding-bottom:110px}
+header h1{font-size:24px}nav button{padding:8px 16px;font-size:15px}.cv{width:54px;height:54px}.it{padding:6px 0;gap:12px}
+#mini .cv{width:46px;height:46px;font-size:20px}#mini .tt b{font-size:16px}
+@media (min-width:700px){#list,nav,header,.ov{max-width:820px;margin-left:auto;margin-right:auto}#mini{left:50%;right:auto;width:min(820px,100%);transform:translateX(-50%)}}
+@media (orientation:landscape) and (max-height:520px){#fc{max-height:58vh}#mini{padding-top:8px;padding-bottom:calc(env(safe-area-inset-bottom) + 6px)}header{padding-top:calc(env(safe-area-inset-top) + 6px)}}
 </style></head><body>
 <div id="splash"><img src="splash.jpg" alt="Melodrift"></div>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
@@ -162,7 +169,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <div class="ov" id="nt"><div class="top"><button class="ic" id="ntx">←</button><span id="ntt"></span></div><div class="set" id="ntl"></div></div>
 <div class="ov" id="wr"><div class="top"><button class="ic" id="wrx">←</button><span id="wrt"></span><button class="ic" id="wrs" style="font-size:22px">⚙</button></div><div id="wrb"></div></div>
 <div id="sh"></div>
-<div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span>Melodrift Studio</span></div>
+<div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span></span></div>
  <div class="set" id="studioHome">
   <div class="sr" data-tool="write"><span>✍️ Écrire des paroles (IA)</span><small>Texte original ›</small></div>
   <div class="sr" data-tool="lyrics"><span>🎤 Paroles synchronisées</span><small>Importer un fichier LRC ›</small></div>
@@ -178,9 +185,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <script>
 const $=id=>document.getElementById(id),au=$('au'),MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
 const L=(k,d)=>{try{const v=JSON.parse(localStorage[k]);return v==null?d:v}catch(e){return d}},S=(k,v)=>{localStorage[k]=JSON.stringify(v)};
-let tint={h:205,s:45};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
+let tint={h:205,s:45};const VSZ=()=>Math.min(100,L('visualSize',40)),hslInt=(h,sa,l)=>{sa/=100;l/=100;const k=n=>(n+h/30)%12,a=sa*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return(255<<24|Math.round(f(0)*255)<<16|Math.round(f(8)*255)<<8|Math.round(f(4)*255))|0};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
 let fdrag=false,lsv=0,nT=0,notifAsked=false;
-let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
+let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],sList=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
 let favs=new Set(L('fav',[])),hid=new Set(L('hid',[])),plays=L('plays',{}),recent=L('rec',[]),pls=L('pls',[]),hist=L('hist',[]),theme=L('theme','auto'),ptime=L('ptime',0),vtime=L('vtime',0),fadeOn=L('fade',false),lang=L('lang','auto');
 const TABS=[0,1,2,3,4,5],KEYS={3:'folder',4:'artist',5:'album'};
 const P=s=>s.split('|');
@@ -271,13 +278,13 @@ $('bt').onclick=()=>sheet(t(7),SORTS.map(x=>[(sort==x[0]?'✓ ':'')+t(x[1]),()=>
 $('bs').onclick=()=>{openOv('sr');$('q').value='';sres();$('q').focus()};$('sx').onclick=()=>closeOv('sr');
 function sres(){sq=$('q').value.toLowerCase().trim();
  if(!sq){$('sc').innerHTML=(hist.length?'<div class="top"><span style="font-size:20px">'+t(41)+'</span><button class="ic" data-clr="1">🗑</button></div>'+hist.map(h=>`<span class="ch" data-h="${esc(h)}">${esc(h)}</span>`).join(''):'');return}
- $('sc').innerHTML=rows(vis().filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(sq)));
+ sList=vis().filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(sq));const keep=shown;$('sc').innerHTML=rows(sList);shown=keep;
  document.querySelectorAll('#sc [data-art]').forEach(e=>obs.observe(e))}
 $('q').oninput=sres;
 $('sc').onclick=e=>{const h=e.target.dataset.h;if(h!==undefined){$('q').value=h;return sres()}
  if(e.target.dataset.clr){hist=[];S('hist',hist);return sres()}
- const m=e.target.dataset.m;if(m!==undefined)return songMenu(shown[m]);
- const it=e.target.closest('[data-i]');if(it){hist=[sq,...hist.filter(x=>x!=sq)].slice(0,10);S('hist',hist);play(shown[+it.dataset.i],shown)}};
+ const m=e.target.dataset.m;if(m!==undefined)return songMenu(sList[m]);
+ const it=e.target.closest('[data-i]');if(it){hist=[sq,...hist.filter(x=>x!=sq)].slice(0,10);S('hist',hist);play(sList[+it.dataset.i],sList)}};
 $('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined)go(+t)};
 $('list').onclick=e=>{const d=e.target.dataset,m=d.m;
  if(m!==undefined)return songMenu(shown[m]);
@@ -302,7 +309,7 @@ function step(d){if(!queue.length)return;let i=queue.findIndex(x=>x.id==cur.id);
 const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
 function syncRepeat(){const b=$('repeatBtn');if(b){b.textContent=mode===1?'🔂 1':mode===2?'🔀':'↻';b.title=mode===1?'Répéter ce titre':mode===2?'Lecture aléatoire':'Répétition désactivée'}}
-$('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};
+$('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};$('fal').onclick=()=>{try{openStudio();openStudioTool('lyrics')}catch(e){}};
 
 syncRepeat();
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
@@ -322,7 +329,7 @@ const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 
 document.querySelector('#fp .pv').innerHTML=ico(PREV);document.querySelector('#fp .nx').innerHTML=ico(NEXT);$('fpp').innerHTML=ico(PLAY);all('pp').forEach(b=>b.innerHTML=ico(PLAY));all('pv').forEach(b=>b.innerHTML=ico(PREV));all('nx').forEach(b=>b.innerHTML=ico(NEXT));
 $('fpp').onclick=()=>document.querySelector('#mini .pp').click();
 $('fh').onclick=()=>{if(!cur)return;favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv();render()};
-$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet(t(40)+' ('+queue.length+')',queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)]))};
+$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet(t(40)+' ('+queue.length+')',[['Répétition : '+['désactivée','ce titre','aléatoire'][mode],()=>{mode=(mode+1)%3;syncRepeat()}]].concat(queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)])))};
 let fy=0,fxx=0;$('fp').addEventListener('touchstart',e=>{fy=e.touches[0].clientY;fxx=e.touches[0].clientX},{passive:true});
 $('fp').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(t.clientY-fy>140&&Math.abs(t.clientX-fxx)<80&&!e.target.closest('input'))closeOv('fp')},{passive:true});
 function rgb2hs(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/2;let h=0;if(d){h=mx==r?((g-b)/d)%6:mx==g?(b-r)/d+2:(r-g)/d+4;h=Math.round(h*60);if(h<0)h+=360}return{h,s:d?Math.round(d/(1-Math.abs(2*l-1))*100):0}}
@@ -378,7 +385,7 @@ async function delSong(s){if(!MS||!confirm(t(63)+'\n'+s.title))return;
  try{const r=await MS.deleteMedia({id:s.id,video:false});if(r.ok){if(cur&&cur.id==s.id)au.pause();favs.delete(s.id);sv();await scan()}}catch(e){}}
 async function nSync(){if(!MS||!cur||!L('notifOn',true))return;try{if(!notifAsked){notifAsked=true;await MS.notifPerm()}
  const k='a:'+cur.id+'160';const art=artCache.has(k)?await artCache.get(k):'';
- MS.showNotif({title:cur.title,artist:cur.artist,playing:!au.paused,art:art||''})}catch(e){}}
+ MS.showNotif({title:cur.title,artist:cur.artist,playing:!au.paused,art:art||'',color:hslInt(tint.h,tint.s,28)})}catch(e){}}
 try{MS&&MS.addListener('media',e=>{if(e.a=='PLAY')document.querySelector('#mini .pp').click();else if(e.a=='NEXT')step(1);else if(e.a=='PREV')step(-1)})}catch(e){}
 const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
@@ -394,7 +401,7 @@ function openStudioTool(tool){
  if(tool==='write'){closeOv('studio');openWrite();return}
  if(tool==='eq'){closeOv('studio');openEqSheet();return}
  $('studioHome').style.display='none';$('studio').firstElementChild.style.display='none';const p=$('studioPanel');
- const back='<div class="top"><button class="ic" id="toolBack">←</button><span>Melodrift Studio</span></div>';
+ const back='<div class="top"><button class="ic" id="toolBack">←</button><span></span></div>';
  if(tool==='eq'){
   const presets=['Personnalisé','Flat','Bass Boost','Pop','Rock','Jazz','Classique'];
   p.innerHTML=back+'<h2>Égaliseur 10 bandes</h2><p style="color:var(--sub)">Traitement audio expérimental Web Audio. Active-le pendant la lecture. Fréquences en Hz.</p><div class="set" id="eqRows">'+EQ_BANDS.map((hz,i)=>`<div style="padding:9px 4px"><div style="display:flex;justify-content:space-between"><b>${hz>=1000?(hz/1000)+'k':hz}</b><small id="eqv${i}">0 dB</small></div><input aria-label="${hz} Hz" type="range" min="-12" max="12" step="1" value="${(L('eq11',Array(10).fill(0))||[])[i]||0}" data-eq="${i}" style="width:100%;accent-color:var(--ac)"></div>`).join('')+'</div><div class="set"><div class="sr"><span>Préréglage</span><select id="eqPreset" style="background:var(--card);color:var(--tx);border:0;padding:8px;border-radius:12px">'+presets.map(x=>`<option>${x}</option>`).join('')+'</select></div><div class="sr" id="eqToggle"><span>Activer le traitement audio</span><button class="btn" style="margin:0">Activer</button></div></div><small id="eqStatus" style="color:var(--sub)">Égaliseur désactivé par défaut.</small>';
@@ -430,7 +437,7 @@ function applyEq(){if(!L('eqEnabled',false))return;if(!ensureAudioGraph()){const
 function toggleEq(){if(!ensureAudioGraph()){$('eqStatus').textContent='Impossible d’activer l’égaliseur avec cette source audio.';return}const on=!L('eqEnabled',false);S('eqEnabled',on);if(on){applyEq();$('eqToggle').querySelector('button').textContent='Désactiver'}else{eqFilters.forEach(f=>f.gain.setTargetAtTime(0,eqContext.currentTime,.04));$('eqToggle').querySelector('button').textContent='Activer';$('eqStatus').textContent='Égaliseur désactivé.'}}
 function parseLrc(txt){return txt.split(/\r?\n/).flatMap(line=>{const tags=[...line.matchAll(/\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g)];const text=line.replace(/\[[^\]]+\]/g,'').trim();return tags.map(m=>({time:+m[1]*60 + +m[2] + (m[3]?+(('0.'+m[3])):0),text}))}).sort((a,b)=>a.time-b.time)}
 function renderLyrics(){const now=$('lyricsNow');if(!now)return;now.textContent=lyrics.length?'Paroles chargées • '+lyrics.length+' lignes':'Aucune parole chargée';$('lyricsList').innerHTML=lyrics.slice(0,200).map(x=>`<div style="padding:7px 4px;color:var(--sub)">${fmt(x.time*1000)} — ${esc(x.text)}</div>`).join('')}
-function syncLyrics(){if(!lyrics.length||!$('lyricsNow'))return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}
+function syncLyrics(){if(!lyrics.length)return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){if($('fal'))$('fal').textContent=lyrics[i].text;if($('lyricsNow')){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}}
 function moveQueue(i,d){const q=queue.length?queue.slice():(cur?[cur]:srt(vis()));const j=i+d;if(j<0||j>=q.length)return;[q[i],q[j]]=[q[j],q[i]];queue=q;S('queue',q.map(x=>x.id));openStudioTool('queue')}
 function exportM3U(pl){if(!pl||!pl.list.length){alert('Cette playlist est vide.');return}const body='#EXTM3U\n'+pl.list.map(x=>`#EXTINF:${Math.round((x.dur||0)/1000)},${x.artist} - ${x.title}\n${x.path}`).join('\n');const blob=new Blob([body],{type:'audio/x-mpegurl'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(pl.name||'Melodrift').replace(/[^a-z0-9-_ ]/gi,'_')+'.m3u';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 function drawVisual(){if(!visualOn)return;const c=$('playerVisual');if(!c||$('fp').style.display!=='flex'||au.paused){visualFrame=requestAnimationFrame(drawVisual);return}const x=c.getContext('2d'),w=c.width,h=c.height,mode=L('visualMode','bars');x.clearRect(0,0,w,h);const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const val=i=>eqAnalyser?(data[i%data.length]/255):(.15+.08*Math.sin(Date.now()/260+i));x.lineWidth=5;x.lineCap='round';if(mode==='waves'){x.beginPath();for(let i=0;i<180;i++){const xx=i/179*w,yy=h/2+Math.sin(i*.12+Date.now()/260)*(10+val(i)*55);i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.strokeStyle='#f08a43';x.stroke()}else if(mode==='circle'||mode==='radial'){const cx=w/2,cy=h/2,r=mode==='circle'?Math.min(w,h)*.22:Math.min(w,h)*.27;for(let i=0;i<64;i++){const a=i/64*Math.PI*2,amp=val(i)*(mode==='circle'?28:45),r1=r,r2=r+amp; x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.strokeStyle=`hsl(${24+i*1.1},85%,58%)`;x.stroke()}x.beginPath();x.arc(cx,cy,r-5,0,Math.PI*2);x.strokeStyle='rgba(240,138,67,.55)';x.lineWidth=3;x.stroke()}else{const n=48;for(let i=0;i<n;i++){const v=val(i*2),bh=8+v*h*.72;x.fillStyle=`hsl(${22+i*.55},85%,${48+v*18}%)`;x.fillRect(i*(w/n)+3,h-bh,w/n-6,bh)}}visualFrame=requestAnimationFrame(drawVisual)}
@@ -507,17 +514,17 @@ let fitN=0;
 function fitPlayer(){const f=$('fp'),c=$('fc');if(!f||f.style.display!=='flex')return;c.style.maxHeight='';const ov=f.scrollHeight-f.clientHeight;if(ov>0)c.style.maxHeight=Math.max(90,c.getBoundingClientRect().height-ov-6)+'px'}
 addEventListener('resize',fitPlayer);
 function drawVisual(){if(!visualOn)return;visualFrame=requestAnimationFrame(drawVisual);if(++fitN%20===0)fitPlayer();const c=$('playerVisual');if(!c||$('fp').style.display!=='flex')return;
- const size=L('visualSize',120),W=Math.round(c.clientWidth*2),H=Math.round(size*2);if(W&&(c.width!==W||c.height!==H)){c.width=W;c.height=H}c.style.height=size+'px';$('fp').style.setProperty('--vzx',Math.max(0,size-110)+'px');
+ const size=VSZ(),W=Math.round(c.clientWidth*2),H=Math.round(size*2);if(W&&(c.width!==W||c.height!==H)){c.width=W;c.height=H}c.style.height=size+'px';$('fp').style.setProperty('--vzx',Math.max(0,size-110)+'px');
  const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const t=Date.now();
  const val=eqAnalyser&&!au.paused?(i,n)=>data[Math.min(data.length-1,Math.floor(i/n*data.length*.8))]/255:(i,n)=>au.paused?.04:(.2+.1*Math.sin(t/260+i));
  paintVisual(c.getContext('2d'),c.width,c.height,L('visualMode','bars'),val,vzCol(),t)}
-function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);c.style.height=L('visualSize',120)+'px';$('fp').style.setProperty('--vzx',on?Math.max(0,L('visualSize',120)-110)+'px':'0px');cancelAnimationFrame(visualFrame);setTimeout(fitPlayer,50);
+function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);c.style.height=VSZ()+'px';$('fp').style.setProperty('--vzx',on?Math.max(0,VSZ()-110)+'px':'0px');cancelAnimationFrame(visualFrame);setTimeout(fitPlayer,50);
  if(on){visualOn=true;ensureAudioGraph();drawVisual()}else{visualOn=false;c.getContext('2d').clearRect(0,0,c.width,c.height)}}
 function vzPaintCards(){$('vzs').querySelectorAll('.vzc').forEach(el=>{const c=el.querySelector('canvas');paintVisual(c.getContext('2d'),c.width,c.height,el.dataset.m,(i,n)=>.18+.7*Math.abs(Math.sin(i*.6+.8))*Math.sin(Math.PI*(i+.5)/n),getComputedStyle(el).color,600)})}
-function openVizSheet(){const cur_=L('visualMode','bars'),on=cur_!=='off',key=on?cur_:L('visualLast','bars'),fr=cl()==='fr',sz=L('visualSize',120);
+function openVizSheet(){const cur_=L('visualMode','bars'),on=cur_!=='off',key=on?cur_:L('visualLast','bars'),fr=cl()==='fr',sz=VSZ();
  $('vzs').innerHTML=`<div class="shb big" id="vzb"><div class="grab" id="vzx"></div><div class="eqtitle"><h3>${tz('vizTitle')}</h3><div class="sw ${on?'on':''}" id="vzSw"><i></i></div></div>
  <div class="vzrow">${VZ.map(([k,n])=>`<div class="vzc ${on&&k===key?'sel':''}" data-m="${k}"><canvas width="260" height="110"></canvas><span>${n[fr?0:1]}</span></div>`).join('')}</div>
- <div class="sr"><span>${tz('size')}</span><small id="vzv">${sz} px</small></div><input id="vzSize" type="range" min="60" max="260" step="10" value="${sz}"></div>`;
+ <div class="sr"><span>${tz('size')}</span><small id="vzv">${sz} px</small></div><input id="vzSize" type="range" min="20" max="100" step="5" value="${sz}"></div>`;
  $('vzs').style.display='block';
  vzPaintCards();
  $('vzSize').oninput=e=>{S('visualSize',+e.target.value);$('vzv').textContent=e.target.value+' px';refreshPlayerVisual()}}
