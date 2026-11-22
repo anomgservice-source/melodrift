@@ -321,4 +321,69 @@ public class MediaScannerPlugin extends Plugin {
             call.resolve();
         } catch (Exception e) { call.reject("hide"); }
     }
+
+    private android.media.AudioManager afAm;
+    private android.media.AudioFocusRequest afReq;
+    private final android.media.AudioManager.OnAudioFocusChangeListener afL = new android.media.AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int c) {
+            String s = c == android.media.AudioManager.AUDIOFOCUS_GAIN ? "gain"
+                : c == android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ? "duck"
+                : c == android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ? "pause" : "loss";
+            JSObject o = new JSObject();
+            o.put("s", s);
+            notifyListeners("focus", o);
+        }
+    };
+
+    @PluginMethod
+    public void focus(PluginCall call) {
+        try {
+            afAm = (android.media.AudioManager) getContext().getSystemService(android.content.Context.AUDIO_SERVICE);
+            if (call.getBoolean("on", true)) {
+                if (Build.VERSION.SDK_INT >= 26) {
+                    afReq = new android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN)
+                        .setAudioAttributes(new android.media.AudioAttributes.Builder()
+                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC).build())
+                        .setOnAudioFocusChangeListener(afL).build();
+                    afAm.requestAudioFocus(afReq);
+                } else {
+                    afAm.requestAudioFocus(afL, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= 26) { if (afReq != null) afAm.abandonAudioFocusRequest(afReq); }
+                else afAm.abandonAudioFocus(afL);
+            }
+            call.resolve();
+        } catch (Exception e) { call.reject("focus"); }
+    }
+
+    @PluginMethod
+    public void askOverlay(PluginCall call) {
+        try {
+            if (!Settings.canDrawOverlays(getContext())) {
+                Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getContext().getPackageName()));
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getContext().startActivity(i);
+            }
+            call.resolve();
+        } catch (Exception e) { call.reject("overlay"); }
+    }
+
+    @PluginMethod
+    public void share(PluginCall call) {
+        try {
+            long id = call.getData().optLong("id", 0);
+            Uri u = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+            Intent s = new Intent(Intent.ACTION_SEND);
+            s.setType("video/*");
+            s.putExtra(Intent.EXTRA_STREAM, u);
+            s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Intent ch = Intent.createChooser(s, null);
+            ch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(ch);
+            call.resolve();
+        } catch (Exception e) { call.reject("share"); }
+    }
 }
