@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Melodrift 11.7</title>
+<title>Melodrift v21</title>
 <style>
 :root{--bg:#fffaf5;--card:#f4e8dc;--tx:#21160f;--sub:#806e60;--ac:#d97735;--mini:#f0c9a8;--mt:#4b2818}
 [data-theme=dark]{--bg:#120d0a;--card:#261a14;--tx:#fff4eb;--sub:#b7a091;--ac:#f08a43;--mini:#3a2418;--mt:#ffd9b0}
@@ -272,7 +272,7 @@ $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  
  if(a=='perm')openPerm();if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
  if(a=='fb')openFb();
- if(a=='about')sheet('Melodrift 11.7',[['© anomgservice',()=>0]])};
+ if(a=='about')sheet('Melodrift v21',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
 const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else{e.style.display='none';if(id=='sr')render()}};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
@@ -350,7 +350,7 @@ function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').i
 $('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
 $('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.7 (Android)')};
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift v21 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
@@ -591,7 +591,7 @@ function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${
  $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Paroles • Outils'))
   +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
   +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('perm','Autorisations')+R('lang',t(23),LANGS[cl()][0]))
-  +C(R('fb',t(25))+R('about',t(26),'11.7'))}
+  +C(R('fb',t(25))+R('about',t(26),'v21'))}
 applyLook();
 setTimeout(()=>{const sp=$('splash');if(!sp)return;sp.style.opacity=0;setTimeout(()=>sp.remove(),600)},1500);
 
