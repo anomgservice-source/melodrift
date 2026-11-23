@@ -19,7 +19,7 @@ jobs:
           java-version: 17
       - run: npm install
       - run: npx cap add android
-      - name: Version Android
+      - name: Version Android automatiquement
         run: |
           sed -i "s/versionCode [0-9][0-9]*/versionCode ${GITHUB_RUN_NUMBER}/" android/app/build.gradle
           sed -i "s/versionName .*/versionName '21.0'/" android/app/build.gradle
