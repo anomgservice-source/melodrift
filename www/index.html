@@ -123,7 +123,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .thc{background:var(--card);border-radius:30px;padding:18px;margin:6px 0 20px}.chs{display:flex;gap:8px;margin:10px 0}.chs span{border-radius:16px;padding:7px 14px;background:rgba(128,128,128,.18);font-size:13px;color:var(--sub)}.chs span.on{background:var(--ac);color:#fff}
 .accs{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}.accs i{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:24px}
 .it .cv{width:var(--cvs,64px);height:var(--cvs,64px)}
-#playerVisual{background:none;flex:none}#fp #fc{max-height:44vh;min-height:90px}
+#playerVisual{background:none;flex:none}
+#fpVideo{display:none;width:min(92%,520px);max-height:34vh;aspect-ratio:16/9;object-fit:cover;border-radius:20px;align-self:center;background:#100b08}
+#playerLyrics{display:none;text-align:center;width:100%;padding:10px 14px;border-radius:18px;background:rgba(0,0,0,.08);font-size:18px;font-weight:650;line-height:1.35}
+#playerLyrics small{display:block;color:var(--sub);font-size:14px;font-weight:400;margin-top:6px}#fp #fc{max-height:44vh;min-height:90px}
 #splash{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .5s}#splash img{width:100%;height:100%;object-fit:contain}
 .ta{width:100%;border:0;border-radius:16px;background:rgba(128,128,128,.14);color:var(--tx);padding:12px;font:inherit;font-size:16px;resize:none;height:90px;margin:6px 0 14px;display:block}
 #wr .set small{display:block;margin-top:4px}
@@ -138,6 +141,23 @@ body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#studio{z-index:9}#carMode
 @media(min-width:700px){#main,#top{max-width:900px;margin-left:auto;margin-right:auto}.vg{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:340px){header h1{font-size:24px}nav button{padding:9px 14px;font-size:15px}.hb svg{width:26px;height:26px}.card b{font-size:18px}}
 @media(orientation:landscape){.vg{grid-template-columns:repeat(3,minmax(0,1fr))}#fp .cv{width:min(87%,36vh)}.ctl button{width:48px;height:48px}#fpp{width:60px!important;height:60px!important}}
+
+/* v21 additions: vinyl landscape, multi-select and backup tools */
+#fp.vinyl-landscape{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3vw;padding:4vh 5vw 3vh}
+#fp.vinyl-landscape>div[style*="flex:1"]{display:none}
+#fp.vinyl-landscape>#fx{position:absolute;top:12px;left:12px;z-index:3}
+#fp.vinyl-landscape>#fc{width:min(43vw,68vh)!important;height:auto;max-height:78vh;flex:none}
+#fp.vinyl-landscape>.trow,#fp.vinyl-landscape>#playerVisual,#fp.vinyl-landscape>#fb,#fp.vinyl-landscape>.tm,#fp.vinyl-landscape>.ctl,#fp.vinyl-landscape>.bot{width:48%;max-width:560px}
+#fp.vinyl-landscape>.trow{margin-top:0}
+#fp.vinyl-landscape>#playerVisual{height:54px!important}
+#fp.vinyl-landscape>.ctl{justify-content:center}
+#fp.vinyl-landscape>.bot{justify-content:space-around}
+#fp.vinyl-landscape>#fc.vinyl{animation-duration:10s}
+#selb{gap:4px;flex-wrap:wrap}
+#selb button{font-size:14px;padding:8px 7px}
+#list [data-v].selected,#list .it.selected{outline:3px solid var(--ac);outline-offset:2px;border-radius:18px}
+.backup-note{color:var(--sub);font-size:14px;line-height:1.5;padding:4px 16px 12px}
+
 </style></head><body>
 <div id="splash"><img src="splash.jpg" alt="Melodrift"></div>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
@@ -147,13 +167,13 @@ body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#studio{z-index:9}#carMode
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
 <button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
-<div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
+<div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div><video id="fpVideo" muted playsinline loop></video>
 <div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
-<div style="flex:1"></div>
+<div id="playerLyrics"><span id="playerLyricNow">Paroles non chargées</span><small id="playerLyricNext"></small></div><div style="flex:1"></div>
 <canvas id="playerVisual" width="900" height="180" aria-label="Visualisation musicale"></canvas>
 <input id="fb" type="range"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div>
 <div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
-<div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
+<div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><button id="vinylModeBtn" aria-label="Mode vinyle paysage">▱</button><button id="lyricsToggle" aria-label="Afficher les paroles">♫</button><button id="chooseVideoBtn" aria-label="Afficher une vidéo">▣</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
 <div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span id="stt">Paramètres</span></div><div id="sl"></div></div>
 <div class="ov" id="fk"><div class="top"><button class="ic" id="kx">←</button><span id="fkt"></span></div>
@@ -169,7 +189,7 @@ body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#studio{z-index:9}#carMode
 <div class="ov" id="tr"><div class="top"><button class="ic" id="trx">←</button><span id="trt"></span></div><div class="seg" id="trS"><button data-v="0">Audio</button><button data-v="1">Vidéo</button></div><div id="trl"></div></div>
 <div class="ov" id="nt"><div class="top"><button class="ic" id="ntx">←</button><span id="ntt"></span></div><div class="set" id="ntl"></div></div>
 <div class="ov" id="wr"><div class="top"><button class="ic" id="wrx">←</button><span id="wrt"></span><button class="ic" id="wrs" style="font-size:22px">⚙</button></div><div id="wrb"></div></div>
-<div class="ov" id="pm"><div class="top"><button class="ic" id="pmx">←</button><span>Autorisations</span></div><div class="set" id="pml"></div></div><div id="selb"></div>
+<div class="ov" id="backup"><div class="top"><button class="ic" id="backupBack">←</button><span>Sauvegarde et restauration</span></div><div class="set"><div class="sr" id="backupExport"><span>Créer une sauvegarde</span><small>Exporter playlists, favoris et réglages ›</small></div><div class="sr" id="backupImport"><span>Restaurer une sauvegarde</span><small>Importer un fichier JSON ›</small></div></div><p class="backup-note">La sauvegarde contient les données et préférences de Melodrift, pas les fichiers audio ou vidéo eux-mêmes.</p><input id="backupFile" type="file" accept="application/json,.json" hidden></div><div class="ov" id="pm"><div class="top"><button class="ic" id="pmx">←</button><span>Autorisations</span></div><div class="set" id="pml"></div></div><div id="selb"></div>
 <div id="sh"></div>
 <div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span>Melodrift Studio</span></div>
  <div class="set" id="studioHome">
@@ -242,7 +262,7 @@ function render(){
  else if(!MS)h='<div class="empty">Ouvre Melodrift depuis l\'app installée pour scanner tes musiques.</div>';
  else if(view){const d=viewData();if(!d){view=null;return render()}
   h=`<div class="top"><button class="ic" data-back="1">←</button><span>${esc(d.name)}</span>${d.user?'<button class="ic" data-del="1">🗑</button>':''}</div>`+rows(d.list)}
- else if(tab==0)h=`<small style="margin-bottom:12px">${vids.length} ${t(0).toLowerCase()}</small><div class="vg">`+vids.map(v=>`<div data-v="${v.id}">${cv(v.title,'v:'+v.id)}<b>${esc(v.title)}</b><small>${v.h?v.h+'P | ':''}${fmt(v.dur)}</small></div>`).join('')+'</div>';
+ else if(tab==0)h=`<small style="margin-bottom:12px">${vids.filter(v=>!L('hiddenVideos',[]).includes(v.id)).length} ${t(0).toLowerCase()}</small><div class="vg">`+vids.filter(v=>!L('hiddenVideos',[]).includes(v.id)).map(v=>`<div data-v="${v.id}">${cv(v.title,'v:'+v.id)}<b>${esc(v.title)}</b><small>${v.h?v.h+'P | ':''}${fmt(v.dur)}</small></div>`).join('')+'</div>';
  else if(!songs.length)h='<div class="empty">'+t(36)+'<br><button class="btn" onclick="scan()">'+t(22)+'</button></div>';
  else if(tab==1)h=rows(srt(vis()));
  else if(tab==2)h='<div class="card add" data-new="1"><span class="plus">＋</span><b>'+t(27)+'</b></div>'+allPl().map(p=>card(`data-p="${esc(p.id)}"`,p.name,p.list)).join('');
@@ -264,13 +284,13 @@ function chooseVisual(){const modes=[['Barres de fréquences','bars'],['Ondes au
 function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],['Visualisation musicale',chooseVisual],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
 function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
 function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
- $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('studio','Studio & outils avancés','Égaliseur • Paroles • Visualiseur')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'10.0')}
+ $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('studio','Studio & outils avancés','Égaliseur • Paroles • Visualiseur')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'v21')}
 $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a=='theme')openTheme();if(a=='trash')openTrash();if(a=='notif')openNotif();
  if(a=='sleep')sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
  if(a=='hid')sheet(t(20),songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['✕',()=>0]]));
  
- if(a=='perm')openPerm();if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
+ if(a=='backup')openOv('backup');if(a=='perm')openPerm();if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
  if(a=='fb')openFb();
  if(a=='about')sheet('Melodrift v21',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
@@ -393,7 +413,7 @@ const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
 fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fbE.style.setProperty('--p',e.target.value+'%')}};
 
-// Melodrift 11.7 — advanced tools. All settings remain local on this device.
+// Melodrift v21 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
 function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display='';openOv('studio'); }
@@ -439,7 +459,7 @@ function applyEq(){if(!L('eqEnabled',false))return;if(!ensureAudioGraph()){const
 function toggleEq(){if(!ensureAudioGraph()){$('eqStatus').textContent='Impossible d’activer l’égaliseur avec cette source audio.';return}const on=!L('eqEnabled',false);S('eqEnabled',on);if(on){applyEq();$('eqToggle').querySelector('button').textContent='Désactiver'}else{eqFilters.forEach(f=>f.gain.setTargetAtTime(0,eqContext.currentTime,.04));$('eqToggle').querySelector('button').textContent='Activer';$('eqStatus').textContent='Égaliseur désactivé.'}}
 function parseLrc(txt){return txt.split(/\r?\n/).flatMap(line=>{const tags=[...line.matchAll(/\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g)];const text=line.replace(/\[[^\]]+\]/g,'').trim();return tags.map(m=>({time:+m[1]*60 + +m[2] + (m[3]?+(('0.'+m[3])):0),text}))}).sort((a,b)=>a.time-b.time)}
 function renderLyrics(){const now=$('lyricsNow');if(!now)return;now.textContent=lyrics.length?'Paroles chargées • '+lyrics.length+' lignes':'Aucune parole chargée';$('lyricsList').innerHTML=lyrics.slice(0,200).map(x=>`<div style="padding:7px 4px;color:var(--sub)">${fmt(x.time*1000)} — ${esc(x.text)}</div>`).join('')}
-function syncLyrics(){if(!lyrics.length||!$('lyricsNow')||!cur||L('lyricsSong',null)!==cur.id)return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}
+function syncLyrics(){if(!cur||L('lyricsSong',null)!==cur.id||!lyrics.length){if($('playerLyricNow'))$('playerLyricNow').textContent='Aucune parole synchronisée';return}let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){const now=lyrics[i].text,next=lyrics[i+1]?.text||'';if($('lyricsNow')){$('lyricsNow').textContent=now;$('lyricsNext').textContent=next}if($('playerLyricNow')){$('playerLyricNow').textContent=now;$('playerLyricNext').textContent=next}}}
 function moveQueue(i,d){const q=queue.length?queue.slice():(cur?[cur]:srt(vis()));const j=i+d;if(j<0||j>=q.length)return;[q[i],q[j]]=[q[j],q[i]];queue=q;S('queue',q.map(x=>x.id));openStudioTool('queue')}
 function exportM3U(pl){if(!pl||!pl.list.length){alert('Cette playlist est vide.');return}const body='#EXTM3U\n'+pl.list.map(x=>`#EXTINF:${Math.round((x.dur||0)/1000)},${x.artist} - ${x.title}\n${x.path}`).join('\n');const blob=new Blob([body],{type:'audio/x-mpegurl'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(pl.name||'Melodrift').replace(/[^a-z0-9-_ ]/gi,'_')+'.m3u';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 function drawVisual(){if(!visualOn)return;const c=$('playerVisual');if(!c||$('fp').style.display!=='flex'||au.paused){visualFrame=requestAnimationFrame(drawVisual);return}const x=c.getContext('2d'),w=c.width,h=c.height,mode=L('visualMode','bars');x.clearRect(0,0,w,h);const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const val=i=>eqAnalyser?(data[i%data.length]/255):(.15+.08*Math.sin(Date.now()/260+i));x.lineWidth=5;x.lineCap='round';if(mode==='waves'){x.beginPath();for(let i=0;i<180;i++){const xx=i/179*w,yy=h/2+Math.sin(i*.12+Date.now()/260)*(10+val(i)*55);i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.strokeStyle='#f08a43';x.stroke()}else if(mode==='circle'||mode==='radial'){const cx=w/2,cy=h/2,r=mode==='circle'?Math.min(w,h)*.22:Math.min(w,h)*.27;for(let i=0;i<64;i++){const a=i/64*Math.PI*2,amp=val(i)*(mode==='circle'?28:45),r1=r,r2=r+amp; x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.strokeStyle=`hsl(${24+i*1.1},85%,58%)`;x.stroke()}x.beginPath();x.arc(cx,cy,r-5,0,Math.PI*2);x.strokeStyle='rgba(240,138,67,.55)';x.lineWidth=3;x.stroke()}else{const n=48;for(let i=0;i<n;i++){const v=val(i*2),bh=8+v*h*.72;x.fillStyle=`hsl(${22+i*.55},85%,${48+v*18}%)`;x.fillRect(i*(w/n)+3,h-bh,w/n-6,bh)}}visualFrame=requestAnimationFrame(drawVisual)}
@@ -449,7 +469,7 @@ $('carMode').addEventListener('click',e=>{if(e.target.id==='carPlay')return});
 const oldOnPlay=au.onplay,oldOnPause=au.onpause;au.addEventListener('timeupdate',syncLyrics);au.addEventListener('play',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='Ⅱ'});au.addEventListener('pause',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='▶'});
 // restore persisted queue after the library scan has populated byId
 const originalScan=scan;scan=async function(){await originalScan();const ids=L('queue',[]);if(ids.length)queue=ids.map(id=>byId[id]).filter(Boolean)};
-// ===== Melodrift 11.7 : égaliseur, visualiseur, thème, corbeille, notifications =====
+// ===== Melodrift v21 : égaliseur, visualiseur, thème, corbeille, notifications =====
 const X={
  trash:['Récemment supprimé','Recently deleted'],notif:['Paramètres de notifications','Notification settings'],
  share:['Partager','Share'],speed:['Vitesse','Speed'],ring:['Définir comme sonnerie','Set as ringtone'],del:['Supprimer','Delete'],
@@ -591,7 +611,7 @@ function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${
  $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Paroles • Outils'))
   +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
   +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('perm','Autorisations')+R('lang',t(23),LANGS[cl()][0]))
-  +C(R('fb',t(25))+R('about',t(26),'v21'))}
+  +C(R('backup','Sauvegarde et restauration','Exporter / importer')+R('fb',t(25))+R('about',t(26),'v21'))}
 applyLook();
 setTimeout(()=>{const sp=$('splash');if(!sp)return;sp.style.opacity=0;setTimeout(()=>sp.remove(),600)},1500);
 
@@ -642,24 +662,30 @@ $('wr').onclick=e=>{const t=e.target,c=t.closest('.ch');
  const sv=t.closest('[data-sv]');if(sv){wres=wSaved()[+sv.dataset.sv].text;S('wres',wres);wDraw();const o=$('wout');if(o)o.scrollIntoView({behavior:'smooth'})}};
 $('wrx').onclick=()=>closeOv('wr');$('wrs').onclick=()=>{wsetup=!wsetup;wDraw()};
 
-/* ===== v20 : appui long = sélection (plus de menu presse-papiers), autorisations, mini flottant ===== */
+/* ===== v21 : sélection multiple audio/vidéo, partage, masquage, suppression ===== */
 document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea'))e.preventDefault()});
 let selIds=null,lpT=0,lpHit=false;
-function selPaint(){document.querySelectorAll('#list .it').forEach(r=>{const s=shown[+r.dataset.i];r.style.background=selIds&&s&&selIds.has(s.id)?'rgba(128,128,128,.25)':''});
- const b=$('selb');if(!selIds){b.style.display='none';return}b.style.display='flex';
- b.innerHTML=`<button data-sa="x">✕</button><b>${selIds.size}</b><button data-sa="pl">＋ ${t(31)}</button><button data-sa="hide">${t(35)}</button>`}
+const selKey=(kind,id)=>kind+':'+id;
+function selPaint(){
+ document.querySelectorAll('#list .it').forEach(r=>{const s=shown[+r.dataset.i],k=s&&selKey('a',s.id),on=!!(selIds&&selIds.has(k));r.classList.toggle('selected',on)});
+ document.querySelectorAll('#list [data-v]').forEach(r=>r.classList.toggle('selected',!!(selIds&&selIds.has(selKey('v',r.dataset.v)))));
+ const b=$('selb');if(!selIds||!selIds.size){b.style.display='none';return}b.style.display='flex';
+ const audioCount=[...selIds].filter(k=>k.startsWith('a:')).length;
+ b.innerHTML=`<button data-sa="x">✕</button><b>${selIds.size}</b><button data-sa="share">↗ Partager</button><button data-sa="hide">Masquer</button><button data-sa="delete">🗑 Supprimer</button>${audioCount?'<button data-sa="pl">＋ Playlist</button>':''}`;
+}
 function selEnd(){selIds=null;selPaint()}
 const _rn=render;render=function(){_rn();selPaint()};
-$('list').addEventListener('touchstart',e=>{const r=e.target.closest('.it');if(!r)return;lpHit=false;clearTimeout(lpT);
- lpT=setTimeout(()=>{const s=shown[+r.dataset.i];if(!s)return;lpHit=true;selIds=selIds||new Set();selIds.add(s.id);navigator.vibrate&&navigator.vibrate(25);selPaint()},450)},{passive:true});
+function beginSelect(el){const kind=el.matches('[data-v]')?'v':'a';const id=kind==='v'?el.dataset.v:shown[+el.dataset.i]?.id;if(id==null)return;selIds=selIds||new Set();selIds.add(selKey(kind,id));navigator.vibrate&&navigator.vibrate(25);selPaint()}
+$('list').addEventListener('touchstart',e=>{const r=e.target.closest('.it,[data-v]');if(!r)return;lpHit=false;clearTimeout(lpT);lpT=setTimeout(()=>{beginSelect(r);lpHit=true},450)},{passive:true});
 ['touchmove','touchend','touchcancel'].forEach(n=>$('list').addEventListener(n,()=>clearTimeout(lpT),{passive:true}));
-$('list').addEventListener('click',e=>{const r=e.target.closest('.it');if(lpHit){lpHit=false;e.stopImmediatePropagation();e.preventDefault();return}
- if(!selIds||!r)return;e.stopImmediatePropagation();e.preventDefault();const s=shown[+r.dataset.i];if(!s)return;
- selIds.has(s.id)?selIds.delete(s.id):selIds.add(s.id);if(!selIds.size)selIds=null;selPaint()},true);
-$('selb').onclick=e=>{const a=e.target.dataset.sa;if(!a||!selIds)return;const ids=[...selIds];
+$('list').addEventListener('click',e=>{const r=e.target.closest('.it,[data-v]');if(lpHit){lpHit=false;e.stopImmediatePropagation();e.preventDefault();return}if(!selIds||!r)return;e.stopImmediatePropagation();e.preventDefault();const kind=r.matches('[data-v]')?'v':'a',id=kind==='v'?r.dataset.v:shown[+r.dataset.i]?.id,k=selKey(kind,id);if(selIds.has(k))selIds.delete(k);else selIds.add(k);if(!selIds.size)selIds=null;selPaint()},true);
+$('selb').onclick=async e=>{const a=e.target.dataset.sa;if(!a||!selIds)return;const keys=[...selIds],audio=keys.filter(k=>k.startsWith('a:')).map(k=>byId[k.slice(2)]).filter(Boolean),videos=keys.filter(k=>k.startsWith('v:')).map(k=>vids.find(v=>String(v.id)===k.slice(2))).filter(Boolean);
  if(a==='x')return selEnd();
- if(a==='hide'){ids.forEach(i=>hid.add(i));sv();selEnd();return render()}
- if(a==='pl')sheet(t(31),[...pls.map(p=>[p.name,()=>{ids.forEach(i=>{if(!p.ids.includes(i))p.ids.push(i)});sv();selEnd();render()}]),['＋ '+t(27),()=>newPl(p=>{ids.forEach(i=>p.ids.push(i));sv();selEnd();render()})]])};
+ if(a==='share'){const items=audio.map(x=>({id:x.id,video:false})).concat(videos.map(x=>({id:x.id,video:true})));if(MS&&MS.shareFiles){try{await MS.shareFiles({items})}catch(e){alert('Le partage a échoué.')}}else{const names=audio.concat(videos).map(x=>x.title||'Média');if(navigator.share){try{await navigator.share({title:'Melodrift',text:names.join('\n')})}catch(e){}}else alert(names.join('\n'))}return}
+ if(a==='hide'){audio.forEach(x=>hid.add(x.id));const hv=new Set(L('hiddenVideos',[]));videos.forEach(x=>hv.add(x.id));S('hiddenVideos',[...hv]);sv();selEnd();render();return}
+ if(a==='delete'){if(!MS||!confirm('Supprimer '+keys.length+' fichier(s) du téléphone ? Android demandera une confirmation.'))return;try{if(MS.deleteMediaBatch)await MS.deleteMediaBatch({items:audio.map(x=>({id:x.id,video:false})).concat(videos.map(x=>({id:x.id,video:true}))) });else{for(const x of audio)await MS.deleteMedia({id:x.id,video:false});for(const x of videos)await MS.deleteMedia({id:x.id,video:true})}}catch(e){alert('La suppression a été annulée ou refusée.')}selEnd();await scan();return}
+ if(a==='pl'&&audio.length){sheet(t(31),[...pls.map(p=>[p.name,()=>{audio.forEach(x=>{if(!p.ids.includes(x.id))p.ids.push(x.id)});sv();selEnd();render()}]),['＋ '+t(27),()=>newPl(p=>{audio.forEach(x=>p.ids.push(x.id));sv();selEnd();render()})]])}
+};
 async function openPerm(){$('pm').style.display='block';let s={};try{s=await MS.permStatus()}catch(e){}
  const rows=[['media','Musiques et vidéos','Lire ta bibliothèque',s.media],['notif','Notifications','Contrôles dans la notification',s.notif],['overlay','Afficher sur d’autres applis','Autorisation du mini lecteur flottant',s.overlay],['battery','Batterie sans restriction','Lecture fiable en arrière-plan',s.battery],['write','Modifier les paramètres système','Définir une sonnerie',s.write],['ov','Mini lecteur flottant','S’affiche quand tu quittes l’app',L('ovOn',false)]];
  $('pml').innerHTML=rows.map(r=>`<div class="sr" data-pk="${r[0]}" style="align-items:center;gap:10px"><div style="flex:1"><div>${r[1]}</div><small style="display:block;white-space:normal">${r[2]}</small></div><span>${r[3]?'✓':'›'}</span></div>`).join('')}
@@ -668,6 +694,12 @@ $('pml').onclick=async e=>{const k=e.target.closest('[data-pk]')?.dataset.pk;if(
  try{await MS.permOpen({k})}catch(x){}setTimeout(openPerm,700)};
 $('pmx').onclick=()=>closeOv('pm');
 document.addEventListener('visibilitychange',()=>{if(!MS||!L('ovOn',false))return;(document.hidden?MS.showOverlay():MS.hideOverlay()).catch(()=>0)});
+// Mode vinyle paysage : bascule l'orientation quand Android/le navigateur l'autorise.
+$('lyricsToggle').onclick=()=>{const p=$('playerLyrics');const on=p.style.display!=='block';p.style.display=on?'block':'none';if(on)syncLyrics()};
+$('chooseVideoBtn').onclick=()=>{const list=vids.filter(v=>!L('hiddenVideos',[]).includes(v.id));sheet('Vidéo d’accompagnement', [['Désactiver la vidéo',()=>{$('fpVideo').pause();$('fpVideo').removeAttribute('src');$('fpVideo').style.display='none'}],...list.map(v=>[v.title||'Vidéo',()=>{const el=$('fpVideo');el.src=src(v.path);el.style.display='block';el.play().catch(()=>alert('Impossible de lire cette vidéo.'))}])])};
+$('vinylModeBtn').onclick=async()=>{const on=!$('fp').classList.contains('vinyl-landscape');$('fp').classList.toggle('vinyl-landscape',on);$('fc').classList.toggle('vinyl',on||!au.paused);$('vinylModeBtn').textContent=on?'▣':'▱';if(on){try{if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape')}catch(e){/* l'utilisateur peut tourner son téléphone manuellement */}}else{try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch(e){}}};
+$('fx').addEventListener('click',()=>{$('fp').classList.remove('vinyl-landscape');$('vinylModeBtn').textContent='▱';try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch(e){}});
+
 applyTint();
 applyLang();scan();
 </script></body></html>
