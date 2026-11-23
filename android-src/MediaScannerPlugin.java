@@ -37,8 +37,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.Collections;
 
-@CapacitorPlugin(name = "MediaScanner", permissions = {
-    @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_IMAGES}),
+@CapacitorPlugin(name = "MediaScanner", requestCodes = {4711, 4712}, permissions = {
+    @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO}),
     @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE}),
     @Permission(alias = "legacy10", strings = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}),
     @Permission(alias = "notif", strings = {Manifest.permission.POST_NOTIFICATIONS})
@@ -150,7 +150,7 @@ public class MediaScannerPlugin extends Plugin {
         i.putExtra("artist", call.getString("artist", ""));
         i.putExtra("playing", call.getBoolean("playing", false));
         i.putExtra("art", call.getString("art", ""));
-        i.putExtra("color", call.getInt("color", 0));
+        OverlayService.setInfo(call.getString("title", ""), call.getBoolean("playing", false));
         try {
             if (Build.VERSION.SDK_INT >= 26) getContext().startForegroundService(i);
             else getContext().startService(i);
@@ -315,75 +315,63 @@ public class MediaScannerPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void permStatus(PluginCall call) {
+        android.content.Context c = getContext();
+        JSObject o = new JSObject();
+        o.put("media", getPermissionState(alias()) == PermissionState.GRANTED);
+        o.put("notif", Build.VERSION.SDK_INT < 33 || getPermissionState("notif") == PermissionState.GRANTED);
+        o.put("overlay", Build.VERSION.SDK_INT < 23 || Settings.canDrawOverlays(c));
+        android.os.PowerManager pm = (android.os.PowerManager) c.getSystemService(android.content.Context.POWER_SERVICE);
+        o.put("battery", Build.VERSION.SDK_INT < 23 || pm.isIgnoringBatteryOptimizations(c.getPackageName()));
+        o.put("write", Build.VERSION.SDK_INT < 23 || Settings.System.canWrite(c));
+        call.resolve(o);
+    }
+
+    @PermissionCallback
+    private void permDone(PluginCall call) { call.resolve(); }
+
+    @PluginMethod
+    public void permOpen(PluginCall call) {
+        String k = call.getString("k", "");
+        android.content.Context c = getContext();
+        Uri pk = Uri.parse("package:" + c.getPackageName());
+        try {
+            if (k.equals("media")) { requestPermissionForAlias(alias(), call, "permDone"); return; }
+            if (k.equals("notif")) {
+                if (Build.VERSION.SDK_INT >= 33) requestPermissionForAlias("notif", call, "permDone"); else call.resolve();
+                return;
+            }
+            Intent i = null;
+            if (k.equals("overlay")) i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, pk);
+            else if (k.equals("battery")) i = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, pk);
+            else if (k.equals("write")) i = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, pk);
+            if (i != null) { i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); c.startActivity(i); }
+            call.resolve();
+        } catch (Exception e) { call.reject("perm"); }
+    }
+
+    @PluginMethod
+    public void showOverlay(PluginCall call) {
+        android.content.Context c = getContext();
+        JSObject o = new JSObject();
+        try {
+            if (Build.VERSION.SDK_INT >= 23 && !Settings.canDrawOverlays(c)) { o.put("perm", true); call.resolve(o); return; }
+            c.startService(new Intent(c, OverlayService.class));
+            call.resolve(o);
+        } catch (Exception e) { call.reject("overlay"); }
+    }
+
+    @PluginMethod
+    public void hideOverlay(PluginCall call) {
+        try { getContext().stopService(new Intent(getContext(), OverlayService.class)); call.resolve(); }
+        catch (Exception e) { call.reject("overlay"); }
+    }
+
+    @PluginMethod
     public void hideNotif(PluginCall call) {
         try {
             getContext().startService(new Intent(getContext(), PlaybackService.class).setAction("HIDE"));
             call.resolve();
         } catch (Exception e) { call.reject("hide"); }
-    }
-
-    private android.media.AudioManager afAm;
-    private android.media.AudioFocusRequest afReq;
-    private final android.media.AudioManager.OnAudioFocusChangeListener afL = new android.media.AudioManager.OnAudioFocusChangeListener() {
-        @Override
-        public void onAudioFocusChange(int c) {
-            String s = c == android.media.AudioManager.AUDIOFOCUS_GAIN ? "gain"
-                : c == android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK ? "duck"
-                : c == android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT ? "pause" : "loss";
-            JSObject o = new JSObject();
-            o.put("s", s);
-            notifyListeners("focus", o);
-        }
-    };
-
-    @PluginMethod
-    public void focus(PluginCall call) {
-        try {
-            afAm = (android.media.AudioManager) getContext().getSystemService(android.content.Context.AUDIO_SERVICE);
-            if (call.getBoolean("on", true)) {
-                if (Build.VERSION.SDK_INT >= 26) {
-                    afReq = new android.media.AudioFocusRequest.Builder(android.media.AudioManager.AUDIOFOCUS_GAIN)
-                        .setAudioAttributes(new android.media.AudioAttributes.Builder()
-                            .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
-                            .setContentType(android.media.AudioAttributes.CONTENT_TYPE_MUSIC).build())
-                        .setOnAudioFocusChangeListener(afL).build();
-                    afAm.requestAudioFocus(afReq);
-                } else {
-                    afAm.requestAudioFocus(afL, android.media.AudioManager.STREAM_MUSIC, android.media.AudioManager.AUDIOFOCUS_GAIN);
-                }
-            } else {
-                if (Build.VERSION.SDK_INT >= 26) { if (afReq != null) afAm.abandonAudioFocusRequest(afReq); }
-                else afAm.abandonAudioFocus(afL);
-            }
-            call.resolve();
-        } catch (Exception e) { call.reject("focus"); }
-    }
-
-    @PluginMethod
-    public void askOverlay(PluginCall call) {
-        try {
-            if (!Settings.canDrawOverlays(getContext())) {
-                Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getContext().getPackageName()));
-                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getContext().startActivity(i);
-            }
-            call.resolve();
-        } catch (Exception e) { call.reject("overlay"); }
-    }
-
-    @PluginMethod
-    public void share(PluginCall call) {
-        try {
-            long id = call.getData().optLong("id", 0);
-            Uri u = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
-            Intent s = new Intent(Intent.ACTION_SEND);
-            s.setType("video/*");
-            s.putExtra(Intent.EXTRA_STREAM, u);
-            s.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Intent ch = Intent.createChooser(s, null);
-            ch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getContext().startActivity(ch);
-            call.resolve();
-        } catch (Exception e) { call.reject("share"); }
     }
 }
