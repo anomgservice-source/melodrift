@@ -19,10 +19,10 @@ jobs:
           java-version: 17
       - run: npm install
       - run: npx cap add android
-      - name: Version Android automatiquement
+      - name: Version Android
         run: |
           sed -i "s/versionCode [0-9][0-9]*/versionCode ${GITHUB_RUN_NUMBER}/" android/app/build.gradle
-          sed -i "s/versionName .*/versionName '21.0'/" android/app/build.gradle
+          sed -i "s/versionName .*/versionName '22.0'/" android/app/build.gradle
       - name: Plugin natif, permissions, icones
         run: |
           cp android-src/*.java android/app/src/main/java/com/melodrift/app/

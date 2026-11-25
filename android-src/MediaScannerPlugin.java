@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Intent;
+import android.content.ClipData;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
@@ -36,8 +37,9 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.Collections;
+import org.json.JSONObject;
 
-@CapacitorPlugin(name = "MediaScanner", requestCodes = {4711, 4712}, permissions = {
+@CapacitorPlugin(name = "MediaScanner", requestCodes = {4711, 4712, 4713}, permissions = {
     @Permission(alias = "media", strings = {Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO}),
     @Permission(alias = "legacy", strings = {Manifest.permission.READ_EXTERNAL_STORAGE}),
     @Permission(alias = "legacy10", strings = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}),
@@ -45,6 +47,7 @@ import java.util.Collections;
 })
 public class MediaScannerPlugin extends Plugin {
     private PluginCall delCall;
+    private PluginCall batchDelCall;
     private PluginCall trashCall;
 
     @Override
@@ -232,6 +235,12 @@ public class MediaScannerPlugin extends Plugin {
             delCall.resolve(o);
             delCall = null;
         }
+        if (requestCode == 4713 && batchDelCall != null) {
+            JSObject o = new JSObject();
+            o.put("ok", resultCode == Activity.RESULT_OK);
+            batchDelCall.resolve(o);
+            batchDelCall = null;
+        }
     }
 
     @PluginMethod
@@ -247,6 +256,59 @@ public class MediaScannerPlugin extends Plugin {
             getActivity().startActivity(Intent.createChooser(i, call.getString("title", "Melodrift")));
             call.resolve();
         } catch (Exception e) { call.reject("share"); }
+    }
+
+    @PluginMethod
+    public void shareFiles(PluginCall call) {
+        try {
+            JSArray items = call.getArray("items");
+            ArrayList<Uri> uris = new ArrayList<>();
+            ClipData clip = null;
+            boolean allAudio = true;
+            for (int n = 0; items != null && n < items.length(); n++) {
+                JSONObject item = items.getJSONObject(n);
+                long id = item.optLong("id");
+                boolean video = item.optBoolean("video", false);
+                allAudio = allAudio && !video;
+                Uri u = ContentUris.withAppendedId(video ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                uris.add(u);
+                if (clip == null) clip = ClipData.newUri(getContext().getContentResolver(), "Melodrift", u);
+                else clip.addItem(new ClipData.Item(u));
+            }
+            if (uris.isEmpty()) { call.reject("no_files"); return; }
+            Intent i = new Intent(Intent.ACTION_SEND_MULTIPLE);
+            i.setType(allAudio ? "audio/*" : "*/*");
+            i.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+            i.setClipData(clip);
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            getActivity().startActivity(Intent.createChooser(i, "Partager depuis Melodrift"));
+            call.resolve();
+        } catch (Exception e) { call.reject("share_multiple", e); }
+    }
+
+    @PluginMethod
+    public void deleteMediaBatch(PluginCall call) {
+        try {
+            JSArray items = call.getArray("items");
+            ArrayList<Uri> uris = new ArrayList<>();
+            for (int n = 0; items != null && n < items.length(); n++) {
+                JSONObject item = items.getJSONObject(n);
+                long id = item.optLong("id");
+                boolean video = item.optBoolean("video", false);
+                uris.add(ContentUris.withAppendedId(video ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id));
+            }
+            if (uris.isEmpty()) { call.reject("no_files"); return; }
+            if (Build.VERSION.SDK_INT >= 30) {
+                PendingIntent pi = MediaStore.createDeleteRequest(getContext().getContentResolver(), uris);
+                batchDelCall = call;
+                getBridge().saveCall(call);
+                getActivity().startIntentSenderForResult(pi.getIntentSender(), 4713, null, 0, 0, 0);
+            } else {
+                int deleted = 0;
+                for (Uri u : uris) deleted += getContext().getContentResolver().delete(u, null, null);
+                JSObject o = new JSObject(); o.put("ok", deleted > 0); call.resolve(o);
+            }
+        } catch (Exception e) { call.reject("delete_batch", e); }
     }
 
     @PluginMethod

@@ -90,8 +90,8 @@ public class PlaybackService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        stopForeground(true);
-        stopSelf();
+        // Do not stop playback just because the user dismisses the app task.
+        // The foreground media service remains responsible for ongoing playback.
         super.onTaskRemoved(rootIntent);
     }
 }
