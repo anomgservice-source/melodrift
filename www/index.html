@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Melodrift v22</title>
+<title>Melodrift 11.9</title>
 <style>
 :root{--bg:#fffaf5;--card:#f4e8dc;--tx:#21160f;--sub:#806e60;--ac:#d97735;--mini:#f0c9a8;--mt:#4b2818}
 [data-theme=dark]{--bg:#120d0a;--card:#261a14;--tx:#fff4eb;--sub:#b7a091;--ac:#f08a43;--mini:#3a2418;--mt:#ffd9b0}
@@ -44,15 +44,15 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--mt)}
 #fp .cv{width:100%;height:auto;aspect-ratio:1.2;max-height:44vh;border-radius:26px;font-size:90px;margin:8px 0 22px;flex:none}
 .trow{display:flex;align-items:center;gap:2px}
 #fp h2{margin:0 0 6px;font-size:30px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-#fa{font-size:17px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fa{font-size:19px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #fh,#fm{font-size:30px!important;flex:none}
 #fb{-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;margin:6px 0;background:linear-gradient(to right,var(--mt) var(--p,0%),#00000026 var(--p,0%))}
 #fb::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--mt)}
 .ctl{display:flex;justify-content:space-around;align-items:center;margin:14px 0}
-.ctl button{width:56px;height:56px;padding:6px}#fpp{width:72px!important;height:72px!important}
+.ctl button{width:76px;height:76px;padding:8px}#fpp{width:100px!important;height:100px!important}
 .bot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:8px}
 .bot span{flex:1;text-align:center;font-size:16px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tm{display:flex;justify-content:space-between;font-size:11px;opacity:.7}
+.tm{display:flex;justify-content:space-between;font-size:14px;opacity:.7}
 .set{background:var(--card);border-radius:24px;padding:4px 18px;margin-bottom:16px}
 .sr{display:flex;justify-content:space-between;padding:18px 0;font-size:18px}.sr small{display:inline}
 #q{width:100%;padding:14px 18px;border-radius:24px;border:0;background:var(--card);color:var(--tx);font-size:17px}
@@ -88,8 +88,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #fc.vinyl:after{content:"";display:block;width:17%;height:17%;border-radius:50%;position:absolute;left:41.5%;top:41.5%;background:var(--mini);border:4px solid rgba(0,0,0,.28);box-shadow:0 0 0 3px rgba(255,255,255,.25)}
 #fc{position:relative;overflow:hidden}
 @keyframes vinylTurn{to{transform:rotate(360deg)}}
-#playerVisual{display:none;width:100%;height:45px;margin:4px 0 8px;border-radius:18px;background:rgba(0,0,0,.10)}
+#playerVisual{display:none;width:100%;height:112px;margin:4px 0 8px;border-radius:18px;background:rgba(0,0,0,.10)}
 #playerVisual.active{display:block}
+
 #eqRows{display:flex;align-items:flex-end;justify-content:space-around;gap:4px;padding:18px 8px 12px;min-height:250px}
 #eqRows>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;min-width:0;flex:1}
 #eqRows>div b{font-size:11px;white-space:nowrap}
@@ -122,58 +123,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .thc{background:var(--card);border-radius:30px;padding:18px;margin:6px 0 20px}.chs{display:flex;gap:8px;margin:10px 0}.chs span{border-radius:16px;padding:7px 14px;background:rgba(128,128,128,.18);font-size:13px;color:var(--sub)}.chs span.on{background:var(--ac);color:#fff}
 .accs{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px}.accs i{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:24px}
 .it .cv{width:var(--cvs,64px);height:var(--cvs,64px)}
-#playerVisual{background:none;flex:none}
-#fpVideo{display:none;width:min(92%,520px);max-height:34vh;aspect-ratio:16/9;object-fit:cover;border-radius:20px;align-self:center;background:#100b08}
-#playerLyrics{display:none;text-align:center;width:100%;padding:10px 14px;border-radius:18px;background:rgba(0,0,0,.08);font-size:18px;font-weight:650;line-height:1.35}
-#playerLyrics small{display:block;color:var(--sub);font-size:14px;font-weight:400;margin-top:6px}#fp #fc{max-height:44vh;min-height:90px}
+#playerVisual{background:none;flex:none}#fp #fc{max-height:44vh;min-height:90px}
 #splash{position:fixed;inset:0;background:#000;z-index:100;display:flex;align-items:center;justify-content:center;transition:opacity .5s}#splash img{width:100%;height:100%;object-fit:contain}
 .ta{width:100%;border:0;border-radius:16px;background:rgba(128,128,128,.14);color:var(--tx);padding:12px;font:inherit;font-size:16px;resize:none;height:90px;margin:6px 0 14px;display:block}
 #wr .set small{display:block;margin-top:4px}
 .wp{white-space:pre-wrap;font:inherit;font-size:17px;line-height:1.55;margin:0 0 14px;word-break:break-word}
 #wr .ch{background:rgba(128,128,128,.16)}#wr .ch.on{background:var(--ac)}
 .wact{display:flex;gap:8px;flex-wrap:wrap}.wact .btn{margin-top:0;padding:10px 16px;font-size:15px}
-#fp .cv{width:min(87%,44vh);align-self:center;aspect-ratio:1}
-*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}input,textarea{-webkit-user-select:text;user-select:text}
-body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#mini{z-index:10}
-#selb{display:none;position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--card);padding:10px 16px calc(env(safe-area-inset-bottom) + 10px);justify-content:space-around;align-items:center}
-#selb button{background:none;border:0;color:var(--tx);font-size:17px;padding:8px 12px}
-@media(min-width:700px){#main,#top{max-width:900px;margin-left:auto;margin-right:auto}.vg{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:340px){header h1{font-size:24px}nav button{padding:9px 14px;font-size:15px}.hb svg{width:26px;height:26px}.card b{font-size:18px}}
-@media(orientation:landscape){.vg{grid-template-columns:repeat(3,minmax(0,1fr))}#fp .cv{width:min(87%,36vh)}.ctl button{width:48px;height:48px}#fpp{width:60px!important;height:60px!important}}
 
-/* v21 additions: vinyl landscape, multi-select and backup tools */
-#fp.vinyl-landscape{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3vw;padding:4vh 5vw 3vh}
-#fp.vinyl-landscape>div[style*="flex:1"]{display:none}
-#fp.vinyl-landscape>#fx{position:absolute;top:12px;left:12px;z-index:3}
-#fp.vinyl-landscape>#fc{width:min(43vw,68vh)!important;height:auto;max-height:78vh;flex:none}
-#fp.vinyl-landscape>.trow,#fp.vinyl-landscape>#playerVisual,#fp.vinyl-landscape>#fb,#fp.vinyl-landscape>.tm,#fp.vinyl-landscape>.ctl,#fp.vinyl-landscape>.bot{width:48%;max-width:560px}
-#fp.vinyl-landscape>.trow{margin-top:0}
-#fp.vinyl-landscape>#playerVisual{height:54px!important}
-#fp.vinyl-landscape>.ctl{justify-content:center}
-#fp.vinyl-landscape>.bot{justify-content:space-around}
-#fp.vinyl-landscape>#fc.vinyl{animation-duration:10s}
-#selb{gap:4px;flex-wrap:wrap}
-#selb button{font-size:14px;padding:8px 7px}
-#list [data-v].selected,#list .it.selected{outline:3px solid var(--ac);outline-offset:2px;border-radius:18px}
-.backup-note{color:var(--sub);font-size:14px;line-height:1.5;padding:4px 16px 12px}
+#repeatBtn{display:none!important}#fal{cursor:pointer}
+body:has(#sr[style*="block"]) #mini{z-index:11}#sc{padding-bottom:110px}
+header h1{font-size:24px}nav button{padding:8px 16px;font-size:15px}.cv{width:54px;height:54px}.it{padding:6px 0;gap:12px}
+#mini .cv{width:46px;height:46px;font-size:20px}#mini .tt b{font-size:16px}
+@media (min-width:700px){#list,nav,header,.ov{max-width:820px;margin-left:auto;margin-right:auto}#mini{left:50%;right:auto;width:min(820px,100%);transform:translateX(-50%)}}
+@media (orientation:landscape) and (max-height:520px){#fc{max-height:58vh}#mini{padding-top:8px;padding-bottom:calc(env(safe-area-inset-bottom) + 6px)}header{padding-top:calc(env(safe-area-inset-top) + 6px)}}
 
-
-/* v22 : bibliothèque vidéo compacte et lecteur adaptatif */
-.video-list{display:flex;flex-direction:column;gap:10px;padding:6px 0 150px}
-.video-row{display:flex;align-items:center;gap:14px;min-width:0;padding:6px 0;cursor:pointer}
-.video-row .cv{width:92px;height:64px;aspect-ratio:16/10;border-radius:12px;flex:none;margin:0}
-.video-row .tt{flex:1;min-width:0}
-.video-row .tt b{display:block;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.video-row .tt small{font-size:13px}
-.video-tag{display:inline-block;border:1px solid currentColor;border-radius:8px;padding:0 5px;margin-right:5px;font-size:11px;line-height:17px;color:var(--sub)}
-#vw{background:#000;color:#fff}
-#vv{width:100%;height:100%;object-fit:contain;background:#000}
-#vtop{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top) + 8px) 14px 12px;background:linear-gradient(#000b,transparent);color:#fff}
-#vtitle{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:650}
-#vtop button{border:0;background:#2229;color:#fff;border-radius:50%;width:42px;height:42px;font-size:18px;position:static;flex:none}
-@media(orientation:landscape){#fp{flex-direction:row!important;flex-wrap:wrap;align-content:center;justify-content:center;gap:10px 3%;padding:calc(env(safe-area-inset-top) + 10px) 4% calc(env(safe-area-inset-bottom) + 10px)}#fp>#fx{position:absolute;left:12px;top:8px;z-index:2}#fp>#fc{width:min(42vw,68vh)!important;height:min(42vw,68vh)!important;max-height:68vh!important;aspect-ratio:1;border-radius:50%!important;flex:none;margin:0 1% 0 0}#fp>.trow{width:48%;max-width:560px;align-self:center;margin:0}#fp>.trow h2{font-size:clamp(24px,4vw,42px)}#fp>#playerLyrics,#fp>#playerVisual{display:none!important}#fp>#fb,#fp>.tm{display:none!important}#fp>.ctl{width:48%;max-width:560px;justify-content:space-around;margin:10px 0}#fp>.bot{display:none!important}#fp #vinylModeBtn{display:none!important}}
-@media(orientation:portrait){#fp>#fc{width:100%;height:auto;aspect-ratio:1.2;max-height:44vh;border-radius:26px}#fp>#fb,#fp>.tm{display:block}}
-
+@media not all and (orientation:landscape) and (max-height:520px){#fc.vinyl{border-radius:26px!important;animation:none!important;box-shadow:none!important}#fc.vinyl:after{display:none}}
+@media (orientation:landscape) and (max-height:520px){
+#fp{display:grid!important;grid-template-columns:44% 1fr;column-gap:2vw;align-content:center;padding:2vh 3vw}
+#fp>*{grid-column:2}
+#fp #fc{grid-column:1;grid-row:1/span 30;align-self:center;justify-self:start;width:62vh;height:62vh;max-height:none;min-height:0;aspect-ratio:1;margin:0 0 0 6vw;border-radius:50%;box-shadow:0 0 0 2.4vh rgba(255,255,255,.14),0 0 0 4.8vh rgba(255,255,255,.07)}
+#fp::after{content:"";position:absolute;left:38%;top:-1vh;width:1.4vh;height:44vh;background:#fff;border-radius:2vh;transform:rotate(-7deg);transform-origin:top center}
+#fp h2{font-size:30px}
+}
 </style></head><body>
 <div id="splash"><img src="splash.jpg" alt="Melodrift"></div>
 <div id="top"><header id="hd"><h1>Melodrift</h1><button class="hb" id="bs"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg></button><button class="hb" id="bt"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h9M3 18h5M18 6v12m0 0l-3-3m3 3l3-3"/></svg></button><button class="hb" id="bg"><svg viewBox="0 0 24 24"><path d="M12 2l8.5 5v10L12 22l-8.5-5V7z"/><circle cx="12" cy="12" r="3"/></svg></button></header>
@@ -183,13 +155,13 @@ body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#mini{z-index:10}
 <div id="mini"><div class="row"><div class="cv" id="mc" style="background:#444">♪</div>
 <div class="tt" id="mo"><b id="mt">Melodrift</b><small id="ma"></small></div>
 <button class="pv">⏮</button><button class="pp">▶</button><button class="nx">⏭</button></div></div>
-<div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div><video id="fpVideo" muted playsinline loop></video>
+<div class="ov" id="fp"><button class="ic" id="fx" style="align-self:flex-start">⌄</button><div class="cv" id="fc" data-sz="512">♪</div>
 <div class="trow"><div style="flex:1;min-width:0"><h2 id="ft"></h2><div id="fa"></div></div><button id="fh">♡</button><button id="fm">⋮</button></div>
-<div id="playerLyrics"><span id="playerLyricNow">Paroles non chargées</span><small id="playerLyricNext"></small></div><div style="flex:1"></div>
+<div style="flex:1"></div>
 <canvas id="playerVisual" width="900" height="180" aria-label="Visualisation musicale"></canvas>
 <input id="fb" type="range"><div class="tm"><span id="t1">0:00</span><span id="t2">0:00</span></div>
 <div class="ctl"><button class="pv"></button><button id="fpp"></button><button class="nx"></button></div>
-<div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><button id="lyricsToggle" aria-label="Afficher les paroles">♫</button><button id="chooseVideoBtn" aria-label="Afficher une vidéo">▣</button><span id="fal"></span><button id="fq">☰</button></div></div>
+<div class="bot"><button class="eqQuick" aria-label="Ouvrir l’égaliseur">🎚</button><button id="repeatBtn" aria-label="Mode de répétition">↻</button><span id="fal"></span><button id="fq">☰</button></div></div>
 <div class="ov" id="sr"><div class="top"><button class="ic" id="sx">←</button><input id="q" placeholder="Rechercher ma musique"></div><div id="sc"></div></div>
 <div class="ov" id="st"><div class="top"><button class="ic" id="tx">←</button><span id="stt">Paramètres</span></div><div id="sl"></div></div>
 <div class="ov" id="fk"><div class="top"><button class="ic" id="kx">←</button><span id="fkt"></span></div>
@@ -204,21 +176,73 @@ body{height:100dvh}.ov{z-index:9;padding-bottom:120px}#mini{z-index:10}
 <div class="ov" id="th"><div class="top"><button class="ic" id="thx">←</button><span id="tht"></span><div class="lsz" id="thS"></div></div><div id="thB"></div></div>
 <div class="ov" id="tr"><div class="top"><button class="ic" id="trx">←</button><span id="trt"></span></div><div class="seg" id="trS"><button data-v="0">Audio</button><button data-v="1">Vidéo</button></div><div id="trl"></div></div>
 <div class="ov" id="nt"><div class="top"><button class="ic" id="ntx">←</button><span id="ntt"></span></div><div class="set" id="ntl"></div></div>
-<div id="wrb"></div></div>
-<div class="ov" id="backup"><div class="top"><button class="ic" id="backupBack">←</button><span>Sauvegarde et restauration</span></div><div class="set"><div class="sr" id="backupExport"><span>Créer une sauvegarde</span><small>Exporter playlists, favoris et réglages ›</small></div><div class="sr" id="backupImport"><span>Restaurer une sauvegarde</span><small>Importer un fichier JSON ›</small></div></div><p class="backup-note">La sauvegarde contient les données et préférences de Melodrift, pas les fichiers audio ou vidéo eux-mêmes.</p><input id="backupFile" type="file" accept="application/json,.json" hidden></div><div class="ov" id="pm"><div class="top"><button class="ic" id="pmx">←</button><span>Autorisations</span></div><div class="set" id="pml"></div></div><div id="selb"></div>
+<div class="ov" id="wr"><div class="top"><button class="ic" id="wrx">←</button><span id="wrt"></span><button class="ic" id="wrs" style="font-size:22px">⚙</button></div><div id="wrb"></div></div>
 <div id="sh"></div>
-<div id="carTitle" style="text-align:center;font-size:25px;font-weight:800;margin:12vh 0 8px">Melodrift</div><div id="carArtist" style="text-align:center;color:var(--sub);font-size:18px">Mode conduite</div><div style="display:flex;justify-content:center;align-items:center;gap:22px;margin:10vh 0"><button class="btn" id="carPrev" style="font-size:30px;width:76px;height:76px">⏮</button><button class="btn" id="carPlay" style="font-size:38px;width:100px;height:100px;border-radius:50%">▶</button><button class="btn" id="carNext" style="font-size:30px;width:76px;height:76px">⏭</button></div><div style="text-align:center;color:var(--sub)">Commandes simplifiées • Garde les yeux sur la route</div></div>
-<div id="vw"><video id="vv" controls playsinline></video><div id="vtop"><button id="vx" aria-label="Fermer">‹</button><span id="vtitle"></span><button id="vspeed">1×</button><button id="vmenu">⋮</button></div></div>
+<div id="carMode" class="ov"><div class="top"><button class="ic" id="carBack">✕</button><span>Mode voiture</span></div><div id="carTitle" style="text-align:center;font-size:25px;font-weight:800;margin:12vh 0 8px">Melodrift</div><div id="carArtist" style="text-align:center;color:var(--sub);font-size:18px">Mode conduite</div><div style="display:flex;justify-content:center;align-items:center;gap:22px;margin:10vh 0"><button class="btn" id="carPrev" style="font-size:30px;width:76px;height:76px">⏮</button><button class="btn" id="carPlay" style="font-size:38px;width:100px;height:100px;border-radius:50%">▶</button><button class="btn" id="carNext" style="font-size:30px;width:76px;height:76px">⏭</button></div><div style="text-align:center;color:var(--sub)">Commandes simplifiées • Garde les yeux sur la route</div></div>
+<div id="vw"><video id="vv" controls playsinline></video><button id="vx">✕</button></div>
 <audio id="au"></audio>
 <script>
-const $=id=>document.getElementById(id),au=$('au'),MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
+// Media3 adapter: keeps the existing UI contract while playback runs natively.
+const $=id=>document.getElementById(id),MP=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Media3Player,MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
+const media3Wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function media3Call(method,args={}){
+ if(!MP||typeof MP[method]!=='function')throw new Error('Plugin Media3Player indisponible');
+ let last;
+ for(let i=0;i<18;i++){
+  try{return await MP[method](args)}catch(e){last=e;const m=String(e&&e.message||e);if(!/not connected|controller is not connected|retry shortly/i.test(m))throw e;await media3Wait(180)}
+ }
+ throw last||new Error('Connexion Media3 impossible');
+}
+const au=(()=>{
+ const listeners={};let source='',sourcePromise=Promise.resolve(),seekPromise=Promise.resolve(),position=0,duration=0,paused=true,volume=1,rate=1,defaultRate=1,pitch=true,metadataReady=false,lastVolume=-1;
+ const fire=(name,detail)=>{const ev={type:name,target:api,detail};try{if(typeof api['on'+name]==='function')api['on'+name].call(api,ev)}catch(e){};(listeners[name]||[]).slice().forEach(fn=>{try{fn.call(api,ev)}catch(e){}})};
+ const api={
+  addEventListener(name,fn){if(typeof fn==='function')(listeners[name]||(listeners[name]=[])).push(fn)},
+  removeEventListener(name,fn){if(listeners[name])listeners[name]=listeners[name].filter(x=>x!==fn)},
+  play(){return sourcePromise.then(()=>seekPromise).then(()=>media3Call('play'))},
+  pause(){media3Call('pause').catch(e=>fire('error',e))},
+  load(){},
+  get paused(){return paused},get ended(){return false},
+  get currentTime(){return position},set currentTime(v){position=Math.max(0,Number(v)||0);seekPromise=media3Call('seekTo',{position:Math.round(position*1000)}).catch(e=>{fire('error',e);throw e});seekPromise.catch(()=>{})},
+  get duration(){return duration},
+  get volume(){return volume},set volume(v){volume=Math.max(0,Math.min(1,Number(v)||0));if(Math.abs(volume-lastVolume)>.015){lastVolume=volume;media3Call('setVolume',{volume}).catch(e=>fire('error',e))}},
+  get playbackRate(){return rate},set playbackRate(v){rate=Math.max(.25,Math.min(3,Number(v)||1));media3Call('setSpeed',{speed:rate}).catch(e=>fire('error',e))},
+  get defaultPlaybackRate(){return defaultRate},set defaultPlaybackRate(v){defaultRate=Number(v)||1},
+  get preservesPitch(){return pitch},set preservesPitch(v){pitch=!!v},
+  _applyState(st){paused=!st.isPlaying;position=Math.max(0,(Number(st.position)||0)/1000);duration=Number(st.duration)>0?Number(st.duration)/1000:0;},_fire(name){fire(name)},_metadataReady(){return metadataReady},_setMetadataReady(){metadataReady=true},
+  get src(){return source},set src(v){
+   source=String(v||'');metadataReady=false;position=0;duration=0;
+   const tracks=(Array.isArray(queue)&&queue.length?queue:(cur?[cur]:[]));
+   const startIndex=Math.max(0,tracks.findIndex(x=>String(x.id)===String(cur&&cur.id)));
+   const items=tracks.map(x=>({id:x.id,title:x.title||'Sans titre',artist:x.artist||'Artiste inconnu',album:x.album||''}));
+   if(!items.length||items.some(x=>x.id==null)){sourcePromise=Promise.reject(new Error('Identifiant MediaStore manquant pour une piste'));sourcePromise.catch(e=>fire('error',e));return}
+   sourcePromise=media3Call('loadQueue',{items,startIndex,autoplay:false}).then(()=>{fire('loadstart')}).catch(e=>{fire('error',e);throw e});sourcePromise.catch(()=>{});
+  }
+ };
+ return api;
+})();
 const L=(k,d)=>{try{const v=JSON.parse(localStorage[k]);return v==null?d:v}catch(e){return d}},S=(k,v)=>{localStorage[k]=JSON.stringify(v)};
-['wf','wres','wsaved','lyUrl','lyKey'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
-let tint={h:205,s:45};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
+let tint={h:205,s:45};const VSZ=()=>Math.min(100,L('visualSize',36)),hslInt=(h,sa,l)=>{sa/=100;l/=100;const k=n=>(n+h/30)%12,a=sa*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return(255<<24|Math.round(f(0)*255)<<16|Math.round(f(8)*255)<<8|Math.round(f(4)*255))|0};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
 let fdrag=false,lsv=0,nT=0,notifAsked=false;
-let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
+let duck=false,autoP=false,preV=1;
+au.addEventListener('play',()=>{try{MS&&MS.focus({on:true})}catch(e){}});
+au.addEventListener('pause',()=>{if(!autoP)try{MS&&MS.focus({on:false})}catch(e){}});
+try{MS&&MS.addListener('focus',e=>{const k=e.s;
+ if(k=='duck'){if(!duck){duck=true;preV=au.volume}au.volume=Math.min(preV,.25)}
+ else if(k=='gain'){if(duck){duck=false;au.volume=preV}if(autoP){autoP=false;au.play()}}
+ else if(k=='pause'){if(!au.paused){autoP=true;au.pause()}}
+ else if(k=='loss'){autoP=false;if(!au.paused)au.pause()}})}catch(e){}
+setTimeout(()=>{if(!L('ovAsk',0)){S('ovAsk',1);try{sheet('Afficher sur les autres applications',[['Autoriser',()=>MS.askOverlay()],['Plus tard',()=>{}]])}catch(e){}}},6000);
+
+let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],sList=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
 let favs=new Set(L('fav',[])),hid=new Set(L('hid',[])),plays=L('plays',{}),recent=L('rec',[]),pls=L('pls',[]),hist=L('hist',[]),theme=L('theme','auto'),ptime=L('ptime',0),vtime=L('vtime',0),fadeOn=L('fade',false),lang=L('lang','auto');
 const TABS=[0,1,2,3,4,5],KEYS={3:'folder',4:'artist',5:'album'};
+window.__MELODRIFT_MEDIA3__=!!MP;
+let media3LastIndex=-2,media3Ended=false,media3Poll=null;
+function reflectMedia3Track(track){if(!track||!cur||String(track.id)===String(cur.id))return;cur=track;$('mt').textContent=track.title;$('ma').textContent=track.artist;$('ft').textContent=track.title;$('fa').textContent=track.artist;$('fal').textContent=track.album||'';setCv($('mc'),track);setCv($('fc'),track);tintOf(track);updHeart();nSoon();}
+function onMedia3State(st){if(!st)return;const oldPaused=au.paused;au._applyState(st);if(Number.isInteger(st.currentIndex)&&st.currentIndex>=0&&st.currentIndex!==media3LastIndex){media3LastIndex=st.currentIndex;const track=queue[st.currentIndex];if(track)reflectMedia3Track(track);media3Ended=false;}if(oldPaused&&!au.paused)au._fire('play');else if(!oldPaused&&au.paused)au._fire('pause');if(au.duration>0&&!au._metadataReady()){au._setMetadataReady();au._fire('loadedmetadata');}au._fire('timeupdate');if(st.playbackState===4&&!media3Ended){media3Ended=true;au._fire('ended');}else if(st.playbackState!==4){media3Ended=false;}}
+function initMedia3Bridge(){if(!MP)return;try{MP.addListener('playerState',e=>onMedia3State(e));MP.addListener('playerError',e=>console.warn('Media3',e));}catch(e){}let tries=0;const connect=async()=>{try{const st=await MP.getState();onMedia3State(st);if(media3Poll)return;media3Poll=setInterval(async()=>{try{onMedia3State(await MP.getState())}catch(e){}},500);}catch(e){if(++tries<40)setTimeout(connect,250);else console.error('Media3 non connecté',e)}};connect();}
+initMedia3Bridge();
 const P=s=>s.split('|');
 const LANGS={fr:['Français',P(`Vidéos|Chansons|Playlists|Dossiers|Artistes|Albums|Rechercher ma musique|Tri|Le dernier|Le plus joué|De A à Z|La plupart comptent|Paramètres|Temps de lecture|Thème|Auto (téléphone)|Clair|Sombre|Minuterie de sommeil|Désactiver|Fichiers masqués|fichiers|Scanner à nouveau|Langue|Paramètres de lecture|Commentaires et problèmes|À propos|Nouvelle playlist|Nom de la playlist|Chansons aimées|Lue dernièrement|Ajouter à une playlist|Supprimer cette playlist ?|Ajouter aux favoris|Retirer des favoris|Masquer ce fichier|Aucune musique trouvée.|Autoriser|Melodrift a besoin d'accéder à tes musiques.|Rien ici pour le moment.|File d'attente|Historique|titres|Dites-nous le problème|Avis|Explique ce qui s'est passé ou donne ton avis.|Envoyer par e-mail|Écrire sur Facebook|Écris ton avis d'abord.|Fichier non trouvé|Le fichier ne peut pas être lu|La musique s'arrête|Application lente|Parole|Pubs|Autres|Durée totale de lecture|Temps de lecture de musique|Durée de lecture vidéo|Fondu enchaîné|Fondu à la fin et au début des pistes|Aucun favori.|Supprimer du téléphone|Supprimer ce fichier du téléphone ?`)],en:['English',P(`Videos|Songs|Playlists|Folders|Artists|Albums|Search my music|Sort|Latest|Most played|A to Z|Most tracks|Settings|Listening time|Theme|Auto (phone)|Light|Dark|Sleep timer|Off|Hidden files|files|Scan again|Language|Playback settings|Feedback and problems|About|New playlist|Playlist name|Liked songs|Recently played|Add to a playlist|Delete this playlist?|Add to favorites|Remove from favorites|Hide this file|No music found.|Allow|Melodrift needs access to your music.|Nothing here yet.|Queue|History|tracks|Tell us the problem|Feedback|Explain what happened or share your opinion.|Send by email|Write on Facebook|Write your feedback first.|File not found|The file cannot be played|The music stops|App is slow|Lyrics|Ads|Other|Total listening time|Music listening time|Video watching time|Crossfade|Fade out and in between tracks|No favorites.|Delete from phone|Delete this file from the phone?`)],mg:['Malagasy',P(`Horonan-tsary|Hira|Lisitra hira|Lahatahiry|Mpanakanto|Albom|Hikaroka ny mozikako|Alaharo|Vaovao indrindra|Re be indrindra|A hatramin'ny Z|Hira maro indrindra|Fanamboarana|Fotoana nihainoana|Lohahevitra|Ho azy (findainao)|Mazava|Maizina|Fandefasana tory|Atsaharo|Rakitra miafina|rakitra|Hikaroka indray|Fiteny|Fanamboarana ny fampiasana|Hevitra sy olana|Mombamomba|Lisitra vaovao|Anaran'ny lisitra|Hira tiana|Vao re|Ampio ao amin'ny lisitra|Fafana ity lisitra ity ve?|Ampio amin'ny tiana|Esory amin'ny tiana|Afeno ity rakitra ity|Tsy nahita hira.|Avela|Mila alalana hidirana amin'ny hirakao i Melodrift.|Tsy mbola misy eto.|Laharana fihainoana|Tantara|hira|Lazao anay ny olana|Hevitra|Lazao ny zava-nitranga na ny hevitrao.|Alefaso amin'ny mailaka|Soraty ao amin'ny Facebook|Soraty aloha ny hevitrao.|Tsy hita ny rakitra|Tsy azo henoina ny rakitra|Mijanona ny hira|Miadana ny application|Tonony|Doka|Hafa|Fotoana feno nihainoana|Fotoana nihainoana hira|Fotoana nijerena horonan-tsary|Fampifangaroana|Fampiakarana sy fampidinana feo eo anelanelan'ny hira|Tsy misy tiana.|Fafana amin'ny findainao|Fafana ve ity rakitra ity amin'ny findainao?`)],es:['Español',P(`Vídeos|Canciones|Listas|Carpetas|Artistas|Álbumes|Buscar en mi música|Ordenar|Más reciente|Más escuchado|De la A a la Z|Más canciones|Ajustes|Tiempo de reproducción|Tema|Auto (teléfono)|Claro|Oscuro|Temporizador de sueño|Desactivado|Archivos ocultos|archivos|Volver a escanear|Idioma|Ajustes de reproducción|Comentarios y problemas|Acerca de|Nueva lista|Nombre de la lista|Canciones favoritas|Reproducidas recientemente|Añadir a una lista|¿Eliminar esta lista?|Añadir a favoritos|Quitar de favoritos|Ocultar este archivo|No se encontró música.|Permitir|Melodrift necesita acceso a tu música.|Aún no hay nada aquí.|Cola|Historial|canciones|Cuéntanos el problema|Opinión|Explica qué pasó o danos tu opinión.|Enviar por correo|Escribir en Facebook|Escribe primero tu opinión.|Archivo no encontrado|No se puede reproducir el archivo|La música se detiene|La aplicación va lenta|Letra|Anuncios|Otros|Tiempo total de reproducción|Tiempo de reproducción de música|Tiempo de reproducción de vídeo|Fundido encadenado|Fundido al final y al inicio de las pistas|Sin favoritos.|Eliminar del teléfono|¿Eliminar este archivo del teléfono?`)],pt:['Português',P(`Vídeos|Músicas|Playlists|Pastas|Artistas|Álbuns|Pesquisar minha música|Ordenar|Mais recente|Mais tocadas|De A a Z|Mais faixas|Configurações|Tempo de reprodução|Tema|Auto (telefone)|Claro|Escuro|Temporizador de sono|Desativado|Arquivos ocultos|arquivos|Verificar novamente|Idioma|Configurações de reprodução|Comentários e problemas|Sobre|Nova playlist|Nome da playlist|Músicas curtidas|Tocadas recentemente|Adicionar a uma playlist|Excluir esta playlist?|Adicionar aos favoritos|Remover dos favoritos|Ocultar este arquivo|Nenhuma música encontrada.|Permitir|O Melodrift precisa de acesso às suas músicas.|Nada aqui ainda.|Fila|Histórico|faixas|Conte-nos o problema|Opinião|Explique o que aconteceu ou dê sua opinião.|Enviar por e-mail|Escrever no Facebook|Escreva sua opinião primeiro.|Arquivo não encontrado|O arquivo não pode ser reproduzido|A música para|Aplicativo lento|Letra|Anúncios|Outros|Tempo total de reprodução|Tempo de reprodução de música|Tempo de reprodução de vídeo|Fade cruzado|Esmaecer no fim e no início das faixas|Sem favoritos.|Excluir do telefone|Excluir este arquivo do telefone?`)],ar:['العربية',P(`فيديو|أغاني|قوائم التشغيل|مجلدات|فنانون|ألبومات|ابحث في موسيقاي|ترتيب|الأحدث|الأكثر تشغيلاً|من أ إلى ي|الأكثر أغاني|الإعدادات|وقت التشغيل|السمة|تلقائي (الهاتف)|فاتح|داكن|مؤقت النوم|إيقاف|ملفات مخفية|ملفات|فحص مرة أخرى|اللغة|إعدادات التشغيل|الملاحظات والمشاكل|حول|قائمة تشغيل جديدة|اسم القائمة|الأغاني المفضلة|شُغّلت مؤخراً|أضف إلى قائمة تشغيل|حذف هذه القائمة؟|أضف إلى المفضلة|أزل من المفضلة|إخفاء هذا الملف|لم يتم العثور على موسيقى.|السماح|يحتاج Melodrift إلى الوصول إلى موسيقاك.|لا شيء هنا بعد.|قائمة الانتظار|السجل|أغاني|أخبرنا بالمشكلة|ملاحظاتك|اشرح ما حدث أو شاركنا رأيك.|إرسال بالبريد الإلكتروني|اكتب على فيسبوك|اكتب ملاحظاتك أولاً.|الملف غير موجود|لا يمكن تشغيل الملف|الموسيقى تتوقف|التطبيق بطيء|الكلمات|إعلانات|أخرى|إجمالي وقت التشغيل|وقت تشغيل الموسيقى|وقت تشغيل الفيديو|مزج التلاشي|تلاشي في نهاية المقاطع وبدايتها|لا توجد مفضلة.|حذف من الهاتف|حذف هذا الملف من الهاتف؟`)],hi:['हिन्दी',P(`वीडियो|गाने|प्लेलिस्ट|फ़ोल्डर|कलाकार|एल्बम|मेरा संगीत खोजें|क्रमबद्ध करें|नवीनतम|सबसे ज़्यादा सुने|A से Z|सबसे ज़्यादा गाने|सेटिंग्स|सुनने का समय|थीम|ऑटो (फ़ोन)|हल्का|गहरा|स्लीप टाइमर|बंद|छिपी हुई फ़ाइलें|फ़ाइलें|दोबारा स्कैन करें|भाषा|प्लेबैक सेटिंग्स|प्रतिक्रिया और समस्याएँ|के बारे में|नई प्लेलिस्ट|प्लेलिस्ट का नाम|पसंदीदा गाने|हाल ही में चलाए गए|प्लेलिस्ट में जोड़ें|यह प्लेलिस्ट हटाएँ?|पसंदीदा में जोड़ें|पसंदीदा से हटाएँ|यह फ़ाइल छिपाएँ|कोई संगीत नहीं मिला।|अनुमति दें|Melodrift को आपके संगीत तक पहुँच चाहिए।|यहाँ अभी कुछ नहीं है।|कतार|इतिहास|गाने|हमें समस्या बताएँ|राय|बताएँ क्या हुआ या अपनी राय दें।|ईमेल से भेजें|Facebook पर लिखें|पहले अपनी राय लिखें।|फ़ाइल नहीं मिली|फ़ाइल चलाई नहीं जा सकती|संगीत रुक जाता है|ऐप धीमा है|बोल|विज्ञापन|अन्य|कुल सुनने का समय|संगीत सुनने का समय|वीडियो देखने का समय|क्रॉसफ़ेड|गानों के अंत और शुरुआत में फ़ेड|कोई पसंदीदा नहीं।|फ़ोन से हटाएँ|यह फ़ाइल फ़ोन से हटाएँ?`)],id:['Bahasa Indonesia',P(`Video|Lagu|Playlist|Folder|Artis|Album|Cari musik saya|Urutkan|Terbaru|Paling sering diputar|A sampai Z|Lagu terbanyak|Pengaturan|Waktu pemutaran|Tema|Otomatis (ponsel)|Terang|Gelap|Timer tidur|Nonaktif|File tersembunyi|file|Pindai ulang|Bahasa|Pengaturan pemutaran|Masukan dan masalah|Tentang|Playlist baru|Nama playlist|Lagu favorit|Baru diputar|Tambahkan ke playlist|Hapus playlist ini?|Tambahkan ke favorit|Hapus dari favorit|Sembunyikan file ini|Musik tidak ditemukan.|Izinkan|Melodrift memerlukan akses ke musik Anda.|Belum ada apa-apa di sini.|Antrean|Riwayat|lagu|Ceritakan masalahnya|Masukan|Jelaskan apa yang terjadi atau berikan pendapat Anda.|Kirim lewat email|Tulis di Facebook|Tulis masukan Anda dulu.|File tidak ditemukan|File tidak dapat diputar|Musik berhenti|Aplikasi lambat|Lirik|Iklan|Lainnya|Total waktu pemutaran|Waktu pemutaran musik|Waktu pemutaran video|Crossfade|Memudar di akhir dan awal lagu|Belum ada favorit.|Hapus dari ponsel|Hapus file ini dari ponsel?`)],ru:['Русский',P(`Видео|Песни|Плейлисты|Папки|Исполнители|Альбомы|Поиск в моей музыке|Сортировка|Последние|Самые популярные|От А до Я|Больше всего треков|Настройки|Время прослушивания|Тема|Авто (телефон)|Светлая|Тёмная|Таймер сна|Выкл.|Скрытые файлы|файлов|Сканировать заново|Язык|Настройки воспроизведения|Отзывы и проблемы|О приложении|Новый плейлист|Название плейлиста|Любимые песни|Недавно воспроизведённые|Добавить в плейлист|Удалить этот плейлист?|Добавить в избранное|Убрать из избранного|Скрыть этот файл|Музыка не найдена.|Разрешить|Melodrift нужен доступ к вашей музыке.|Здесь пока ничего нет.|Очередь|История|треков|Расскажите о проблеме|Отзыв|Опишите, что произошло, или поделитесь мнением.|Отправить по e-mail|Написать в Facebook|Сначала напишите отзыв.|Файл не найден|Файл не удаётся воспроизвести|Музыка останавливается|Приложение тормозит|Текст песни|Реклама|Другое|Общее время прослушивания|Время прослушивания музыки|Время просмотра видео|Плавный переход|Затухание в конце и начале треков|Нет избранного.|Удалить с телефона|Удалить этот файл с телефона?`)],zh:['中文',P(`视频|歌曲|播放列表|文件夹|艺术家|专辑|搜索我的音乐|排序|最新|播放最多|A 到 Z|歌曲最多|设置|播放时长|主题|自动（手机）|浅色|深色|睡眠定时|关闭|隐藏的文件|个文件|重新扫描|语言|播放设置|反馈与问题|关于|新建播放列表|播放列表名称|喜欢的歌曲|最近播放|添加到播放列表|删除此播放列表？|添加到收藏|从收藏中移除|隐藏此文件|未找到音乐。|允许|Melodrift 需要访问你的音乐。|这里还没有内容。|播放队列|历史记录|首|告诉我们问题|意见|请说明发生了什么，或分享你的意见。|通过邮件发送|在 Facebook 上留言|请先写下你的意见。|找不到文件|无法播放该文件|音乐停止|应用很慢|歌词|广告|其他|总播放时长|音乐播放时长|视频播放时长|淡入淡出|曲目结尾和开头淡入淡出|没有收藏。|从手机删除|从手机删除此文件？`)]};
 const cl=()=>{if(lang!='auto'&&LANGS[lang])return lang;const n=(navigator.language||'en').slice(0,2).toLowerCase();return LANGS[n]?n:'en'};
@@ -229,7 +253,7 @@ const dm=matchMedia('(prefers-color-scheme:dark)');
 function applyTheme(){document.documentElement.dataset.theme=theme=='auto'?(dm.matches?'dark':'light'):theme;applyTint()}
 dm.onchange=applyTheme;applyTheme();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const col=s=>'hsl('+((([...s].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7))%360)+360)%360+',45%,38%)';
+const col=s=>'hsl('+[...s].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7)%360+',45%,38%)';
 const fmt=ms=>{const s=Math.round(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 const src=p=>Capacitor.convertFileSrc('file://'+p.split('/').map(encodeURIComponent).join('/'));
 const artCache=new Map(),obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){obs.unobserve(e.target);loadArt(e.target)}}),{rootMargin:'300px'});
@@ -269,7 +293,7 @@ function render(){
  else if(!MS)h='<div class="empty">Ouvre Melodrift depuis l\'app installée pour scanner tes musiques.</div>';
  else if(view){const d=viewData();if(!d){view=null;return render()}
   h=`<div class="top"><button class="ic" data-back="1">←</button><span>${esc(d.name)}</span>${d.user?'<button class="ic" data-del="1">🗑</button>':''}</div>`+rows(d.list)}
- else if(tab==0)h=`<small style="margin-bottom:12px">${vids.filter(v=>!L('hiddenVideos',[]).includes(v.id)).length} ${t(0).toLowerCase()}</small><div class="video-list">`+vids.filter(v=>!L('hiddenVideos',[]).includes(v.id)).map(v=>`<div class="video-row" data-v="${v.id}">${cv(v.title,'v:'+v.id)}<div class="tt"><b>${esc(v.title)}</b><small><span class="video-tag">VIDÉO</span>${v.h?v.h+'P · ':''}${fmt(v.dur)}</small></div><button class="mo" data-vmenu="${v.id}">⋮</button></div>`).join('')+'</div>';
+ else if(tab==0)h=`<small style="margin-bottom:12px">${vids.length} ${t(0).toLowerCase()}</small><div class="vg">`+vids.map(v=>`<div data-v="${v.id}">${cv(v.title,'v:'+v.id)}<b>${esc(v.title)}</b><small>${v.h?v.h+'P | ':''}${fmt(v.dur)}</small></div>`).join('')+'</div>';
  else if(!songs.length)h='<div class="empty">'+t(36)+'<br><button class="btn" onclick="scan()">'+t(22)+'</button></div>';
  else if(tab==1)h=rows(srt(vis()));
  else if(tab==2)h='<div class="card add" data-new="1"><span class="plus">＋</span><b>'+t(27)+'</b></div>'+allPl().map(p=>card(`data-p="${esc(p.id)}"`,p.name,p.list)).join('');
@@ -283,51 +307,58 @@ async function scan(){
  render()}
 function sheet(title,items){const sh=$('sh');sh.innerHTML=`<div class="shb"><h3>${esc(title)}</h3>${items.map((x,i)=>`<div class="si" data-s="${i}">${esc(x[0])}</div>`).join('')}</div>`;sh.style.display='block';
  sh.onclick=e=>{const i=e.target.dataset.s;sh.style.display='none';if(i!==undefined)items[i][1]()}}
-function videoMenu(v){sheet(v.title||'Vidéo',[[ 'Partager',()=>{if(MS&&MS.shareFile)MS.shareFile({id:v.id,video:true,title:v.title}).catch(()=>alert('Le partage a échoué.'));else if(navigator.share)navigator.share({title:v.title}).catch(()=>0)}],['Fenêtre flottante',()=>alert('La fenêtre flottante vidéo nécessite un lecteur Android natif dédié. Elle n’est pas encore prise en charge dans cette version.')],['Mode de lecture · Tout répéter',()=>{S('videoRepeat',!L('videoRepeat',false));alert(L('videoRepeat',false)?'Répétition activée':'Répétition désactivée')}],['Ajustement de l’image · Adapter',()=>{const vdo=$('vv');vdo.style.objectFit=vdo.style.objectFit==='cover'?'contain':'cover'}],['Piste audio',()=>alert('La sélection de piste audio sera disponible uniquement si le fichier expose plusieurs pistes au lecteur Android.')],['Masquer',()=>{const a=new Set(L('hiddenVideos',[]));a.add(v.id);S('hiddenVideos',[...a]);$('vx').click();render()}],['Supprimer',async()=>{if(!MS||!confirm('Supprimer cette vidéo du téléphone ?'))return;try{const r=await MS.deleteMedia({id:v.id,video:true});if(r&&r.ok){$('vx').click();await scan()}else alert('Suppression non autorisée ou annulée.')}catch(e){alert('Suppression non autorisée ou annulée.')}}]])}
-$('vspeed').onclick=()=>{const vals=[.5,.75,1,1.25,1.5,2];const cur=$('vv').playbackRate;sheet('Vitesse vidéo',vals.map(v=>[(cur===v?'✓ ':'')+v+'×',()=>{$('vv').playbackRate=v;$('vspeed').textContent=v+'×'}]))};$('vmenu').onclick=()=>{const title=$('vtitle').textContent,v=vids.find(x=>x.title===title);if(v)videoMenu(v)};
 const sv=()=>{S('fav',[...favs]);S('hid',[...hid]);S('pls',pls);updHeart()}
 function updHeart(){const f=cur&&favs.has(cur.id);$('fh').textContent=f?'♥':'♡';$('fh').style.color=f?'#ff5a7a':''};
 function newPl(then){const n=prompt(t(28));if(!n)return;const p={id:'u'+Date.now(),name:n.trim(),ids:[]};pls.push(p);sv();then?then(p):render()}
 function addTo(s){const put=p=>{if(!p.ids.includes(s.id))p.ids.push(s.id);sv();render()};sheet(t(31),[...pls.map(p=>[p.name,()=>put(p)]),['＋ '+t(27),()=>newPl(put)]])}
 function chooseVisual(){const modes=[['Barres de fréquences','bars'],['Ondes audio','waves'],['Cercle animé','circle'],['Spectre circulaire','radial']];sheet('Visualisation musicale',modes.map(([label,key])=>[`${L('visualMode','bars')===key?'✓ ':''}${label}`,()=>{S('visualMode',key);refreshPlayerVisual()}]).concat([['Désactiver la visualisation',()=>{S('visualMode','off');refreshPlayerVisual()}]]))}
-function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],['Partager',()=>shareSong(s)],['Visualiseur musical',chooseVisual],['Vitesse · '+(au.playbackRate||1)+'×',speedSheet],['Définir comme sonnerie',()=>ringSong(s)],[t(18),()=>sheet(t(18),[['Désactiver',()=>setSleep(0)],['15 min',()=>setSleep(15)],['30 min',()=>setSleep(30)],['45 min',()=>setSleep(45)],['60 min',()=>setSleep(60)]])],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
+function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],['Visualisation musicale',chooseVisual],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
 function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
-$('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(!a)return;if(a==='theme')openTheme();else if(a==='trash')openTrash();else if(a==='notif')openNotif();else if(a==='sleep')sheet(t(18),[[t(19),()=>setSleep(0)],['15 min',()=>setSleep(15)],['30 min',()=>setSleep(30)],['45 min',()=>setSleep(45)],['60 min',()=>setSleep(60)]]);else if(a==='hid')sheet(t(20),songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]));else if(a==='backup')openOv('backup');else if(a==='perm')openPerm();else if(a==='lang')openLang();else if(a==='play')openPlay();else if(a==='time')openTime();else if(a==='scan')refresh();else if(a==='fb')openFb();else if(a==='about')sheet('Melodrift v22',[['© anomgservice',()=>0]])};
-const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp'){e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'});setTimeout(()=>{if(typeof adaptPlayerOrientation==='function')adaptPlayerOrientation();if(typeof fitPlayer==='function')fitPlayer()},80)}};
-const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else{e.style.display='none';if(id=='sr')render()}};
+function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
+ $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'10.0')}
+$('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
+ if(a=='theme')openTheme();if(a=='trash')openTrash();if(a=='notif')openNotif();
+ if(a=='sleep')sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
+ if(a=='hid')sheet(t(20),songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['✕',()=>0]]));
+
+ if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();
+ if(a=='fb')openFb();
+ if(a=='about')sheet('Melodrift 11.7',[['© anomgservice',()=>0]])};
+const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
+const closeOv=id=>{const e=$(id);if(id=='fp')e.animate([{transform:'none'},{transform:'translateY(100%)'}],{duration:220,easing:'ease-in'}).onfinish=()=>e.style.display='none';else e.style.display='none'};
 $('bg').onclick=()=>{renderSet();openOv('st')};$('tx').onclick=()=>closeOv('st');
 $('bt').onclick=()=>sheet(t(7),SORTS.map(x=>[(sort==x[0]?'✓ ':'')+t(x[1]),()=>{sort=x[0];render()}]));
 $('bs').onclick=()=>{openOv('sr');$('q').value='';sres();$('q').focus()};$('sx').onclick=()=>closeOv('sr');
 function sres(){sq=$('q').value.toLowerCase().trim();
  if(!sq){$('sc').innerHTML=(hist.length?'<div class="top"><span style="font-size:20px">'+t(41)+'</span><button class="ic" data-clr="1">🗑</button></div>'+hist.map(h=>`<span class="ch" data-h="${esc(h)}">${esc(h)}</span>`).join(''):'');return}
- $('sc').innerHTML=rows(vis().filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(sq)));
+ sList=vis().filter(s=>(s.title+' '+s.artist+' '+s.album).toLowerCase().includes(sq));const keep=shown;$('sc').innerHTML=rows(sList);shown=keep;
  document.querySelectorAll('#sc [data-art]').forEach(e=>obs.observe(e))}
 $('q').oninput=sres;
 $('sc').onclick=e=>{const h=e.target.dataset.h;if(h!==undefined){$('q').value=h;return sres()}
  if(e.target.dataset.clr){hist=[];S('hist',hist);return sres()}
- const m=e.target.dataset.m;if(m!==undefined)return songMenu(shown[m]);
- const it=e.target.closest('[data-i]');if(it){hist=[sq,...hist.filter(x=>x!=sq)].slice(0,10);S('hist',hist);play(shown[+it.dataset.i],shown)}};
+ const m=e.target.dataset.m;if(m!==undefined)return songMenu(sList[m]);
+ const it=e.target.closest('[data-i]');if(it){hist=[sq,...hist.filter(x=>x!=sq)].slice(0,10);S('hist',hist);play(sList[+it.dataset.i],sList)}};
 $('nav').onclick=e=>{const t=e.target.dataset.t;if(t!==undefined)go(+t)};
 $('list').onclick=e=>{const d=e.target.dataset,m=d.m;
  if(m!==undefined)return songMenu(shown[m]);
  if(d.back){view=null;return render()}
  if(d.del){if(confirm(t(32))){pls=pls.filter(p=>p.id!=view.id);sv();view=null;render()}return}
- const vm=e.target.closest('[data-vmenu]');if(vm){const v=vids.find(y=>String(y.id)===vm.dataset.vmenu);if(v)return videoMenu(v);return}const it=e.target.closest('[data-i],[data-g],[data-p],[data-v],[data-new]');if(!it)return;const x=it.dataset;
+ const it=e.target.closest('[data-i],[data-g],[data-p],[data-v],[data-new]');if(!it)return;const x=it.dataset;
  if(x.new)return newPl();
  if(x.p!==undefined){view={t:'p',id:x.p};return render()}
  if(x.g!==undefined){view={t:'g',k:x.g};return render()}
- if(x.v){const v=vids.find(y=>y.id==x.v);if(!v)return;au.pause();$('vtitle').textContent=v.title||'Vidéo';$('vv').src=src(v.path);$('vw').style.display='block';$('vv').play().catch(()=>alert('Impossible de lire cette vidéo.'));return}
+ if(x.v){const v=vids.find(y=>y.id==x.v);au.pause();$('vv').src=src(v.path);$('vw').style.display='block';return $('vv').play()}
  if(x.i!==undefined)play(shown[+x.i],shown)};
-$('vx').onclick=()=>{$('vv').pause();$('vv').removeAttribute('src');$('vw').style.display='none'};$('vv').addEventListener('ended',()=>{if(L('videoRepeat',false)){$('vv').currentTime=0;$('vv').play().catch(()=>0)}});
-function play(s,list){if(!s)return;if(list){queue=list;S('queue',queue.map(x=>x.id))}cur=s;$('fc').classList.remove('vinyl');au.src=src(s.path);au.playbackRate=L('speed',1);au.play();
+$('vx').onclick=()=>{$('vv').pause();$('vv').removeAttribute('src');$('vw').style.display='none'};
+function play(s,list){if(!s)return;if(list){queue=list;S('queue',queue.map(x=>x.id))}cur=s;$('fc').classList.remove('vinyl');au.src=src(s.path);au.play();
  plays[s.id]=(plays[s.id]||0)+1;recent=[s.id,...recent.filter(i=>i!=s.id)].slice(0,100);S('plays',plays);S('rec',recent);
  $('mt').textContent=s.title;$('ma').textContent=s.artist;$('ft').textContent=s.title;$('fa').textContent=s.artist;
  all('pp').forEach(b=>b.style.setProperty('--p','0%'));setCv($('mc'),s);setCv($('fc'),s);tintOf(s);nSoon();$('fal').textContent=s.album;updHeart();
  if('mediaSession'in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:s.title,artist:s.artist});
   navigator.mediaSession.setActionHandler('nexttrack',()=>step(1));navigator.mediaSession.setActionHandler('previoustrack',()=>step(-1))}
  render()}
-function nSoon(){clearTimeout(nT);nT=setTimeout(nSync,300);try{if(cur){$('carTitle').textContent=cur.title;$('carArtist').textContent=cur.artist}}catch(e){}}
-function step(d,auto){if(!queue.length)return;let i=queue.findIndex(x=>x.id==cur.id);if(mode==0&&auto&&i>=queue.length-1){au.pause();return}i=mode==2?Math.floor(Math.random()*queue.length):(i+d+queue.length)%queue.length;play(queue[i])}
+function nSoon(){clearTimeout(nT);nT=setTimeout(nSync,300)}
+function step(d){if(!queue.length)return;let i=queue.findIndex(x=>x.id==cur.id);i=mode==2?Math.floor(Math.random()*queue.length):(i+d+queue.length)%queue.length;play(queue[i])}
 const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
 function syncRepeat(){const b=$('repeatBtn');if(b){b.textContent=mode===1?'🔂 1':mode===2?'🔀':'↻';b.title=mode===1?'Répéter ce titre':mode===2?'Lecture aléatoire':'Répétition désactivée'}}
@@ -336,23 +367,22 @@ $('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};
 syncRepeat();
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
 au.onplay=()=>{if(L('visualMode','bars')!=='off'){visualOn=true;ensureAudioGraph();refreshPlayerVisual()}$('fc').classList.add('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PAUSE));$('fpp').innerHTML=ico(PAUSE);nSoon()};au.onpause=()=>{$('fc').classList.remove('vinyl');all('pp').forEach(b=>b.innerHTML=ico(PLAY));$('fpp').innerHTML=ico(PLAY);nSoon()};
-au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1,true);let erN=0;au.onerror=()=>{if(++erN<5)setTimeout(()=>step(1,true),300)};au.addEventListener('playing',()=>erN=0);
+au.onended=()=>mode==1?(au.currentTime=0,au.play()):step(1);
 au.ontimeupdate=()=>{if(au.duration){au.volume=fadeOn?Math.max(.03,Math.min(1,(au.duration-au.currentTime)/3,au.currentTime/3+.1)):1;const v=au.currentTime/au.duration*100;document.querySelectorAll('.pp').forEach(b=>b.style.setProperty('--p',v+'%'));if(!fdrag){$('fb').value=v;$('fb').style.setProperty('--p',v+'%')}if(cur&&Date.now()-lsv>4000){lsv=Date.now();S('last',{id:cur.id,t:au.currentTime})}$('t1').textContent=fmt(au.currentTime*1000);$('t2').textContent=fmt(au.duration*1000)}};
 $('mo').onclick=$('mc').onclick=()=>{if(cur){openOv('fp');refreshPlayerVisual()}};$('fx').onclick=()=>closeOv('fp');
 $('fm').onclick=()=>cur&&sheet(cur.title,[[favs.has(cur.id)?t(34):t(33),()=>{favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv()}],[t(31),()=>addTo(cur)],['Visualisation musicale',chooseVisual],[t(18),()=>sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]))]]);
 setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}if(!$('vv').paused&&$('vw').style.display=='block'){vtime++;if(vtime%10==0)S('vtime',vtime)}},1000);
-try{Capacitor.Plugins.App.addListener('backButton',()=>{if(selIds)return selEnd();
+try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
  if($('sh').style.display=='block')return $('sh').style.display='none';
- const o=['eqs','vzs','pm','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);
+ const o=['wr','eqs','vzs','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);if($('carMode').style.display=='block')return closeOv('carMode');
  if(view){view=null;return render()}Capacitor.Plugins.App.exitApp()})}catch(e){}
 const ico=d=>`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 18V6L3 12zM21 18V6l-8.5 6z',NEXT='M12.5 6v12L21 12zM3 6v12l8.5-6z';
 document.querySelector('#fp .pv').innerHTML=ico(PREV);document.querySelector('#fp .nx').innerHTML=ico(NEXT);$('fpp').innerHTML=ico(PLAY);all('pp').forEach(b=>b.innerHTML=ico(PLAY));all('pv').forEach(b=>b.innerHTML=ico(PREV));all('nx').forEach(b=>b.innerHTML=ico(NEXT));
-$('fpp').onclick=()=>document.querySelector('#mini .pp').click();const oldOpenOv=openOv;
-
+$('fpp').onclick=()=>document.querySelector('#mini .pp').click();
 $('fh').onclick=()=>{if(!cur)return;favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);sv();render()};
-$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet(t(40)+' ('+queue.length+')',queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)]))};
+$('fq').onclick=()=>{if(!cur)return;const i=Math.max(queue.findIndex(x=>x.id==cur.id),0);sheet(t(40)+' ('+queue.length+')',[['Répétition : '+['désactivée','ce titre','aléatoire'][mode],()=>{mode=(mode+1)%3;syncRepeat()}]].concat(queue.slice(i,i+60).map(s=>[(s.id==cur.id?'▶ ':'')+s.title,()=>play(s)])))};
 let fy=0,fxx=0;$('fp').addEventListener('touchstart',e=>{fy=e.touches[0].clientY;fxx=e.touches[0].clientX},{passive:true});
 $('fp').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(t.clientY-fy>140&&Math.abs(t.clientX-fxx)<80&&!e.target.closest('input'))closeOv('fp')},{passive:true});
 function rgb2hs(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn,l=(mx+mn)/2;let h=0;if(d){h=mx==r?((g-b)/d)%6:mx==g?(b-r)/d+2:(r-g)/d+4;h=Math.round(h*60);if(h<0)h+=360}return{h,s:d?Math.round(d/(1-Math.abs(2*l-1))*100):0}}
@@ -371,14 +401,13 @@ function openFb(){kcat='';$('kt').value='';$('kn').textContent='0/500';$('kc').i
 $('kc').onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;kcat=KC()[k];[...$('kc').children].forEach((c,i)=>c.classList.toggle('on',i==k))};
 $('kt').oninput=()=>$('kn').textContent=$('kt').value.length+'/500';$('kx').onclick=()=>closeOv('fk');
 $('ke').onclick=()=>{if(!$('kt').value.trim())return alert(t(48));
- location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift v22 (Android)')};
+ location.href='mailto:'+MAIL+'?subject='+encodeURIComponent('Melodrift - '+(kcat||'Commentaire'))+'&body='+encodeURIComponent($('kt').value+'\n\n-- Melodrift 11.7 (Android)')};
 $('kf').onclick=()=>{location.href=FB_URL};
 let my=0,mx0=0;$('mini').addEventListener('touchstart',e=>{my=e.touches[0].clientY;mx0=e.touches[0].clientX},{passive:true});
 $('mini').addEventListener('touchend',e=>{const t=e.changedTouches[0];if(my-t.clientY>40&&Math.abs(t.clientX-mx0)<70&&!e.target.closest('input')&&cur)openOv('fp')},{passive:true});
 function lay(){$('top').style.setProperty('--hh',$('hd').offsetHeight+'px');$('main').style.paddingTop=$('top').offsetHeight+'px'}
 let ls=0;$('main').addEventListener('scroll',()=>{const st=$('main').scrollTop,dy=st-ls;if(st<20||dy<-6)$('top').classList.remove('h');else if(dy>8)$('top').classList.add('h');ls=st},{passive:true});
-function adaptPlayerOrientation(){const land=matchMedia('(orientation: landscape)').matches&&$('fp').style.display==='flex';$('fp').classList.toggle('vinyl-landscape',land);$('fc').classList.toggle('vinyl',land||!au.paused);}
-addEventListener('resize',()=>{lay();adaptPlayerOrientation()});addEventListener('orientationchange',()=>setTimeout(adaptPlayerOrientation,120));lay();setTimeout(lay,400);function applyLang(){document.documentElement.lang=cl();document.documentElement.dir=cl()=='ar'?'rtl':'ltr';
+addEventListener('resize',lay);lay();setTimeout(lay,400);function applyLang(){document.documentElement.lang=cl();document.documentElement.dir=cl()=='ar'?'rtl':'ltr';
  $('q').placeholder=t(6);$('stt').textContent=t(12);$('fkt').textContent=t(43);$('fko').textContent=t(44)+' *';$('kt').placeholder=t(45);$('ke').textContent=t(46);$('kf').textContent=t(47);
  $('nav').innerHTML='';render();renderSet()}
 function openLang(){$('lgt').textContent=t(23);$('ll').innerHTML=[['auto','Auto'],...Object.entries(LANGS).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<div class="sr" data-l="${k}"><span>${esc(n)}</span><span>${lang==k?'✓':''}</span></div>`).join('');openOv('lg')}
@@ -401,30 +430,38 @@ $('main').addEventListener('touchend',async()=>{if(!pgo)return;pgo=false;ptr.sty
 
 async function refresh(){if(MS)try{await MS.reindex({known:songs.map(s=>s.path).concat(vids.map(v=>v.path))})}catch(e){}await scan()}
 function restore(){const l=L('last',null);if(cur||!l||!byId[l.id])return;const s=byId[l.id];
- queue=(L('queue',[])||[]).map(i=>byId[i]).filter(Boolean);if(!queue.length)queue=[s];cur=s;
- au.src=src(s.path);au.addEventListener('loadedmetadata',()=>{au.currentTime=l.t||0},{once:true});
+ queue=(L('queue',[])||[]).map(i=>byId[i]).filter(Boolean);
+const currentIndex=queue.findIndex(x=>String(x.id)===String(s.id));
+if(currentIndex<0)queue.unshift(s);
+cur=s;
+au.src=src(s.path);au.addEventListener('loadedmetadata',()=>{au.currentTime=Math.max(0,Number(l.t)||0)},{once:true});
  $('mt').textContent=s.title;$('ma').textContent=s.artist;$('ft').textContent=s.title;$('fa').textContent=s.artist;$('fal').textContent=s.album;
  setCv($('mc'),s);setCv($('fc'),s);tintOf(s);updHeart()}
 async function delSong(s){if(!MS||!confirm(t(63)+'\n'+s.title))return;
  try{const r=await MS.deleteMedia({id:s.id,video:false});if(r.ok){if(cur&&cur.id==s.id)au.pause();favs.delete(s.id);sv();await scan()}}catch(e){}}
-async function nSync(){if(!MS||!cur||!L('notifOn',true))return;try{if(!notifAsked){notifAsked=true;await MS.notifPerm()}
- const k='a:'+cur.id+'160';const art=artCache.has(k)?await artCache.get(k):'';
- MS.showNotif({title:cur.title,artist:cur.artist,playing:!au.paused,art:art||''})}catch(e){}}
+async function nSync(){/* Media3 MediaSessionService owns the native media notification. */return;}
 try{MS&&MS.addListener('media',e=>{if(e.a=='PLAY')document.querySelector('#mini .pp').click();else if(e.a=='NEXT')step(1);else if(e.a=='PREV')step(-1)})}catch(e){}
 const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
 fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fbE.style.setProperty('--p',e.target.value+'%')}};
 
-// Melodrift v21 — advanced tools. All settings remain local on this device.
+// Melodrift 11.7 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
-function ensureAudioGraph(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;if(!eqContext){eqContext=new AC();eqSource=eqContext.createMediaElementSource(au);let prev=eqSource;eqFilters=EQ_BANDS.map((hz,i)=>{const f=eqContext.createBiquadFilter();f.type='peaking';f.frequency.value=hz;f.Q.value=1;f.gain.value=L('eqEnabled',false)?((L('eq11',Array(10).fill(0))||[])[i]||0):0;prev.connect(f);prev=f;return f});eqAnalyser=eqContext.createAnalyser();eqAnalyser.fftSize=128;prev.connect(eqAnalyser);eqAnalyser.connect(eqContext.destination)}if(eqContext.state==='suspended')eqContext.resume();return true}catch(e){return false}}
+function ensureAudioGraph(){if(window.__MELODRIFT_MEDIA3__)return false;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;if(!eqContext){eqContext=new AC();eqSource=eqContext.createMediaElementSource(au);let prev=eqSource;eqFilters=EQ_BANDS.map((hz,i)=>{const f=eqContext.createBiquadFilter();f.type='peaking';f.frequency.value=hz;f.Q.value=1;f.gain.value=(L('eq11',Array(10).fill(0))||[])[i]||0;prev.connect(f);prev=f;return f});eqAnalyser=eqContext.createAnalyser();eqAnalyser.fftSize=128;prev.connect(eqAnalyser);eqAnalyser.connect(eqContext.destination)}if(eqContext.state==='suspended')eqContext.resume();return true}catch(e){return false}}
 function applyEq(){if(!L('eqEnabled',false))return;if(!ensureAudioGraph()){const st=$('eqStatus');if(st)st.textContent='Le traitement audio n’est pas pris en charge par cette source sur cet appareil.';return}const vals=L('eq11',Array(10).fill(0))||[];eqFilters.forEach((f,i)=>f.gain.setTargetAtTime(vals[i]||0,eqContext.currentTime,.04));const st=$('eqStatus');if(st)st.textContent='Égaliseur actif.'}
 function toggleEq(){if(!ensureAudioGraph()){$('eqStatus').textContent='Impossible d’activer l’égaliseur avec cette source audio.';return}const on=!L('eqEnabled',false);S('eqEnabled',on);if(on){applyEq();$('eqToggle').querySelector('button').textContent='Désactiver'}else{eqFilters.forEach(f=>f.gain.setTargetAtTime(0,eqContext.currentTime,.04));$('eqToggle').querySelector('button').textContent='Activer';$('eqStatus').textContent='Égaliseur désactivé.'}}
-
+function parseLrc(txt){return txt.split(/\r?\n/).flatMap(line=>{const tags=[...line.matchAll(/\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g)];const text=line.replace(/\[[^\]]+\]/g,'').trim();return tags.map(m=>({time:+m[1]*60 + +m[2] + (m[3]?+(('0.'+m[3])):0),text}))}).sort((a,b)=>a.time-b.time)}
+function renderLyrics(){const now=$('lyricsNow');if(!now)return;now.textContent=lyrics.length?'Paroles chargées • '+lyrics.length+' lignes':'Aucune parole chargée';$('lyricsList').innerHTML=lyrics.slice(0,200).map(x=>`<div style="padding:7px 4px;color:var(--sub)">${fmt(x.time*1000)} — ${esc(x.text)}</div>`).join('')}
+function syncLyrics(){if(!lyrics.length)return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){if($('fal'))$('fal').textContent=lyrics[i].text;if($('lyricsNow')){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}}
+function drawVisual(){if(!visualOn)return;const c=$('playerVisual');if(!c||$('fp').style.display!=='flex'||au.paused){visualFrame=requestAnimationFrame(drawVisual);return}const x=c.getContext('2d'),w=c.width,h=c.height,mode=L('visualMode','bars');x.clearRect(0,0,w,h);const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const val=i=>eqAnalyser?(data[i%data.length]/255):(.15+.08*Math.sin(Date.now()/260+i));x.lineWidth=5;x.lineCap='round';if(mode==='waves'){x.beginPath();for(let i=0;i<180;i++){const xx=i/179*w,yy=h/2+Math.sin(i*.12+Date.now()/260)*(10+val(i)*55);i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.strokeStyle='#f08a43';x.stroke()}else if(mode==='circle'||mode==='radial'){const cx=w/2,cy=h/2,r=mode==='circle'?Math.min(w,h)*.22:Math.min(w,h)*.27;for(let i=0;i<64;i++){const a=i/64*Math.PI*2,amp=val(i)*(mode==='circle'?28:45),r1=r,r2=r+amp; x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.strokeStyle=`hsl(${24+i*1.1},85%,58%)`;x.stroke()}x.beginPath();x.arc(cx,cy,r-5,0,Math.PI*2);x.strokeStyle='rgba(240,138,67,.55)';x.lineWidth=3;x.stroke()}else{const n=48;for(let i=0;i<n;i++){const v=val(i*2),bh=8+v*h*.72;x.fillStyle=`hsl(${22+i*.55},85%,${48+v*18}%)`;x.fillRect(i*(w/n)+3,h-bh,w/n-6,bh)}}visualFrame=requestAnimationFrame(drawVisual)}
+function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);if(on){visualOn=true;ensureAudioGraph();cancelAnimationFrame(visualFrame);drawVisual()}else{visualOn=false;cancelAnimationFrame(visualFrame);c.getContext('2d').clearRect(0,0,c.width,c.height)}}
+$('carBack').onclick=()=>closeOv('carMode');$('carPrev').onclick=()=>step(-1);$('carNext').onclick=()=>step(1);$('carPlay').onclick=()=>{if(!cur){const l=srt(vis());if(l.length)play(l[0],l)}else au.paused?au.play():au.pause()};
+$('carMode').addEventListener('click',e=>{if(e.target.id==='carPlay')return});
+const oldOnPlay=au.onplay,oldOnPause=au.onpause;au.addEventListener('timeupdate',syncLyrics);au.addEventListener('play',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='Ⅱ'});au.addEventListener('pause',()=>{if($('carMode').style.display==='block')$('carPlay').textContent='▶'});
 // restore persisted queue after the library scan has populated byId
 const originalScan=scan;scan=async function(){await originalScan();const ids=L('queue',[]);if(ids.length)queue=ids.map(id=>byId[id]).filter(Boolean)};
-// ===== Melodrift v21 : égaliseur, visualiseur, thème, corbeille, notifications =====
+// ===== Melodrift 11.7 : égaliseur, visualiseur, thème, corbeille, notifications =====
 const X={
  trash:['Récemment supprimé','Recently deleted'],notif:['Paramètres de notifications','Notification settings'],
  share:['Partager','Share'],speed:['Vitesse','Speed'],ring:['Définir comme sonnerie','Set as ringtone'],del:['Supprimer','Delete'],
@@ -491,17 +528,17 @@ let fitN=0;
 function fitPlayer(){const f=$('fp'),c=$('fc');if(!f||f.style.display!=='flex')return;c.style.maxHeight='';const ov=f.scrollHeight-f.clientHeight;if(ov>0)c.style.maxHeight=Math.max(90,c.getBoundingClientRect().height-ov-6)+'px'}
 addEventListener('resize',fitPlayer);
 function drawVisual(){if(!visualOn)return;visualFrame=requestAnimationFrame(drawVisual);if(++fitN%20===0)fitPlayer();const c=$('playerVisual');if(!c||$('fp').style.display!=='flex')return;
- const size=L('visualSize',45),W=Math.round(c.clientWidth*2),H=Math.round(size*2);if(W&&(c.width!==W||c.height!==H)){c.width=W;c.height=H}c.style.height=size+'px';$('fp').style.setProperty('--vzx',Math.max(0,size-110)+'px');
+ const size=VSZ(),W=Math.round(c.clientWidth*2),H=Math.round(size*2);if(W&&(c.width!==W||c.height!==H)){c.width=W;c.height=H}c.style.height=size+'px';$('fp').style.setProperty('--vzx',Math.max(0,size-110)+'px');
  const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const t=Date.now();
  const val=eqAnalyser&&!au.paused?(i,n)=>data[Math.min(data.length-1,Math.floor(i/n*data.length*.8))]/255:(i,n)=>au.paused?.04:(.2+.1*Math.sin(t/260+i));
  paintVisual(c.getContext('2d'),c.width,c.height,L('visualMode','bars'),val,vzCol(),t)}
-function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);c.style.height=L('visualSize',45)+'px';$('fp').style.setProperty('--vzx',on?Math.max(0,L('visualSize',45)-110)+'px':'0px');cancelAnimationFrame(visualFrame);setTimeout(fitPlayer,50);
+function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);c.style.height=VSZ()+'px';$('fp').style.setProperty('--vzx',on?Math.max(0,VSZ()-110)+'px':'0px');cancelAnimationFrame(visualFrame);setTimeout(fitPlayer,50);
  if(on){visualOn=true;ensureAudioGraph();drawVisual()}else{visualOn=false;c.getContext('2d').clearRect(0,0,c.width,c.height)}}
 function vzPaintCards(){$('vzs').querySelectorAll('.vzc').forEach(el=>{const c=el.querySelector('canvas');paintVisual(c.getContext('2d'),c.width,c.height,el.dataset.m,(i,n)=>.18+.7*Math.abs(Math.sin(i*.6+.8))*Math.sin(Math.PI*(i+.5)/n),getComputedStyle(el).color,600)})}
-function openVizSheet(){const cur_=L('visualMode','bars'),on=cur_!=='off',key=on?cur_:L('visualLast','bars'),fr=cl()==='fr',sz=L('visualSize',45);
+function openVizSheet(){const cur_=L('visualMode','bars'),on=cur_!=='off',key=on?cur_:L('visualLast','bars'),fr=cl()==='fr',sz=VSZ();
  $('vzs').innerHTML=`<div class="shb big" id="vzb"><div class="grab" id="vzx"></div><div class="eqtitle"><h3>${tz('vizTitle')}</h3><div class="sw ${on?'on':''}" id="vzSw"><i></i></div></div>
  <div class="vzrow">${VZ.map(([k,n])=>`<div class="vzc ${on&&k===key?'sel':''}" data-m="${k}"><canvas width="260" height="110"></canvas><span>${n[fr?0:1]}</span></div>`).join('')}</div>
- <div class="sr"><span>${tz('size')}</span><small id="vzv">${sz} px</small></div><input id="vzSize" type="range" min="40" max="260" step="5" value="${sz}"></div>`;
+ <div class="sr"><span>${tz('size')}</span><small id="vzv">${sz} px</small></div><input id="vzSize" type="range" min="20" max="100" step="5" value="${sz}"></div>`;
  $('vzs').style.display='block';
  vzPaintCards();
  $('vzSize').oninput=e=>{S('visualSize',+e.target.value);$('vzv').textContent=e.target.value+' px';refreshPlayerVisual()}}
@@ -540,9 +577,9 @@ $('trx').onclick=()=>closeOv('tr');
 
 /* ---------- Paramètres de notifications ---------- */
 function openNotif(){$('ntt').textContent=tz('notif');const R=(k,a,b)=>`<div class="sr" data-n="${k}" style="align-items:center;gap:10px"><div style="flex:1"><div>${tz(a)}</div><small style="display:block;white-space:normal">${tz(b)}</small></div><div class="sw ${L(k,true)?'on':''}"><i></i></div></div>`;
- $('ntl').innerHTML=R('notifOn','nPlay','nPlayD')+R('vibOn','nVib','nVibD');openOv('nt')}
-$('ntl').onclick=e=>{const r=e.target.closest('[data-n]');if(!r)return;const k=r.dataset.n,v=!L(k,true);S(k,v);
- if(k==='notifOn'){if(!v&&MS&&MS.hideNotif)MS.hideNotif().catch(()=>0);if(v)nSync()}openNotif()};
+ $('ntl').innerHTML=R('vibOn','nVib','nVibD');openOv('nt')}
+$('ntl').onclick=e=>{const r=e.target.closest('[data-n]');if(!r)return;const k=r.dataset.n;S(k,!L(k,true));
+ openNotif()};
 $('ntx').onclick=()=>closeOv('nt');
 
 /* ---------- Page Thème : mode, couleur d'accent, taille de liste ---------- */
@@ -563,44 +600,59 @@ $('thx').onclick=()=>closeOv('th');
 
 /* ---------- Paramètres en cartes ---------- */
 function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`,C=x=>`<div class="set">${x}</div>`;
- $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('backup','Sauvegarder et restaurer',''))+C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))+C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('lang',t(23),LANGS[cl()][0])+R('perm','Autorisations',''))+C(R('scan',t(22))+R('fb',t(25))+R('about',t(26),'v22'));}
+ $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime)))
+  +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
+  +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('lang',t(23),LANGS[cl()][0]))
+  +C(R('fb',t(25))+R('about',t(26),'11.7'))}
 applyLook();
 setTimeout(()=>{const sp=$('splash');if(!sp)return;sp.style.opacity=0;setTimeout(()=>sp.remove(),600)},1500);
 
-/* ===== v21 : sélection multiple audio/vidéo, partage, masquage, suppression ===== */
-document.addEventListener('contextmenu',e=>{if(!e.target.closest('input,textarea'))e.preventDefault()});
-let selIds=null,lpT=0,lpHit=false;
-const selKey=(kind,id)=>kind+':'+id;
-function selPaint(){
- document.querySelectorAll('#list .it').forEach(r=>{const s=shown[+r.dataset.i],k=s&&selKey('a',s.id),on=!!(selIds&&selIds.has(k));r.classList.toggle('selected',on)});
- document.querySelectorAll('#list [data-v]').forEach(r=>r.classList.toggle('selected',!!(selIds&&selIds.has(selKey('v',r.dataset.v)))));
- const b=$('selb');if(!selIds||!selIds.size){b.style.display='none';return}b.style.display='flex';
- const audioCount=[...selIds].filter(k=>k.startsWith('a:')).length;
- b.innerHTML=`<button data-sa="x">✕</button><b>${selIds.size}</b><button data-sa="share">↗ Partager</button><button data-sa="hide">Masquer</button><button data-sa="delete">🗑 Supprimer</button>${audioCount?'<button data-sa="pl">＋ Playlist</button>':''}`;
-}
-function selEnd(){selIds=null;selPaint()}
-const _rn=render;render=function(){_rn();selPaint()};
-function beginSelect(el){const kind=el.matches('[data-v]')?'v':'a';const id=kind==='v'?el.dataset.v:shown[+el.dataset.i]?.id;if(id==null)return;selIds=selIds||new Set();selIds.add(selKey(kind,id));navigator.vibrate&&navigator.vibrate(25);selPaint()}
-$('list').addEventListener('touchstart',e=>{const r=e.target.closest('.it,[data-v]');if(!r)return;lpHit=false;clearTimeout(lpT);lpT=setTimeout(()=>{beginSelect(r);lpHit=true},450)},{passive:true});
-['touchmove','touchend','touchcancel'].forEach(n=>$('list').addEventListener(n,()=>clearTimeout(lpT),{passive:true}));
-$('list').addEventListener('click',e=>{const r=e.target.closest('.it,[data-v]');if(lpHit){lpHit=false;e.stopImmediatePropagation();e.preventDefault();return}if(!selIds||!r)return;e.stopImmediatePropagation();e.preventDefault();const kind=r.matches('[data-v]')?'v':'a',id=kind==='v'?r.dataset.v:shown[+r.dataset.i]?.id,k=selKey(kind,id);if(selIds.has(k))selIds.delete(k);else selIds.add(k);if(!selIds.size)selIds=null;selPaint()},true);
-$('selb').onclick=async e=>{const a=e.target.dataset.sa;if(!a||!selIds)return;const keys=[...selIds],audio=keys.filter(k=>k.startsWith('a:')).map(k=>byId[k.slice(2)]).filter(Boolean),videos=keys.filter(k=>k.startsWith('v:')).map(k=>vids.find(v=>String(v.id)===k.slice(2))).filter(Boolean);
- if(a==='x')return selEnd();
- if(a==='share'){const items=audio.map(x=>({id:x.id,video:false})).concat(videos.map(x=>({id:x.id,video:true})));if(MS&&MS.shareFiles){try{await MS.shareFiles({items})}catch(e){alert('Le partage a échoué.')}}else{const names=audio.concat(videos).map(x=>x.title||'Média');if(navigator.share){try{await navigator.share({title:'Melodrift',text:names.join('\n')})}catch(e){}}else alert(names.join('\n'))}return}
- if(a==='hide'){audio.forEach(x=>hid.add(x.id));const hv=new Set(L('hiddenVideos',[]));videos.forEach(x=>hv.add(x.id));S('hiddenVideos',[...hv]);sv();selEnd();render();return}
- if(a==='delete'){if(!MS||!confirm('Supprimer '+keys.length+' fichier(s) du téléphone ? Android demandera une confirmation.'))return;try{if(MS.deleteMediaBatch)await MS.deleteMediaBatch({items:audio.map(x=>({id:x.id,video:false})).concat(videos.map(x=>({id:x.id,video:true}))) });else{for(const x of audio)await MS.deleteMedia({id:x.id,video:false});for(const x of videos)await MS.deleteMedia({id:x.id,video:true})}}catch(e){alert('La suppression a été annulée ou refusée.')}selEnd();await scan();return}
- if(a==='pl'&&audio.length){sheet(t(31),[...pls.map(p=>[p.name,()=>{audio.forEach(x=>{if(!p.ids.includes(x.id))p.ids.push(x.id)});sv();selEnd();render()}]),['＋ '+t(27),()=>newPl(p=>{audio.forEach(x=>p.ids.push(x.id));sv();selEnd();render()})]])}
-};
-async function openPerm(){$('pm').style.display='block';let s={};try{s=await MS.permStatus()}catch(e){}
- const rows=[['media','Musiques et vidéos','Lire ta bibliothèque',s.media],['notif','Notifications','Contrôles dans la notification',s.notif],['overlay','Afficher sur d’autres applis','Autorisation du mini lecteur flottant',s.overlay],['battery','Batterie sans restriction','Lecture fiable en arrière-plan',s.battery],['write','Modifier les paramètres système','Définir une sonnerie',s.write],['ov','Mini lecteur flottant','S’affiche quand tu quittes l’app',L('ovOn',false)]];
- $('pml').innerHTML=rows.map(r=>`<div class="sr" data-pk="${r[0]}" style="align-items:center;gap:10px"><div style="flex:1"><div>${r[1]}</div><small style="display:block;white-space:normal">${r[2]}</small></div><span>${r[3]?'✓':'›'}</span></div>`).join('')}
-$('pml').onclick=async e=>{const k=e.target.closest('[data-pk]')?.dataset.pk;if(!k||!MS)return;
- if(k==='ov'){const on=!L('ovOn',false);S('ovOn',on);if(!on)MS.hideOverlay().catch(()=>0);return openPerm()}
- try{await MS.permOpen({k})}catch(x){}setTimeout(openPerm,700)};
-$('pmx').onclick=()=>closeOv('pm');
-document.addEventListener('visibilitychange',()=>{if(!MS||!L('ovOn',false))return;(document.hidden?MS.showOverlay():MS.hideOverlay()).catch(()=>0)});
-// La rotation est pilotée uniquement par la rotation système Android.
-$('fx').addEventListener('click',()=>closeOv('fp'));
+/* ---------- Paroles IA (serveur Render) ---------- */
+const tw=(a,b)=>cl()==='fr'?a:b;
+const WL=[['fr','Français'],['en','English'],['mg','Malagasy']];
+const WS=['Salegy','Hira gasy','Afrobeat','Pop','Rap','Ballade','Gospel','Reggae'];
+const WM=[['Joyeuse','Joyful'],['Nostalgique','Nostalgic'],['Romantique','Romantic'],['Énergique','Energetic'],['Triste','Sad'],['Inspirante','Inspiring']];
+const WLEN=[['short','Court','Short'],['normal','Normal','Normal'],['long','Long','Long']];
+let wf=L('wf',{theme:'',lang:'fr',style:'Pop',mood:0,len:'normal'}),wres=L('wres',''),wbusy=false,wsetup=false;
+const wSaved=()=>L('wsaved',[]);
+function openWrite(){$('wrt').textContent=tw('Écrire des paroles (IA)','Write lyrics (AI)');openOv('wr');wDraw()}
+const wChip=(g,v,l,on)=>`<span class="ch ${on?'on':''}" data-g="${g}" data-v="${v}">${esc(l)}</span>`;
+function wSetupHtml(){return `<div class="set" style="padding:16px"><b>${tw('Connexion au serveur de paroles','Lyrics server connection')}</b><small style="white-space:normal;margin:6px 0 10px">${tw('Colle l’adresse de ton serveur Render et ton code d’accès (voir le guide du serveur).','Paste your Render server address and your access code.')}</small>
+ <input id="wurl" class="ta" style="height:auto" placeholder="https://melodrift-lyrics.onrender.com" value="${esc(L('lyUrl',''))}">
+ <input id="wkey" class="ta" style="height:auto;margin-top:-4px" placeholder="${tw('Code d’accès','Access code')}" value="${esc(L('lyKey',''))}">
+ <button class="btn" id="wsv" style="width:100%;margin-top:0">${tw('Enregistrer','Save')}</button></div>`}
+function wOutHtml(){return `<div class="set" style="padding:16px"><pre class="wp">${esc(wres)}</pre><div class="wact"><button class="btn" data-w="copy">${tw('Copier','Copy')}</button><button class="btn" data-w="share">${tw('Partager','Share')}</button><button class="btn" data-w="save">${tw('Enregistrer','Save')}</button><button class="btn" data-w="again">${tw('Régénérer','Regenerate')}</button></div></div>`}
+function wSavedHtml(){const a=wSaved();if(!a.length)return '';return `<h3 style="margin:18px 4px 8px">${tw('Mes paroles','My lyrics')}</h3><div class="set">`+a.map((x,i)=>`<div class="sr" data-sv="${i}" style="align-items:center;gap:8px"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.title)}<small>${esc(x.meta)}</small></span><button class="ic" data-sd="${i}">🗑</button></div>`).join('')+'</div>'}
+function wDraw(){if(!L('lyUrl','')||wsetup){$('wrb').innerHTML=wSetupHtml();return}
+ $('wrb').innerHTML=`<div class="set" style="padding:16px"><small>${tw('Thème ou idée','Theme or idea')}</small>
+ <textarea id="wth" class="ta" maxlength="300" placeholder="${tw('Ex. : le retour au village après des années','E.g. coming back to the village after years')}">${esc(wf.theme)}</textarea>
+ <small>${tw('Langue','Language')}</small><div>${WL.map(l=>wChip('lang',l[0],l[1],wf.lang===l[0])).join('')}</div>
+ <small>Style</small><div>${WS.map(x=>wChip('style',x,x,wf.style===x)).join('')}</div>
+ <small>${tw('Ambiance','Mood')}</small><div>${WM.map((m,i)=>wChip('mood',i,m[cl()==='fr'?0:1],wf.mood===i)).join('')}</div>
+ <small>${tw('Longueur','Length')}</small><div>${WLEN.map(l=>wChip('len',l[0],cl()==='fr'?l[1]:l[2],wf.len===l[0])).join('')}</div>
+ <button class="btn" id="wgo" style="width:100%">${tw('Générer','Generate')}</button></div>
+ <div id="wout" style="margin-top:14px">${wres?wOutHtml():''}</div>${wSavedHtml()}`}
+async function wGenerate(){if(wbusy)return;const th=$('wth')?$('wth').value.trim():wf.theme;wf.theme=th;S('wf',wf);
+ if(th.length<3){alert(tw('Écris d’abord un thème.','Write a theme first.'));return}
+ wbusy=true;const go=$('wgo');if(go){go.disabled=true;go.textContent=tw('Écriture en cours… (jusqu’à 1 minute si le serveur dort)','Writing… (up to 1 min if the server is asleep)')}
+ try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),70000);
+  const r=await fetch(L('lyUrl','').replace(/\/+$/,'')+'/lyrics',{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json','X-App-Key':L('lyKey','')},body:JSON.stringify({theme:th,lang:wf.lang,style:wf.style,mood:WM[wf.mood][0],len:wf.len})});
+  clearTimeout(to);const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(r.status===401?tw('Code d’accès incorrect.','Wrong access code.'):r.status===429?tw('Trop de demandes, réessaie plus tard.','Too many requests, try later.'):(d.error||('Erreur '+r.status)));
+  wres=d.text||'';S('wres',wres)}
+ catch(e){alert(e.name==='AbortError'?tw('Le serveur met trop de temps à répondre.','The server took too long.'):(e.message==='Failed to fetch'?tw('Impossible de joindre le serveur (Internet ou adresse).','Cannot reach the server.'):e.message))}
+ wbusy=false;wDraw()}
+async function wCopy(){try{await navigator.clipboard.writeText(wres)}catch(e){const a=document.createElement('textarea');a.value=wres;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}alert(tw('Paroles copiées.','Lyrics copied.'))}
+function wShare(){if(navigator.share)navigator.share({text:wres}).catch(()=>0);else wCopy()}
+function wSave(){const a=wSaved(),m=wres.match(/^\s*(?:Titre|Title)\s*:\s*(.+)$/im);a.unshift({title:m?m[1].trim():(wf.theme.slice(0,40)||'Sans titre'),meta:WL.find(l=>l[0]===wf.lang)[1]+' · '+wf.style,text:wres,t:Date.now()});S('wsaved',a.slice(0,50));wDraw()}
+$('wr').onclick=e=>{const t=e.target,c=t.closest('.ch');
+ if(c&&c.dataset.g){const g=c.dataset.g,v=c.dataset.v;wf[g]=g==='mood'?+v:v;S('wf',wf);[...c.parentNode.children].forEach(x=>x.classList.toggle('on',x===c));return}
+ if(t.id==='wgo')return wGenerate();
+ if(t.id==='wsv'){S('lyUrl',$('wurl').value.trim());S('lyKey',$('wkey').value.trim());wsetup=false;return wDraw()}
+ const b=t.closest('[data-w]');if(b){const k=b.dataset.w;if(k==='copy')wCopy();else if(k==='share')wShare();else if(k==='save')wSave();else if(k==='again')wGenerate();return}
+ const sd=t.closest('[data-sd]');if(sd){const a=wSaved();a.splice(+sd.dataset.sd,1);S('wsaved',a);return wDraw()}
+ const sv=t.closest('[data-sv]');if(sv){wres=wSaved()[+sv.dataset.sv].text;S('wres',wres);wDraw();const o=$('wout');if(o)o.scrollIntoView({behavior:'smooth'})}};
+$('wrx').onclick=()=>closeOv('wr');$('wrs').onclick=()=>{wsetup=!wsetup;wDraw()};
 
 applyTint();
 applyLang();scan();

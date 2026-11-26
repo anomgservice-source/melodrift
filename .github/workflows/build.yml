@@ -17,6 +17,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - name: Interface de référence Melodrift
+        run: cp index.html www/index.html
       - run: npm install
       - run: npx cap add android
       - name: Version Android
@@ -41,6 +43,8 @@ jobs:
             cp icons/$d.png $R/mipmap-$d/ic_launcher_round.png
             cp icons/$d.png $R/mipmap-$d/ic_launcher_foreground.png
           done
+      - name: Configurer Android Media3
+        run: python3 scripts/configure_media3.py
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - run: cp android/app/build/outputs/apk/debug/app-debug.apk Melodrift.apk

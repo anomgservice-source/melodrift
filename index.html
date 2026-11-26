@@ -90,7 +90,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 @keyframes vinylTurn{to{transform:rotate(360deg)}}
 #playerVisual{display:none;width:100%;height:112px;margin:4px 0 8px;border-radius:18px;background:rgba(0,0,0,.10)}
 #playerVisual.active{display:block}
-#studio{z-index:12}
+
 #eqRows{display:flex;align-items:flex-end;justify-content:space-around;gap:4px;padding:18px 8px 12px;min-height:250px}
 #eqRows>div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;min-width:0;flex:1}
 #eqRows>div b{font-size:11px;white-space:nowrap}
@@ -131,7 +131,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 #wr .ch{background:rgba(128,128,128,.16)}#wr .ch.on{background:var(--ac)}
 .wact{display:flex;gap:8px;flex-wrap:wrap}.wact .btn{margin-top:0;padding:10px 16px;font-size:15px}
 
-#repeatBtn{display:none!important}#fal{cursor:pointer}#studio{z-index:35}
+#repeatBtn{display:none!important}#fal{cursor:pointer}
 body:has(#sr[style*="block"]) #mini{z-index:11}#sc{padding-bottom:110px}
 header h1{font-size:24px}nav button{padding:8px 16px;font-size:15px}.cv{width:54px;height:54px}.it{padding:6px 0;gap:12px}
 #mini .cv{width:46px;height:46px;font-size:20px}#mini .tt b{font-size:16px}
@@ -178,21 +178,49 @@ header h1{font-size:24px}nav button{padding:8px 16px;font-size:15px}.cv{width:54
 <div class="ov" id="nt"><div class="top"><button class="ic" id="ntx">←</button><span id="ntt"></span></div><div class="set" id="ntl"></div></div>
 <div class="ov" id="wr"><div class="top"><button class="ic" id="wrx">←</button><span id="wrt"></span><button class="ic" id="wrs" style="font-size:22px">⚙</button></div><div id="wrb"></div></div>
 <div id="sh"></div>
-<div class="ov" id="studio"><div class="top"><button class="ic" id="studioBack">←</button><span></span></div>
- <div class="set" id="studioHome">
-  <div class="sr" data-tool="write"><span>✍️ Écrire des paroles (IA)</span><small>Texte original ›</small></div>
-  <div class="sr" data-tool="lyrics"><span>🎤 Paroles synchronisées</span><small>Importer un fichier LRC ›</small></div>
-  <div class="sr" data-tool="queue"><span>☷ File d'attente intelligente</span><small>Réorganiser les titres ›</small></div>
-  <div class="sr" data-tool="car"><span>🚗 Mode voiture</span><small>Commandes simplifiées ›</small></div>
-  <div class="sr" data-tool="mix"><span>✨ Mix intelligent</span><small>Suggestions depuis ta bibliothèque ›</small></div><div class="sr" data-tool="export"><span>↗ Exporter une playlist</span><small>Créer un fichier M3U ›</small></div><div class="sr" data-tool="tags"><span>✎ Informations du morceau</span><small>Consulter les métadonnées ›</small></div>
- </div>
- <div id="studioPanel"></div>
-</div>
 <div id="carMode" class="ov"><div class="top"><button class="ic" id="carBack">✕</button><span>Mode voiture</span></div><div id="carTitle" style="text-align:center;font-size:25px;font-weight:800;margin:12vh 0 8px">Melodrift</div><div id="carArtist" style="text-align:center;color:var(--sub);font-size:18px">Mode conduite</div><div style="display:flex;justify-content:center;align-items:center;gap:22px;margin:10vh 0"><button class="btn" id="carPrev" style="font-size:30px;width:76px;height:76px">⏮</button><button class="btn" id="carPlay" style="font-size:38px;width:100px;height:100px;border-radius:50%">▶</button><button class="btn" id="carNext" style="font-size:30px;width:76px;height:76px">⏭</button></div><div style="text-align:center;color:var(--sub)">Commandes simplifiées • Garde les yeux sur la route</div></div>
 <div id="vw"><video id="vv" controls playsinline></video><button id="vx">✕</button></div>
 <audio id="au"></audio>
 <script>
-const $=id=>document.getElementById(id),au=$('au'),MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
+// Media3 adapter: keeps the existing UI contract while playback runs natively.
+const $=id=>document.getElementById(id),MP=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Media3Player,MS=window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.MediaScanner;
+const media3Wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function media3Call(method,args={}){
+ if(!MP||typeof MP[method]!=='function')throw new Error('Plugin Media3Player indisponible');
+ let last;
+ for(let i=0;i<18;i++){
+  try{return await MP[method](args)}catch(e){last=e;const m=String(e&&e.message||e);if(!/not connected|controller is not connected|retry shortly/i.test(m))throw e;await media3Wait(180)}
+ }
+ throw last||new Error('Connexion Media3 impossible');
+}
+const au=(()=>{
+ const listeners={};let source='',sourcePromise=Promise.resolve(),seekPromise=Promise.resolve(),position=0,duration=0,paused=true,volume=1,rate=1,defaultRate=1,pitch=true,metadataReady=false,lastVolume=-1;
+ const fire=(name,detail)=>{const ev={type:name,target:api,detail};try{if(typeof api['on'+name]==='function')api['on'+name].call(api,ev)}catch(e){};(listeners[name]||[]).slice().forEach(fn=>{try{fn.call(api,ev)}catch(e){}})};
+ const api={
+  addEventListener(name,fn){if(typeof fn==='function')(listeners[name]||(listeners[name]=[])).push(fn)},
+  removeEventListener(name,fn){if(listeners[name])listeners[name]=listeners[name].filter(x=>x!==fn)},
+  play(){return sourcePromise.then(()=>seekPromise).then(()=>media3Call('play'))},
+  pause(){media3Call('pause').catch(e=>fire('error',e))},
+  load(){},
+  get paused(){return paused},get ended(){return false},
+  get currentTime(){return position},set currentTime(v){position=Math.max(0,Number(v)||0);seekPromise=media3Call('seekTo',{position:Math.round(position*1000)}).catch(e=>{fire('error',e);throw e});seekPromise.catch(()=>{})},
+  get duration(){return duration},
+  get volume(){return volume},set volume(v){volume=Math.max(0,Math.min(1,Number(v)||0));if(Math.abs(volume-lastVolume)>.015){lastVolume=volume;media3Call('setVolume',{volume}).catch(e=>fire('error',e))}},
+  get playbackRate(){return rate},set playbackRate(v){rate=Math.max(.25,Math.min(3,Number(v)||1));media3Call('setSpeed',{speed:rate}).catch(e=>fire('error',e))},
+  get defaultPlaybackRate(){return defaultRate},set defaultPlaybackRate(v){defaultRate=Number(v)||1},
+  get preservesPitch(){return pitch},set preservesPitch(v){pitch=!!v},
+  _applyState(st){paused=!st.isPlaying;position=Math.max(0,(Number(st.position)||0)/1000);duration=Number(st.duration)>0?Number(st.duration)/1000:0;},_fire(name){fire(name)},_metadataReady(){return metadataReady},_setMetadataReady(){metadataReady=true},
+  get src(){return source},set src(v){
+   source=String(v||'');metadataReady=false;position=0;duration=0;
+   const tracks=(Array.isArray(queue)&&queue.length?queue:(cur?[cur]:[]));
+   const startIndex=Math.max(0,tracks.findIndex(x=>String(x.id)===String(cur&&cur.id)));
+   const items=tracks.map(x=>({id:x.id,title:x.title||'Sans titre',artist:x.artist||'Artiste inconnu',album:x.album||''}));
+   if(!items.length||items.some(x=>x.id==null)){sourcePromise=Promise.reject(new Error('Identifiant MediaStore manquant pour une piste'));sourcePromise.catch(e=>fire('error',e));return}
+   sourcePromise=media3Call('loadQueue',{items,startIndex,autoplay:false}).then(()=>{fire('loadstart')}).catch(e=>{fire('error',e);throw e});sourcePromise.catch(()=>{});
+  }
+ };
+ return api;
+})();
 const L=(k,d)=>{try{const v=JSON.parse(localStorage[k]);return v==null?d:v}catch(e){return d}},S=(k,v)=>{localStorage[k]=JSON.stringify(v)};
 let tint={h:205,s:45};const VSZ=()=>Math.min(100,L('visualSize',36)),hslInt=(h,sa,l)=>{sa/=100;l/=100;const k=n=>(n+h/30)%12,a=sa*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));return(255<<24|Math.round(f(0)*255)<<16|Math.round(f(8)*255)<<8|Math.round(f(4)*255))|0};const MAIL='anomgservice@gmail.com',FB_URL='https://www.facebook.com/profile.php?id=61596020765544';
 let fdrag=false,lsv=0,nT=0,notifAsked=false;
@@ -209,6 +237,12 @@ setTimeout(()=>{if(!L('ovAsk',0)){S('ovAsk',1);try{sheet('Afficher sur les autre
 let songs=[],vids=[],byId={},tab=1,view=null,sort='new',cur=null,queue=[],shown=[],sList=[],mode=0,denied=false,sleepT=null,sleepL=0,sq='';
 let favs=new Set(L('fav',[])),hid=new Set(L('hid',[])),plays=L('plays',{}),recent=L('rec',[]),pls=L('pls',[]),hist=L('hist',[]),theme=L('theme','auto'),ptime=L('ptime',0),vtime=L('vtime',0),fadeOn=L('fade',false),lang=L('lang','auto');
 const TABS=[0,1,2,3,4,5],KEYS={3:'folder',4:'artist',5:'album'};
+window.__MELODRIFT_MEDIA3__=!!MP;
+let media3LastIndex=-2,media3Ended=false,media3Poll=null;
+function reflectMedia3Track(track){if(!track||!cur||String(track.id)===String(cur.id))return;cur=track;$('mt').textContent=track.title;$('ma').textContent=track.artist;$('ft').textContent=track.title;$('fa').textContent=track.artist;$('fal').textContent=track.album||'';setCv($('mc'),track);setCv($('fc'),track);tintOf(track);updHeart();nSoon();}
+function onMedia3State(st){if(!st)return;const oldPaused=au.paused;au._applyState(st);if(Number.isInteger(st.currentIndex)&&st.currentIndex>=0&&st.currentIndex!==media3LastIndex){media3LastIndex=st.currentIndex;const track=queue[st.currentIndex];if(track)reflectMedia3Track(track);media3Ended=false;}if(oldPaused&&!au.paused)au._fire('play');else if(!oldPaused&&au.paused)au._fire('pause');if(au.duration>0&&!au._metadataReady()){au._setMetadataReady();au._fire('loadedmetadata');}au._fire('timeupdate');if(st.playbackState===4&&!media3Ended){media3Ended=true;au._fire('ended');}else if(st.playbackState!==4){media3Ended=false;}}
+function initMedia3Bridge(){if(!MP)return;try{MP.addListener('playerState',e=>onMedia3State(e));MP.addListener('playerError',e=>console.warn('Media3',e));}catch(e){}let tries=0;const connect=async()=>{try{const st=await MP.getState();onMedia3State(st);if(media3Poll)return;media3Poll=setInterval(async()=>{try{onMedia3State(await MP.getState())}catch(e){}},500);}catch(e){if(++tries<40)setTimeout(connect,250);else console.error('Media3 non connecté',e)}};connect();}
+initMedia3Bridge();
 const P=s=>s.split('|');
 const LANGS={fr:['Français',P(`Vidéos|Chansons|Playlists|Dossiers|Artistes|Albums|Rechercher ma musique|Tri|Le dernier|Le plus joué|De A à Z|La plupart comptent|Paramètres|Temps de lecture|Thème|Auto (téléphone)|Clair|Sombre|Minuterie de sommeil|Désactiver|Fichiers masqués|fichiers|Scanner à nouveau|Langue|Paramètres de lecture|Commentaires et problèmes|À propos|Nouvelle playlist|Nom de la playlist|Chansons aimées|Lue dernièrement|Ajouter à une playlist|Supprimer cette playlist ?|Ajouter aux favoris|Retirer des favoris|Masquer ce fichier|Aucune musique trouvée.|Autoriser|Melodrift a besoin d'accéder à tes musiques.|Rien ici pour le moment.|File d'attente|Historique|titres|Dites-nous le problème|Avis|Explique ce qui s'est passé ou donne ton avis.|Envoyer par e-mail|Écrire sur Facebook|Écris ton avis d'abord.|Fichier non trouvé|Le fichier ne peut pas être lu|La musique s'arrête|Application lente|Parole|Pubs|Autres|Durée totale de lecture|Temps de lecture de musique|Durée de lecture vidéo|Fondu enchaîné|Fondu à la fin et au début des pistes|Aucun favori.|Supprimer du téléphone|Supprimer ce fichier du téléphone ?`)],en:['English',P(`Videos|Songs|Playlists|Folders|Artists|Albums|Search my music|Sort|Latest|Most played|A to Z|Most tracks|Settings|Listening time|Theme|Auto (phone)|Light|Dark|Sleep timer|Off|Hidden files|files|Scan again|Language|Playback settings|Feedback and problems|About|New playlist|Playlist name|Liked songs|Recently played|Add to a playlist|Delete this playlist?|Add to favorites|Remove from favorites|Hide this file|No music found.|Allow|Melodrift needs access to your music.|Nothing here yet.|Queue|History|tracks|Tell us the problem|Feedback|Explain what happened or share your opinion.|Send by email|Write on Facebook|Write your feedback first.|File not found|The file cannot be played|The music stops|App is slow|Lyrics|Ads|Other|Total listening time|Music listening time|Video watching time|Crossfade|Fade out and in between tracks|No favorites.|Delete from phone|Delete this file from the phone?`)],mg:['Malagasy',P(`Horonan-tsary|Hira|Lisitra hira|Lahatahiry|Mpanakanto|Albom|Hikaroka ny mozikako|Alaharo|Vaovao indrindra|Re be indrindra|A hatramin'ny Z|Hira maro indrindra|Fanamboarana|Fotoana nihainoana|Lohahevitra|Ho azy (findainao)|Mazava|Maizina|Fandefasana tory|Atsaharo|Rakitra miafina|rakitra|Hikaroka indray|Fiteny|Fanamboarana ny fampiasana|Hevitra sy olana|Mombamomba|Lisitra vaovao|Anaran'ny lisitra|Hira tiana|Vao re|Ampio ao amin'ny lisitra|Fafana ity lisitra ity ve?|Ampio amin'ny tiana|Esory amin'ny tiana|Afeno ity rakitra ity|Tsy nahita hira.|Avela|Mila alalana hidirana amin'ny hirakao i Melodrift.|Tsy mbola misy eto.|Laharana fihainoana|Tantara|hira|Lazao anay ny olana|Hevitra|Lazao ny zava-nitranga na ny hevitrao.|Alefaso amin'ny mailaka|Soraty ao amin'ny Facebook|Soraty aloha ny hevitrao.|Tsy hita ny rakitra|Tsy azo henoina ny rakitra|Mijanona ny hira|Miadana ny application|Tonony|Doka|Hafa|Fotoana feno nihainoana|Fotoana nihainoana hira|Fotoana nijerena horonan-tsary|Fampifangaroana|Fampiakarana sy fampidinana feo eo anelanelan'ny hira|Tsy misy tiana.|Fafana amin'ny findainao|Fafana ve ity rakitra ity amin'ny findainao?`)],es:['Español',P(`Vídeos|Canciones|Listas|Carpetas|Artistas|Álbumes|Buscar en mi música|Ordenar|Más reciente|Más escuchado|De la A a la Z|Más canciones|Ajustes|Tiempo de reproducción|Tema|Auto (teléfono)|Claro|Oscuro|Temporizador de sueño|Desactivado|Archivos ocultos|archivos|Volver a escanear|Idioma|Ajustes de reproducción|Comentarios y problemas|Acerca de|Nueva lista|Nombre de la lista|Canciones favoritas|Reproducidas recientemente|Añadir a una lista|¿Eliminar esta lista?|Añadir a favoritos|Quitar de favoritos|Ocultar este archivo|No se encontró música.|Permitir|Melodrift necesita acceso a tu música.|Aún no hay nada aquí.|Cola|Historial|canciones|Cuéntanos el problema|Opinión|Explica qué pasó o danos tu opinión.|Enviar por correo|Escribir en Facebook|Escribe primero tu opinión.|Archivo no encontrado|No se puede reproducir el archivo|La música se detiene|La aplicación va lenta|Letra|Anuncios|Otros|Tiempo total de reproducción|Tiempo de reproducción de música|Tiempo de reproducción de vídeo|Fundido encadenado|Fundido al final y al inicio de las pistas|Sin favoritos.|Eliminar del teléfono|¿Eliminar este archivo del teléfono?`)],pt:['Português',P(`Vídeos|Músicas|Playlists|Pastas|Artistas|Álbuns|Pesquisar minha música|Ordenar|Mais recente|Mais tocadas|De A a Z|Mais faixas|Configurações|Tempo de reprodução|Tema|Auto (telefone)|Claro|Escuro|Temporizador de sono|Desativado|Arquivos ocultos|arquivos|Verificar novamente|Idioma|Configurações de reprodução|Comentários e problemas|Sobre|Nova playlist|Nome da playlist|Músicas curtidas|Tocadas recentemente|Adicionar a uma playlist|Excluir esta playlist?|Adicionar aos favoritos|Remover dos favoritos|Ocultar este arquivo|Nenhuma música encontrada.|Permitir|O Melodrift precisa de acesso às suas músicas.|Nada aqui ainda.|Fila|Histórico|faixas|Conte-nos o problema|Opinião|Explique o que aconteceu ou dê sua opinião.|Enviar por e-mail|Escrever no Facebook|Escreva sua opinião primeiro.|Arquivo não encontrado|O arquivo não pode ser reproduzido|A música para|Aplicativo lento|Letra|Anúncios|Outros|Tempo total de reprodução|Tempo de reprodução de música|Tempo de reprodução de vídeo|Fade cruzado|Esmaecer no fim e no início das faixas|Sem favoritos.|Excluir do telefone|Excluir este arquivo do telefone?`)],ar:['العربية',P(`فيديو|أغاني|قوائم التشغيل|مجلدات|فنانون|ألبومات|ابحث في موسيقاي|ترتيب|الأحدث|الأكثر تشغيلاً|من أ إلى ي|الأكثر أغاني|الإعدادات|وقت التشغيل|السمة|تلقائي (الهاتف)|فاتح|داكن|مؤقت النوم|إيقاف|ملفات مخفية|ملفات|فحص مرة أخرى|اللغة|إعدادات التشغيل|الملاحظات والمشاكل|حول|قائمة تشغيل جديدة|اسم القائمة|الأغاني المفضلة|شُغّلت مؤخراً|أضف إلى قائمة تشغيل|حذف هذه القائمة؟|أضف إلى المفضلة|أزل من المفضلة|إخفاء هذا الملف|لم يتم العثور على موسيقى.|السماح|يحتاج Melodrift إلى الوصول إلى موسيقاك.|لا شيء هنا بعد.|قائمة الانتظار|السجل|أغاني|أخبرنا بالمشكلة|ملاحظاتك|اشرح ما حدث أو شاركنا رأيك.|إرسال بالبريد الإلكتروني|اكتب على فيسبوك|اكتب ملاحظاتك أولاً.|الملف غير موجود|لا يمكن تشغيل الملف|الموسيقى تتوقف|التطبيق بطيء|الكلمات|إعلانات|أخرى|إجمالي وقت التشغيل|وقت تشغيل الموسيقى|وقت تشغيل الفيديو|مزج التلاشي|تلاشي في نهاية المقاطع وبدايتها|لا توجد مفضلة.|حذف من الهاتف|حذف هذا الملف من الهاتف؟`)],hi:['हिन्दी',P(`वीडियो|गाने|प्लेलिस्ट|फ़ोल्डर|कलाकार|एल्बम|मेरा संगीत खोजें|क्रमबद्ध करें|नवीनतम|सबसे ज़्यादा सुने|A से Z|सबसे ज़्यादा गाने|सेटिंग्स|सुनने का समय|थीम|ऑटो (फ़ोन)|हल्का|गहरा|स्लीप टाइमर|बंद|छिपी हुई फ़ाइलें|फ़ाइलें|दोबारा स्कैन करें|भाषा|प्लेबैक सेटिंग्स|प्रतिक्रिया और समस्याएँ|के बारे में|नई प्लेलिस्ट|प्लेलिस्ट का नाम|पसंदीदा गाने|हाल ही में चलाए गए|प्लेलिस्ट में जोड़ें|यह प्लेलिस्ट हटाएँ?|पसंदीदा में जोड़ें|पसंदीदा से हटाएँ|यह फ़ाइल छिपाएँ|कोई संगीत नहीं मिला।|अनुमति दें|Melodrift को आपके संगीत तक पहुँच चाहिए।|यहाँ अभी कुछ नहीं है।|कतार|इतिहास|गाने|हमें समस्या बताएँ|राय|बताएँ क्या हुआ या अपनी राय दें।|ईमेल से भेजें|Facebook पर लिखें|पहले अपनी राय लिखें।|फ़ाइल नहीं मिली|फ़ाइल चलाई नहीं जा सकती|संगीत रुक जाता है|ऐप धीमा है|बोल|विज्ञापन|अन्य|कुल सुनने का समय|संगीत सुनने का समय|वीडियो देखने का समय|क्रॉसफ़ेड|गानों के अंत और शुरुआत में फ़ेड|कोई पसंदीदा नहीं।|फ़ोन से हटाएँ|यह फ़ाइल फ़ोन से हटाएँ?`)],id:['Bahasa Indonesia',P(`Video|Lagu|Playlist|Folder|Artis|Album|Cari musik saya|Urutkan|Terbaru|Paling sering diputar|A sampai Z|Lagu terbanyak|Pengaturan|Waktu pemutaran|Tema|Otomatis (ponsel)|Terang|Gelap|Timer tidur|Nonaktif|File tersembunyi|file|Pindai ulang|Bahasa|Pengaturan pemutaran|Masukan dan masalah|Tentang|Playlist baru|Nama playlist|Lagu favorit|Baru diputar|Tambahkan ke playlist|Hapus playlist ini?|Tambahkan ke favorit|Hapus dari favorit|Sembunyikan file ini|Musik tidak ditemukan.|Izinkan|Melodrift memerlukan akses ke musik Anda.|Belum ada apa-apa di sini.|Antrean|Riwayat|lagu|Ceritakan masalahnya|Masukan|Jelaskan apa yang terjadi atau berikan pendapat Anda.|Kirim lewat email|Tulis di Facebook|Tulis masukan Anda dulu.|File tidak ditemukan|File tidak dapat diputar|Musik berhenti|Aplikasi lambat|Lirik|Iklan|Lainnya|Total waktu pemutaran|Waktu pemutaran musik|Waktu pemutaran video|Crossfade|Memudar di akhir dan awal lagu|Belum ada favorit.|Hapus dari ponsel|Hapus file ini dari ponsel?`)],ru:['Русский',P(`Видео|Песни|Плейлисты|Папки|Исполнители|Альбомы|Поиск в моей музыке|Сортировка|Последние|Самые популярные|От А до Я|Больше всего треков|Настройки|Время прослушивания|Тема|Авто (телефон)|Светлая|Тёмная|Таймер сна|Выкл.|Скрытые файлы|файлов|Сканировать заново|Язык|Настройки воспроизведения|Отзывы и проблемы|О приложении|Новый плейлист|Название плейлиста|Любимые песни|Недавно воспроизведённые|Добавить в плейлист|Удалить этот плейлист?|Добавить в избранное|Убрать из избранного|Скрыть этот файл|Музыка не найдена.|Разрешить|Melodrift нужен доступ к вашей музыке.|Здесь пока ничего нет.|Очередь|История|треков|Расскажите о проблеме|Отзыв|Опишите, что произошло, или поделитесь мнением.|Отправить по e-mail|Написать в Facebook|Сначала напишите отзыв.|Файл не найден|Файл не удаётся воспроизвести|Музыка останавливается|Приложение тормозит|Текст песни|Реклама|Другое|Общее время прослушивания|Время прослушивания музыки|Время просмотра видео|Плавный переход|Затухание в конце и начале треков|Нет избранного.|Удалить с телефона|Удалить этот файл с телефона?`)],zh:['中文',P(`视频|歌曲|播放列表|文件夹|艺术家|专辑|搜索我的音乐|排序|最新|播放最多|A 到 Z|歌曲最多|设置|播放时长|主题|自动（手机）|浅色|深色|睡眠定时|关闭|隐藏的文件|个文件|重新扫描|语言|播放设置|反馈与问题|关于|新建播放列表|播放列表名称|喜欢的歌曲|最近播放|添加到播放列表|删除此播放列表？|添加到收藏|从收藏中移除|隐藏此文件|未找到音乐。|允许|Melodrift 需要访问你的音乐。|这里还没有内容。|播放队列|历史记录|首|告诉我们问题|意见|请说明发生了什么，或分享你的意见。|通过邮件发送|在 Facebook 上留言|请先写下你的意见。|找不到文件|无法播放该文件|音乐停止|应用很慢|歌词|广告|其他|总播放时长|音乐播放时长|视频播放时长|淡入淡出|曲目结尾和开头淡入淡出|没有收藏。|从手机删除|从手机删除此文件？`)]};
 const cl=()=>{if(lang!='auto'&&LANGS[lang])return lang;const n=(navigator.language||'en').slice(0,2).toLowerCase();return LANGS[n]?n:'en'};
@@ -281,13 +315,13 @@ function chooseVisual(){const modes=[['Barres de fréquences','bars'],['Ondes au
 function songMenu(s){sheet(s.title,[[favs.has(s.id)?t(34):t(33),()=>{favs.has(s.id)?favs.delete(s.id):favs.add(s.id);sv();render()}],[t(31),()=>addTo(s)],['Visualisation musicale',chooseVisual],[t(35),()=>{hid.add(s.id);sv();render()}],[t(62),()=>delSong(s)]])}
 function setSleep(m){clearTimeout(sleepT);sleepL=m?m+' min':0;if(m)sleepT=setTimeout(()=>{au.pause();sleepL=0},m*60000);renderSet()}
 function renderSet(){const R=(a,l,v)=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`;
- $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('studio','Studio & outils avancés','Égaliseur • Paroles • Visualiseur')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'10.0')}
+ $('sl').innerHTML=R('time',t(13),fmtD(ptime+vtime))+R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19))+R('hid',t(20),hid.size+' '+t(21))+R('lang',t(23),LANGS[cl()][0])+R('play',t(24),'')+R('scan',t(22),'')+R('fb',t(25),'')+R('about',t(26),'10.0')}
 $('sl').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a=='theme')openTheme();if(a=='trash')openTrash();if(a=='notif')openNotif();
  if(a=='sleep')sheet(t(18),[[t(19),0],['15 min',15],['30 min',30],['45 min',45],['60 min',60]].map(x=>[x[0],()=>setSleep(x[1])]));
  if(a=='hid')sheet(t(20),songs.filter(s=>hid.has(s.id)).map(s=>[s.title,()=>{hid.delete(s.id);sv();renderSet();render()}]).concat([['✕',()=>0]]));
- 
- if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();if(a=='studio')openStudio();
+
+ if(a=='lang')openLang();if(a=='play')openPlay();if(a=='time')openTime();
  if(a=='fb')openFb();
  if(a=='about')sheet('Melodrift 11.7',[['© anomgservice',()=>0]])};
 const ovs=['fp','sr','st'];const openOv=id=>{const e=$(id);e.style.display=id=='fp'?'flex':'block';if(id=='fp')e.animate([{transform:'translateY(100%)'},{transform:'none'}],{duration:260,easing:'ease-out'})};
@@ -328,7 +362,7 @@ function step(d){if(!queue.length)return;let i=queue.findIndex(x=>x.id==cur.id);
 const all=c=>document.querySelectorAll('.'+c);
 all('nx').forEach(b=>b.onclick=()=>step(1));all('pv').forEach(b=>b.onclick=()=>step(-1));
 function syncRepeat(){const b=$('repeatBtn');if(b){b.textContent=mode===1?'🔂 1':mode===2?'🔀':'↻';b.title=mode===1?'Répéter ce titre':mode===2?'Lecture aléatoire':'Répétition désactivée'}}
-$('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};$('fal').onclick=()=>{try{openStudio();openStudioTool('lyrics')}catch(e){}};
+$('repeatBtn').onclick=()=>{mode=(mode+1)%3;syncRepeat()};
 
 syncRepeat();
 all('pp').forEach(b=>b.onclick=()=>{if(!cur){const l=srt(vis());return l.length&&play(l[0],l)}au.paused?au.play():au.pause()});
@@ -341,7 +375,7 @@ setInterval(()=>{if(!au.paused){ptime++;if(ptime%10==0)S('ptime',ptime)}if(!$('v
 try{Capacitor.Plugins.App.addListener('backButton',()=>{
  if($('vw').style.display=='block')return $('vx').click();
  if($('sh').style.display=='block')return $('sh').style.display='none';
- const o=['wr','eqs','vzs','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);if($('carMode').style.display=='block')return closeOv('carMode');if($('studio').style.display=='block')return closeOv('studio');
+ const o=['wr','eqs','vzs','th','tr','nt','fk','lg','ps','tp','sr','st','fp'].find(i=>$(i).style.display&&$(i).style.display!='none');if(o)return closeOv(o);if($('carMode').style.display=='block')return closeOv('carMode');
  if(view){view=null;return render()}Capacitor.Plugins.App.exitApp()})}catch(e){}
 const ico=d=>`<svg viewBox="0 0 24 24" width="100%" height="100%" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="${d}"/></svg>`;
 const PLAY='M7 4.5v15l12.5-7.5z',PAUSE='M6 5h4v14H6zM14 5h4v14h-4z',PREV='M11.5 18V6L3 12zM21 18V6l-8.5 6z',NEXT='M12.5 6v12L21 12zM3 6v12l8.5-6z';
@@ -396,15 +430,16 @@ $('main').addEventListener('touchend',async()=>{if(!pgo)return;pgo=false;ptr.sty
 
 async function refresh(){if(MS)try{await MS.reindex({known:songs.map(s=>s.path).concat(vids.map(v=>v.path))})}catch(e){}await scan()}
 function restore(){const l=L('last',null);if(cur||!l||!byId[l.id])return;const s=byId[l.id];
- queue=(L('queue',[])||[]).map(i=>byId[i]).filter(Boolean);if(!queue.length)queue=[s];cur=s;
- au.src=src(s.path);au.addEventListener('loadedmetadata',()=>{au.currentTime=l.t||0},{once:true});
+ queue=(L('queue',[])||[]).map(i=>byId[i]).filter(Boolean);
+const currentIndex=queue.findIndex(x=>String(x.id)===String(s.id));
+if(currentIndex<0)queue.unshift(s);
+cur=s;
+au.src=src(s.path);au.addEventListener('loadedmetadata',()=>{au.currentTime=Math.max(0,Number(l.t)||0)},{once:true});
  $('mt').textContent=s.title;$('ma').textContent=s.artist;$('ft').textContent=s.title;$('fa').textContent=s.artist;$('fal').textContent=s.album;
  setCv($('mc'),s);setCv($('fc'),s);tintOf(s);updHeart()}
 async function delSong(s){if(!MS||!confirm(t(63)+'\n'+s.title))return;
  try{const r=await MS.deleteMedia({id:s.id,video:false});if(r.ok){if(cur&&cur.id==s.id)au.pause();favs.delete(s.id);sv();await scan()}}catch(e){}}
-async function nSync(){if(!MS||!cur||!L('notifOn',true))return;try{if(!notifAsked){notifAsked=true;await MS.notifPerm()}
- const k='a:'+cur.id+'160';const art=artCache.has(k)?await artCache.get(k):'';
- MS.showNotif({title:cur.title,artist:cur.artist,playing:!au.paused,art:art||'',color:hslInt(tint.h,tint.s,28)})}catch(e){}}
+async function nSync(){/* Media3 MediaSessionService owns the native media notification. */return;}
 try{MS&&MS.addListener('media',e=>{if(e.a=='PLAY')document.querySelector('#mini .pp').click();else if(e.a=='NEXT')step(1);else if(e.a=='PREV')step(-1)})}catch(e){}
 const fbE=$('fb');fbE.min=0;fbE.max=100;fbE.step='any';fbE.value=0;
 fbE.addEventListener('touchstart',()=>{fdrag=true},{passive:true});fbE.addEventListener('touchend',()=>{fdrag=false},{passive:true});
@@ -413,52 +448,12 @@ fbE.oninput=e=>{if(au.duration){au.currentTime=e.target.value/100*au.duration;fb
 // Melodrift 11.7 — advanced tools. All settings remain local on this device.
 let eqContext=null,eqSource=null,eqFilters=[],eqAnalyser=null,visualFrame=0,visualOn=false,lyrics=[],lyricsTimer=null,lyricsText='';
 const EQ_BANDS=[60,120,250,500,1000,2000,4000,8000,12000,16000];
-function openStudio(){ $('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display='';openOv('studio'); }
-$('studioBack').onclick=()=>closeOv('studio');
-$('studioHome').onclick=e=>{const tool=e.target.closest('[data-tool]')?.dataset.tool;if(!tool)return;openStudioTool(tool)};
-function openStudioTool(tool){
- if(tool==='write'){closeOv('studio');openWrite();return}
- if(tool==='eq'){closeOv('studio');openEqSheet();return}
- $('studioHome').style.display='none';$('studio').firstElementChild.style.display='none';const p=$('studioPanel');
- const back='<div class="top"><button class="ic" id="toolBack">←</button><span></span></div>';
- if(tool==='eq'){
-  const presets=['Personnalisé','Flat','Bass Boost','Pop','Rock','Jazz','Classique'];
-  p.innerHTML=back+'<h2>Égaliseur 10 bandes</h2><p style="color:var(--sub)">Traitement audio expérimental Web Audio. Active-le pendant la lecture. Fréquences en Hz.</p><div class="set" id="eqRows">'+EQ_BANDS.map((hz,i)=>`<div style="padding:9px 4px"><div style="display:flex;justify-content:space-between"><b>${hz>=1000?(hz/1000)+'k':hz}</b><small id="eqv${i}">0 dB</small></div><input aria-label="${hz} Hz" type="range" min="-12" max="12" step="1" value="${(L('eq11',Array(10).fill(0))||[])[i]||0}" data-eq="${i}" style="width:100%;accent-color:var(--ac)"></div>`).join('')+'</div><div class="set"><div class="sr"><span>Préréglage</span><select id="eqPreset" style="background:var(--card);color:var(--tx);border:0;padding:8px;border-radius:12px">'+presets.map(x=>`<option>${x}</option>`).join('')+'</select></div><div class="sr" id="eqToggle"><span>Activer le traitement audio</span><button class="btn" style="margin:0">Activer</button></div></div><small id="eqStatus" style="color:var(--sub)">Égaliseur désactivé par défaut.</small>';
-  p.querySelectorAll('[data-eq]').forEach(el=>{const i=+el.dataset.eq;$('eqv'+i).textContent=el.value+' dB';el.oninput=()=>{ $('eqv'+i).textContent=el.value+' dB';saveEq();applyEq() }});
-  $('eqPreset').onchange=()=>{const key=$('eqPreset').value;const presets={Flat:[0,0,0,0,0,0,0,0,0,0],'Bass Boost':[7,6,4,1,0,0,0,1,2,2],Pop:[-1,2,4,5,3,0,-1,-1,0,1],Rock:[5,3,-1,-3,1,3,5,6,6,5],Jazz:[4,2,1,2,-2,-2,0,2,3,4],Classique:[4,3,2,1,-1,-1,0,2,3,4]};const vals=presets[key];if(vals){p.querySelectorAll('[data-eq]').forEach((el,i)=>{el.value=vals[i];$('eqv'+i).textContent=vals[i]+' dB'});saveEq();applyEq()}};
-  $('eqToggle').onclick=()=>toggleEq();if(L('eqEnabled',false))$('eqToggle').querySelector('button').textContent='Désactiver';
- } else if(tool==='lyrics'){
-  p.innerHTML=back+'<h2>Paroles synchronisées</h2><p style="color:var(--sub)">Importe un fichier .LRC depuis ton téléphone. Les paroles restent locales.</p><div class="set" style="padding:16px"><input id="lrcFile" type="file" accept=".lrc,.txt,text/plain" style="width:100%"><button class="btn" id="lrcClear">Effacer les paroles</button></div><div id="lyricsNow" style="font-size:23px;font-weight:700;text-align:center;min-height:120px;padding:28px 8px">Aucune parole chargée</div><div id="lyricsNext" style="text-align:center;color:var(--sub)"></div><div id="lyricsList" class="set" style="padding:12px;max-height:40vh;overflow:auto"></div>';
-  $('lrcFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;lyricsText=await f.text();lyrics=parseLrc(lyricsText);S('lyricsSong',cur?cur.id:null);S('lyricsText',lyricsText);renderLyrics();};$('lrcClear').onclick=()=>{lyrics=[];lyricsText='';S('lyricsText','');renderLyrics()};lyricsText=L('lyricsText','')||'';lyrics=parseLrc(lyricsText);renderLyrics();
- } else if(tool==='visual'){
-  p.innerHTML=back+'<h2>Visualiseur audio</h2><p style="color:var(--sub)">Animation du spectre lorsque l’analyse audio est disponible.</p><canvas id="visualCanvas" width="900" height="360" style="width:100%;height:220px;background:#160e09;border-radius:22px"></canvas><button class="btn" id="visualToggle">Démarrer le visualiseur</button><small id="visualStatus" style="display:block;color:var(--sub);margin-top:12px">Lance un morceau avant de démarrer.</small>';
-  $('visualToggle').onclick=()=>{visualOn=!visualOn;$('visualToggle').textContent=visualOn?'Arrêter':'Démarrer le visualiseur';if(visualOn){if(!ensureAudioGraph()){$('visualStatus').textContent='Analyse audio indisponible sur cette lecture. Le lecteur continue normalement.';visualOn=false;return}drawVisual()}else cancelAnimationFrame(visualFrame)};
- } else if(tool==='queue'){
-  const list=queue.length?queue:(cur?[cur]:srt(vis()));
-  p.innerHTML=back+'<h2>File d’attente</h2><p style="color:var(--sub)">Utilise les flèches pour réorganiser les titres.</p><div class="set" id="queueRows">'+list.map((s,i)=>`<div class="sr" style="gap:8px"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${i+1}. ${esc(s.title)}</span><button data-qup="${i}" aria-label="Monter">↑</button><button data-qdown="${i}" aria-label="Descendre">↓</button><button data-qplay="${i}" aria-label="Lire">▶</button></div>`).join('')+'</div><button class="btn" id="queueClear">Vider la file</button>';
-  p.querySelectorAll('[data-qup]').forEach(b=>b.onclick=()=>moveQueue(+b.dataset.qup,-1));p.querySelectorAll('[data-qdown]').forEach(b=>b.onclick=()=>moveQueue(+b.dataset.qdown,1));p.querySelectorAll('[data-qplay]').forEach(b=>b.onclick=()=>play(list[+b.dataset.qplay],list));$('queueClear').onclick=()=>{queue=cur?[cur]:[];S('queue',queue.map(x=>x.id));openStudioTool('queue')};
- } else if(tool==='car'){
-  $('carTitle').textContent=cur?.title||'Aucun morceau';$('carArtist').textContent=cur?.artist||'Lance une musique';closeOv('studio');openOv('carMode');return;
- } else if(tool==='mix'){
-  const base=recent.map(id=>byId[id]).filter(Boolean);const seed=cur||base[0]||srt(vis())[0];const rec=seed?vis().filter(x=>x.id!==seed.id&&(x.artist===seed.artist||x.album===seed.album)).slice(0,30):[];const picks=rec.length?rec:vis().filter(x=>!favs.has(x.id)).sort((a,b)=>(plays[b.id]||0)-(plays[a.id]||0)).slice(0,30);
-  p.innerHTML=back+'<h2>Mix intelligent</h2><p style="color:var(--sub)">Suggestions calculées localement à partir de tes écoutes, artistes et albums. Aucune donnée envoyée sur Internet.</p><div class="set" id="mixRows">'+picks.map((x,i)=>`<div class="sr"><span style="flex:1">${esc(x.title)}<small>${esc(x.artist)}</small></span><button data-mixplay="${i}">▶</button></div>`).join('')+'</div><button class="btn" id="mixPlay">Lire ce mix</button>';
-  p.querySelectorAll('[data-mixplay]').forEach(b=>b.onclick=()=>play(picks[+b.dataset.mixplay],picks));$('mixPlay').onclick=()=>picks.length&&play(picks[0],picks);
- } else if(tool==='export'){
-  const playlists=allPl();p.innerHTML=back+'<h2>Exporter une playlist</h2><p style="color:var(--sub)">Crée un fichier M3U contenant les chemins des fichiers audio présents sur cet appareil.</p><div class="set" id="exportRows">'+playlists.map((x,i)=>`<div class="sr"><span style="flex:1">${esc(x.name)} (${x.list.length})</span><button data-export="${i}">Exporter</button></div>`).join('')+'</div>';p.querySelectorAll('[data-export]').forEach(b=>b.onclick=()=>exportM3U(playlists[+b.dataset.export]));
- } else if(tool==='tags'){
-  p.innerHTML=back+'<h2>Informations du morceau</h2><p style="color:var(--sub)">L’édition directe des tags du fichier dépend des permissions Android. Pour l’instant, consulte les métadonnées détectées.</p><div class="set" style="padding:16px">'+(cur?`<b>${esc(cur.title)}</b><p>Artiste : ${esc(cur.artist)}</p><p>Album : ${esc(cur.album)}</p><p>Durée : ${fmt(cur.dur)}</p><p>Fichier : ${esc(cur.path)}</p>`:'Aucun morceau sélectionné.')+'</div>';
- }
- $('toolBack').onclick=()=>{$('studioPanel').innerHTML='';$('studioHome').style.display='block';$('studio').firstElementChild.style.display=''};
-}
-function saveEq(){S('eq11',[...$('studioPanel').querySelectorAll('[data-eq]')].map(x=>+x.value))}
-function ensureAudioGraph(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;if(!eqContext){eqContext=new AC();eqSource=eqContext.createMediaElementSource(au);let prev=eqSource;eqFilters=EQ_BANDS.map((hz,i)=>{const f=eqContext.createBiquadFilter();f.type='peaking';f.frequency.value=hz;f.Q.value=1;f.gain.value=(L('eq11',Array(10).fill(0))||[])[i]||0;prev.connect(f);prev=f;return f});eqAnalyser=eqContext.createAnalyser();eqAnalyser.fftSize=128;prev.connect(eqAnalyser);eqAnalyser.connect(eqContext.destination)}if(eqContext.state==='suspended')eqContext.resume();return true}catch(e){return false}}
+function ensureAudioGraph(){if(window.__MELODRIFT_MEDIA3__)return false;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;if(!eqContext){eqContext=new AC();eqSource=eqContext.createMediaElementSource(au);let prev=eqSource;eqFilters=EQ_BANDS.map((hz,i)=>{const f=eqContext.createBiquadFilter();f.type='peaking';f.frequency.value=hz;f.Q.value=1;f.gain.value=(L('eq11',Array(10).fill(0))||[])[i]||0;prev.connect(f);prev=f;return f});eqAnalyser=eqContext.createAnalyser();eqAnalyser.fftSize=128;prev.connect(eqAnalyser);eqAnalyser.connect(eqContext.destination)}if(eqContext.state==='suspended')eqContext.resume();return true}catch(e){return false}}
 function applyEq(){if(!L('eqEnabled',false))return;if(!ensureAudioGraph()){const st=$('eqStatus');if(st)st.textContent='Le traitement audio n’est pas pris en charge par cette source sur cet appareil.';return}const vals=L('eq11',Array(10).fill(0))||[];eqFilters.forEach((f,i)=>f.gain.setTargetAtTime(vals[i]||0,eqContext.currentTime,.04));const st=$('eqStatus');if(st)st.textContent='Égaliseur actif.'}
 function toggleEq(){if(!ensureAudioGraph()){$('eqStatus').textContent='Impossible d’activer l’égaliseur avec cette source audio.';return}const on=!L('eqEnabled',false);S('eqEnabled',on);if(on){applyEq();$('eqToggle').querySelector('button').textContent='Désactiver'}else{eqFilters.forEach(f=>f.gain.setTargetAtTime(0,eqContext.currentTime,.04));$('eqToggle').querySelector('button').textContent='Activer';$('eqStatus').textContent='Égaliseur désactivé.'}}
 function parseLrc(txt){return txt.split(/\r?\n/).flatMap(line=>{const tags=[...line.matchAll(/\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g)];const text=line.replace(/\[[^\]]+\]/g,'').trim();return tags.map(m=>({time:+m[1]*60 + +m[2] + (m[3]?+(('0.'+m[3])):0),text}))}).sort((a,b)=>a.time-b.time)}
 function renderLyrics(){const now=$('lyricsNow');if(!now)return;now.textContent=lyrics.length?'Paroles chargées • '+lyrics.length+' lignes':'Aucune parole chargée';$('lyricsList').innerHTML=lyrics.slice(0,200).map(x=>`<div style="padding:7px 4px;color:var(--sub)">${fmt(x.time*1000)} — ${esc(x.text)}</div>`).join('')}
 function syncLyrics(){if(!lyrics.length)return;let i=-1;for(let n=0;n<lyrics.length;n++){if(lyrics[n].time<=au.currentTime)i=n;else break}if(i>=0){if($('fal'))$('fal').textContent=lyrics[i].text;if($('lyricsNow')){$('lyricsNow').textContent=lyrics[i].text;$('lyricsNext').textContent=lyrics[i+1]?.text||''}}}
-function moveQueue(i,d){const q=queue.length?queue.slice():(cur?[cur]:srt(vis()));const j=i+d;if(j<0||j>=q.length)return;[q[i],q[j]]=[q[j],q[i]];queue=q;S('queue',q.map(x=>x.id));openStudioTool('queue')}
-function exportM3U(pl){if(!pl||!pl.list.length){alert('Cette playlist est vide.');return}const body='#EXTM3U\n'+pl.list.map(x=>`#EXTINF:${Math.round((x.dur||0)/1000)},${x.artist} - ${x.title}\n${x.path}`).join('\n');const blob=new Blob([body],{type:'audio/x-mpegurl'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=(pl.name||'Melodrift').replace(/[^a-z0-9-_ ]/gi,'_')+'.m3u';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 function drawVisual(){if(!visualOn)return;const c=$('playerVisual');if(!c||$('fp').style.display!=='flex'||au.paused){visualFrame=requestAnimationFrame(drawVisual);return}const x=c.getContext('2d'),w=c.width,h=c.height,mode=L('visualMode','bars');x.clearRect(0,0,w,h);const data=new Uint8Array(eqAnalyser?eqAnalyser.frequencyBinCount:64);if(eqAnalyser)eqAnalyser.getByteFrequencyData(data);const val=i=>eqAnalyser?(data[i%data.length]/255):(.15+.08*Math.sin(Date.now()/260+i));x.lineWidth=5;x.lineCap='round';if(mode==='waves'){x.beginPath();for(let i=0;i<180;i++){const xx=i/179*w,yy=h/2+Math.sin(i*.12+Date.now()/260)*(10+val(i)*55);i?x.lineTo(xx,yy):x.moveTo(xx,yy)}x.strokeStyle='#f08a43';x.stroke()}else if(mode==='circle'||mode==='radial'){const cx=w/2,cy=h/2,r=mode==='circle'?Math.min(w,h)*.22:Math.min(w,h)*.27;for(let i=0;i<64;i++){const a=i/64*Math.PI*2,amp=val(i)*(mode==='circle'?28:45),r1=r,r2=r+amp; x.beginPath();x.moveTo(cx+Math.cos(a)*r1,cy+Math.sin(a)*r1);x.lineTo(cx+Math.cos(a)*r2,cy+Math.sin(a)*r2);x.strokeStyle=`hsl(${24+i*1.1},85%,58%)`;x.stroke()}x.beginPath();x.arc(cx,cy,r-5,0,Math.PI*2);x.strokeStyle='rgba(240,138,67,.55)';x.lineWidth=3;x.stroke()}else{const n=48;for(let i=0;i<n;i++){const v=val(i*2),bh=8+v*h*.72;x.fillStyle=`hsl(${22+i*.55},85%,${48+v*18}%)`;x.fillRect(i*(w/n)+3,h-bh,w/n-6,bh)}}visualFrame=requestAnimationFrame(drawVisual)}
 function refreshPlayerVisual(){const c=$('playerVisual');if(!c)return;const on=L('visualMode','bars')!=='off';c.classList.toggle('active',on);if(on){visualOn=true;ensureAudioGraph();cancelAnimationFrame(visualFrame);drawVisual()}else{visualOn=false;cancelAnimationFrame(visualFrame);c.getContext('2d').clearRect(0,0,c.width,c.height)}}
 $('carBack').onclick=()=>closeOv('carMode');$('carPrev').onclick=()=>step(-1);$('carNext').onclick=()=>step(1);$('carPlay').onclick=()=>{if(!cur){const l=srt(vis());if(l.length)play(l[0],l)}else au.paused?au.play():au.pause()};
@@ -582,9 +577,9 @@ $('trx').onclick=()=>closeOv('tr');
 
 /* ---------- Paramètres de notifications ---------- */
 function openNotif(){$('ntt').textContent=tz('notif');const R=(k,a,b)=>`<div class="sr" data-n="${k}" style="align-items:center;gap:10px"><div style="flex:1"><div>${tz(a)}</div><small style="display:block;white-space:normal">${tz(b)}</small></div><div class="sw ${L(k,true)?'on':''}"><i></i></div></div>`;
- $('ntl').innerHTML=R('notifOn','nPlay','nPlayD')+R('vibOn','nVib','nVibD');openOv('nt')}
-$('ntl').onclick=e=>{const r=e.target.closest('[data-n]');if(!r)return;const k=r.dataset.n,v=!L(k,true);S(k,v);
- if(k==='notifOn'){if(!v&&MS&&MS.hideNotif)MS.hideNotif().catch(()=>0);if(v)nSync()}openNotif()};
+ $('ntl').innerHTML=R('vibOn','nVib','nVibD');openOv('nt')}
+$('ntl').onclick=e=>{const r=e.target.closest('[data-n]');if(!r)return;const k=r.dataset.n;S(k,!L(k,true));
+ openNotif()};
 $('ntx').onclick=()=>closeOv('nt');
 
 /* ---------- Page Thème : mode, couleur d'accent, taille de liste ---------- */
@@ -605,7 +600,7 @@ $('thx').onclick=()=>closeOv('th');
 
 /* ---------- Paramètres en cartes ---------- */
 function renderSet(){const R=(a,l,v='')=>`<div class="sr" data-a="${a}"><span>${l}</span><small>${v} ›</small></div>`,C=x=>`<div class="set">${x}</div>`;
- $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime))+R('studio','Studio','Paroles • Outils'))
+ $('sl').innerHTML=C(R('time',t(13),fmtD(ptime+vtime)))
   +C(R('theme',t(14),{auto:t(15),light:t(16),dark:t(17)}[theme])+R('sleep',t(18),sleepL||t(19)))
   +C(R('hid',t(20),hid.size+' '+t(21))+R('trash',tz('trash'))+R('play',t(24))+R('notif',tz('notif'))+R('lang',t(23),LANGS[cl()][0]))
   +C(R('fb',t(25))+R('about',t(26),'11.7'))}
