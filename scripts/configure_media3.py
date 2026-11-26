@@ -35,7 +35,7 @@ for dep in deps:
         marker = "dependencies {"
         if marker not in g:
             raise SystemExit("Could not find dependencies block in android/app/build.gradle")
-        g = g.replace(marker, marker + "\\n" + dep, 1)
+        g = g.replace(marker, marker + "\n" + dep, 1)
 
 gradle.write_text(g)
 
